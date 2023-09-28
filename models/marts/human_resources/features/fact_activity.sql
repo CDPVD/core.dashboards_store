@@ -15,5 +15,28 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select matr, date_eff, lieu_trav, corp_empl, etat, stat_eng, type, ref_empl, date_fin
-from {{ var("database_paie") }}.dbo.pai_hemp
+{# 
+    Compute the activity status over time of an employee
+#}
+-- Only keep the last 10 years of historical data
+with
+    source as (
+        select school_year, matr, etat_empl
+        from {{ ref("stg_employment_history") }} as hemp
+        where hemp.school_year >= {{ store.get_current_year() - 10 }}
+
+    ),
+    filtered as (
+        select src.*
+        from source as src
+        inner join
+            {{ ref("dim_etat_empl_yearly") }} as etat_empl
+            on src.etat_empl = etat_empl.etat_empl
+            and src.school_year = etat_empl.school_year
+            and etat_empl.etat_actif = 1
+
+    )
+
+select * matr, school_year
+from filtered
+group by matr
