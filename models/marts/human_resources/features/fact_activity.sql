@@ -21,22 +21,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- Only keep the last 10 years of historical data
 with
     source as (
-        select school_year, matr, etat_empl
+        select
+            school_year,
+            matr,
+            ref_empl,
+            corp_empl,
+            etat_empl,
+            lieu_trav,
+            date_eff,
+            date_fin
         from {{ ref("stg_employment_history") }} as hemp
         where hemp.school_year >= {{ store.get_current_year() - 10 }}
 
     ),
     filtered as (
-        select src.*
+        select
+            src.matr,
+            src.school_year,
+            src.ref_empl,
+            src.corp_empl,
+            src.etat_empl,
+            src.lieu_trav,
+            src.date_eff,
+            src.date_fin
         from source as src
         inner join
             {{ ref("dim_etat_empl_yearly") }} as etat_empl
             on src.etat_empl = etat_empl.etat_empl
             and src.school_year = etat_empl.school_year
             and etat_empl.etat_actif = 1
-
     )
 
-select * matr, school_year
+-- Reduce
+select
+    matr,
+    school_year,
+    ref_empl,
+    corp_empl,
+    etat_empl,
+    lieu_trav,
+    min(date_eff) as date_eff,
+    max(date_fin) as date_fin
 from filtered
-group by matr
+group by matr, school_year, ref_empl, corp_empl, etat_empl, lieu_trav

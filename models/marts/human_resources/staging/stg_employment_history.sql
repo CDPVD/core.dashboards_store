@@ -40,18 +40,7 @@ with
             -- Extract the start / end date within between, the attributes stays the
             -- same
             min(hmp.date_eff) as date_eff,
-            max(hmp.date_fin) as date_fin,
-            {{
-                dbt_utils.generate_surrogate_key(
-                    [
-                        "hmp.matr",
-                        "hmp.ref_empl",
-                        "hmp.corp_empl",
-                        "hmp.etat",
-                        "hmp.lieu_trav",
-                    ]
-                )
-            }} as partition_key  -- unique hash of the static properties
+            max(hmp.date_fin) as date_fin
         from {{ ref("i_paie_hemp") }} as hmp
         group by matr, ref_empl, corp_empl, etat, lieu_trav
 
@@ -69,8 +58,7 @@ with
                 case
                     when src.date_fin > now_.now_ then now_.now_ else src.date_fin
                 end as date
-            ) as date_fin,
-            src.partition_key
+            ) as date_fin
         from source as src
         cross join (select getdate() as now_) as now_
 
@@ -89,8 +77,7 @@ with
                 when month(date_eff) between 9 and 12
                 then year(date_eff)
                 else year(date_eff) - 1
-            end as school_year,
-            partition_key
+            end as school_year
         from dated as dt
 
     -- Yearly padd the data
@@ -104,8 +91,7 @@ with
             etat as etat_empl,
             lieu_trav,
             date_eff,
-            date_fin,
-            partition_key
+            date_fin
         from with_year as yr
         cross join
             (
@@ -113,8 +99,14 @@ with
                 from {{ ref("int_sequence_0_to_1000") }}
                 where seq_value <= 50
             ) as seq
-        where (school_year + seq.seq_value) <= {{ store.get_current_year() }}
+        where
+            case
+                when month(date_fin) between 9 and 12
+                then year(date_fin)
+                else year(date_fin) - 1
+            end
+            >= (school_year + seq.seq_value)
     )
 
-select *
+select matr, school_year, ref_empl, corp_empl, etat_empl, lieu_trav, date_eff, date_fin
 from padded
