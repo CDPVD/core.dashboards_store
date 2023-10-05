@@ -116,48 +116,108 @@ with
             and src.ref_empl = mn.main_job_ref
 
     -- Adding the main job log identifies the main job in about 85% of the cases.
-    -- The remaining 15% are identified by the following logic:
+    -- The remaining 15% are guess-identified by the following logic:
     -- 1. If the employee has only one job, then it is the main job -> account for
     -- about 3% of the cases
-    -- 2. If the employee has more than one job, then i'm fucked -_-
+    -- 2. If the employee has more than one job, then I used the current one from
+    -- i_dos_empl table -> account for about 10% of the cases
+    -- 3. If the employee has more than one job and no current one, then I use the
+    -- last added ref (lexicographic order) -> account for about 2% of the cases
     ),
-    patched as (
+    -- Apply the first patch
+    patch_1 as (
+
         select
-            matr,
-            school_year,
-            ref_empl,
-            corp_empl,
-            etat_empl,
-            lieu_trav,
-            date_eff,
-            date_fin,
-            is_main_job,
-            -- count distinct is not allowed in a windows function, so I first compute
-            -- a dense rank and then max it
-            dense_rank() over (
-                partition by matr, school_year order by ref_empl
-            ) as rank_
-        from main_job
+            ranked.matr,
+            ranked.school_year,
+            ranked.ref_empl,
+            ranked.corp_empl,
+            ranked.etat_empl,
+            ranked.lieu_trav,
+            ranked.date_eff,
+            ranked.date_fin,
+            case
+                when
+                    -- If the rank max is 1, then I have only one (distinct) ref
+                    -- emploi for the current year
+                    max(ranked.rank_) over (
+                        partition by ranked.matr, ranked.school_year
+                        order by ranked.date_eff
+                        rows between unbounded preceding and unbounded following
+                    )
+                    = 1
+                then 1
+                else ranked.is_main_job
+            end as is_main_job
+        from
+            (
+                select
+                    matr,
+                    school_year,
+                    ref_empl,
+                    corp_empl,
+                    etat_empl,
+                    lieu_trav,
+                    date_eff,
+                    date_fin,
+                    is_main_job,
+                    -- count distinct is not allowed in a windows function, so I
+                    -- first compute
+                    -- a dense rank and then max it
+                    dense_rank() over (
+                        partition by matr, school_year order by ref_empl
+                    ) as rank_
+                from main_job
+            ) as ranked
+
+    ),
+    -- Apply the second patch
+    patch_2 as (
+
+        select
+            base.matr,
+            base.school_year,
+            base.ref_empl,
+            base.corp_empl,
+            base.etat_empl,
+            base.lieu_trav,
+            base.date_eff,
+            base.date_fin,
+            patch.is_main_job as main_backup,
+            base.to_be_patched,
+            case
+                when base.to_be_patched = 0
+                then coalesce(patch.is_main_job, 0)
+                else base.is_main_job
+            end as is_main_job
+        from
+            (
+                select
+                    src.matr,
+                    src.school_year,
+                    src.ref_empl,
+                    src.corp_empl,
+                    src.etat_empl,
+                    src.lieu_trav,
+                    src.date_eff,
+                    src.date_fin,
+                    src.is_main_job,
+                    -- Flag 
+                    max(is_main_job) over (
+                        partition by src.matr, src.school_year
+                    ) as to_be_patched
+                from patch_1 as src
+            ) as base
+        left join
+            (
+                select matr, ref_empl, 1 as is_main_job
+                from {{ ref("i_pai_dos_empl") }}
+                where ind_empl_princ = 1
+            ) as patch
+            on base.matr = patch.matr
+            and base.ref_empl = patch.ref_empl
+
     )
 
-select
-    matr,
-    school_year,
-    ref_empl,
-    corp_empl,
-    etat_empl,
-    lieu_trav,
-    date_eff,
-    date_fin,
-    case
-        when
-            max(rank_) over (
-                partition by matr, school_year
-                order by date_eff
-                rows between unbounded preceding and unbounded following
-            )
-            = 1
-        then 1
-        else is_main_job
-    end as is_main_job
-from patched
+select *
+from patch_2
