@@ -36,8 +36,8 @@ with
             on hst.school_year = dm.school_year
             and hst.etat_empl = dm.etat_empl
             and dm.etat_actif = 1
-        where hst.school_year > {{ store.get_current_year() }} - 10  -- Inferring the main job before that is shady at best
-
+    -- where hst.school_year > {{ store.get_current_year() }} - 10  -- Inferring the
+    -- main job before that is shady at best
     -- Yearly padd the active history 
     ),
     padded as (

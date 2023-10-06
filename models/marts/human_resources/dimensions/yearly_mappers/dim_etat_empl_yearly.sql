@@ -30,7 +30,7 @@ with
             src.empl_cong,
             src.cong_lt,
             src.etat_actif,
-            coalesce(src.valid_from, 2000) as valid_from,
+            coalesce(src.valid_from, 1950) as valid_from,
             coalesce(src.valid_until, {{ store.get_current_year() }} + 1) as valid_until
         from {{ ref("etat_empl") }} as src
 
@@ -51,7 +51,7 @@ with
             (
                 select seq_value
                 from {{ ref("int_sequence_0_to_1000") }}
-                where seq_value between 0 and 25
+                where seq_value between 0 and 100
             ) as seq
         where
             src.valid_from + seq.seq_value >= src.valid_from
