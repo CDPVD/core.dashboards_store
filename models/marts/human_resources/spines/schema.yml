@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  
+  - name: spine_rh
+    config:
+      tags:
+        - hr_spine
+        - hr
+    description: >
+      La table de spine "spine_rh" contient l'ensemble des numéros de matricule par année scolaire.
+      Elle permet la construction des tables de faits via l'utilisation de left joins.

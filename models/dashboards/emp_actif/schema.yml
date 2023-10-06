@@ -1,40 +1,15 @@
-version: 2
+version: 2 
 
 models:
-  - name: ema_report_emp_actif
+  - name : report_emp_active 
     description: >
-        Table uniquement pour les employés actifs.
+        Table uniquement pour les employés actifs qui sont actifs actuellement
     tests: 
       - resolution: 
           combination_of_columns: 
-            - matr
-            - courriel_portail
-    columns:
-      - name: matr
-        description: le matricule de l'employé
-        tests:
-          - not_null
-          - unique  
-      - name: nom_empl
-        description: le nom complet de l'employé           
-      - name: courriel_portail
-        description: le courriel de l'employé
-        tests: 
-            - not_null
-            - unique
-      - name: lieu_trav
-        description: le lieu de travail de l'employé
-      - name: corps_empl
-        description: le corps de travail de l'employé                           
-      - name: etat_empl
-        description: l'état de l'employé  
-      - name: stat_eng
-        description: le statut d'engagement de l'employé
-      - name: isEmployePermanent
-        description: > 
-            Idicateur de permanence
-            Un employé est considéré comme permanent si l'indicateur de permanence indique 1, sinon il ne l'est pas. 
-            L'ensemble est pris en compte dans les "modèles" au niveau de "pbi_table". 
-            La condition est dans 'ema_report_empl_active.sql'.
-        tests: 
-            - not_null
+            - matricule
+            - annee                 
+            - today_is_active
+            - today_job_categories
+            - stat_eng
+            - corp_empl_descr
