@@ -95,25 +95,43 @@ with
             ) as base
         where base.seq_id = 1
 
-    -- add the main job ref
+    -- add the main job ref, and flag the rows that are going to be patched
     ),
     main_job as (
+
         select
-            src.matr,
-            src.school_year,
-            src.ref_empl,
-            src.corp_empl,
-            src.etat_empl,
-            src.lieu_trav,
-            src.date_eff,
-            src.date_fin,
-            case when mn.main_job_ref is null then 0 else 1 end as is_main_job
-        from up_to_date as src
-        left join
-            {{ ref("stg_main_job_transition") }} as mn
-            on src.matr = mn.matr
-            and src.school_year = mn.school_year
-            and src.ref_empl = mn.main_job_ref
+            base.matr,
+            base.school_year,
+            base.ref_empl,
+            base.corp_empl,
+            base.etat_empl,
+            base.lieu_trav,
+            base.date_eff,
+            base.date_fin,
+            base.is_main_job,
+            1 - max(is_main_job) over (
+                partition by base.matr, base.school_year
+            ) as is_main_job_patched
+        from
+            (
+
+                select
+                    src.matr,
+                    src.school_year,
+                    src.ref_empl,
+                    src.corp_empl,
+                    src.etat_empl,
+                    src.lieu_trav,
+                    src.date_eff,
+                    src.date_fin,
+                    case when mn.main_job_ref is null then 0 else 1 end as is_main_job
+                from up_to_date as src
+                left join
+                    {{ ref("stg_main_job_transition") }} as mn
+                    on src.matr = mn.matr
+                    and src.school_year = mn.school_year
+                    and src.ref_empl = mn.main_job_ref
+            ) as base
 
     -- Adding the main job log identifies the main job in about 85% of the cases.
     -- The remaining 15% are guess-identified by the following logic:
@@ -148,7 +166,8 @@ with
                     = 1
                 then 1
                 else ranked.is_main_job
-            end as is_main_job
+            end as is_main_job,
+            ranked.is_main_job_patched
         from
             (
                 select
@@ -166,7 +185,8 @@ with
                     -- a dense rank and then max it
                     dense_rank() over (
                         partition by matr, school_year order by ref_empl
-                    ) as rank_
+                    ) as rank_,
+                    is_main_job_patched
                 from main_job
             ) as ranked
 
@@ -183,13 +203,12 @@ with
             base.lieu_trav,
             base.date_eff,
             base.date_fin,
-            patch.is_main_job as main_backup,
-            base.to_be_patched,
             case
-                when base.to_be_patched = 0
+                when base.patch_flag = 0
                 then coalesce(patch.is_main_job, 0)
                 else base.is_main_job
-            end as is_main_job
+            end as is_main_job,
+            base.is_main_job_patched
         from
             (
                 select
@@ -205,7 +224,8 @@ with
                     -- Flag 
                     max(is_main_job) over (
                         partition by src.matr, src.school_year
-                    ) as to_be_patched
+                    ) as patch_flag,
+                    is_main_job_patched
                 from patch_1 as src
             ) as base
         left join
@@ -217,7 +237,60 @@ with
             on base.matr = patch.matr
             and base.ref_empl = patch.ref_empl
 
+    -- Apply the third patch
+    ),
+    patch_3 as (
+
+        select
+            base.matr,
+            base.school_year,
+            base.ref_empl,
+            base.corp_empl,
+            base.etat_empl,
+            base.lieu_trav,
+            base.date_eff,
+            base.date_fin,
+            case
+                when base.patch_flag = 0
+                then case when base.last_ref_empl = base.ref_empl then 1 else 0 end
+                else base.is_main_job
+            end as is_main_job,
+            base.is_main_job_patched
+        from
+            (
+                select
+                    src.matr,
+                    src.school_year,
+                    src.ref_empl,
+                    src.corp_empl,
+                    src.etat_empl,
+                    src.lieu_trav,
+                    src.date_eff,
+                    src.date_fin,
+                    src.is_main_job,
+                    -- Flag 
+                    max(is_main_job) over (
+                        partition by src.matr, src.school_year
+                    ) as patch_flag,
+                    max(src.ref_empl) over (
+                        partition by src.matr, src.school_year
+                        order by src.ref_empl desc
+                        rows between unbounded preceding and unbounded following
+                    ) as last_ref_empl,
+                    src.is_main_job_patched
+                from patch_2 as src
+            ) as base
+
     )
 
-select *
-from patch_2
+select
+    matr,
+    school_year,
+    ref_empl,
+    corp_empl,
+    etat_empl,
+    lieu_trav,
+    date_eff,
+    date_fin,
+    is_main_job
+from patch_3
