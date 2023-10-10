@@ -28,7 +28,8 @@ with
             nom_legal as legal_name,
             date_nais as birth_date,
             nom as last_name,
-            prnom as first_name
+            prnom as first_name,
+            date_dern_paie as last_pay_date
         from {{ ref("i_pai_dos") }}
 
     -- Select the email address
@@ -51,6 +52,7 @@ select
     dos.birth_date as birth_date,
     dos.last_name as last_name,
     dos.first_name as first_name,
-    dos2.email_address as email_address
+    dos2.email_address as email_address,
+    dos.last_pay_date
 from dos
 join dos2 on dos.matr = dos2.matr
