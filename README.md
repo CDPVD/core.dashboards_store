@@ -432,7 +432,7 @@ vars:
   
 | Interfaces  | Marts 	| Marts seeds | Dashboard seeds | Additional config |
 |-----------	|-------------	|-------	|-------	| -------	|
-| paie |  No | human_resources 	| No 	| Yes 	|
+| paie |  No | human_resources 	| Yes 	| No 	|
 
 > This dashboard requiers the specification of a seed.
 
@@ -460,23 +460,8 @@ models:
               +enabled: True
 ```
 
-#### Additional configuration
-> These steps are optional.
-##### Configuring the `nbrs_sem_dern_paie`
-> The `nbrs_sem_dern_paie` variable is used as a recency parameters. It's used to filter out employeed for which the last paye occuperd for too long time. It is set to 1 by default.
-
-The variable can be overriden by setting the `nbrs_sem_dern_paie` variable in the `dbt_project.yml` file, in the `vars` section and under the `emp_actif` key. Please consults  `core.data.store/dbt_project.yml` to find the default value and see an example of the specification of this variable. 
-
-```yaml
-# cssXX/dbt_project.yml
-vars:
-  emp_actif:
-    nbrs_sem_dern_paie: 1
-```
-
 ##### Using the Report builder: empl_actif.rdl
 > An SSRS report is available to export the list of active employees of the CSS. The `emp_actif.rdl` can be found in a `core.data.store/reporting/emp_actif/emp_actif.rdl`
-
 
 ### suivi_resultats
 > Monitor the grades of students (s1 to s3) in maths and french . The dashboard displays, for each students currently enrolled in s1 to s3, the history of it's grades for all courses belonging to the same group of courses (maths or french). The dashboard conditionally renders the student status. Only the last grade for a given course code is taken into considerations.
