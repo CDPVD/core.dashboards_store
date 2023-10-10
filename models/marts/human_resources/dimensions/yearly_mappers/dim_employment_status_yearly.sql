@@ -45,7 +45,10 @@ with
             src.cong_lt,
             src.etat_actif,
             src.valid_from + seq.seq_value as school_year,
-            src.valid_until
+            src.valid_until,
+            row_number() over (
+                partition by src.etat_empl order by src.valid_from + seq.seq_value desc
+            ) as seq_id
         from padded as src
         cross join
             (
@@ -58,5 +61,14 @@ with
             and src.valid_from + seq.seq_value < src.valid_until
     )
 
-select school_year, etat_empl, descr, empl_retr, empl_cong, cong_lt, etat_actif
+select
+    school_year,
+    etat_empl,
+    descr,
+    empl_retr,
+    empl_cong,
+    cong_lt,
+    etat_actif,
+    concat(descr, ' - (', etat_empl, ')') as employment_status_name,
+    case when seq_id = 1 then 1 else 0 end as is_current
 from crossed
