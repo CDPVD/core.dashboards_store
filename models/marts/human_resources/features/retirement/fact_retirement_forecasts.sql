@@ -36,7 +36,7 @@ with
         from
             (
                 select src.matr, job.job_group_category, dos.date_nais
-                from {{ ref("fact_active_employes") }} as src
+                from {{ ref("fact_activity_current") }} as src
                 left join {{ ref("i_pai_dos") }} as dos on src.matr = dos.matr
                 left join
                     {{ ref("dim_mapper_job_group") }} as job

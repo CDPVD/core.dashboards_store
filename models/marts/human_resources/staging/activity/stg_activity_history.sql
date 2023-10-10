@@ -34,19 +34,20 @@ with
             hmp.corp_empl,
             hmp.etat,
             hmp.lieu_trav,
+            hmp.stat_eng,
             hmp.date_eff,
             hmp.date_fin,
             -- Compute a partition id within attributes does not changes except for
             -- the date
             {{
                 dbt_utils.generate_surrogate_key(
-                    ["matr", "ref_empl", "corp_empl", "etat", "lieu_trav"]
+                    ["matr", "ref_empl", "corp_empl", "etat", "lieu_trav", "stat_eng"]
                 )
             }} as partition_id,
             -- Add the previeous date_eff, for a given property set to check for
             -- continuity
             lag(date_fin) over (
-                partition by matr, ref_empl, corp_empl, etat, lieu_trav
+                partition by matr, ref_empl, corp_empl, etat, lieu_trav, stat_eng
                 order by date_eff
             ) as previous_date_fin
         from {{ ref("i_paie_hemp") }} as hmp
@@ -60,6 +61,7 @@ with
             corp_empl,
             etat,
             lieu_trav,
+            stat_eng,
             date_eff,
             date_fin,
             partition_id,
@@ -79,6 +81,7 @@ with
             corp_empl,
             etat,
             lieu_trav,
+            stat_eng,
             date_eff,
             date_fin,
             partition_id,
@@ -99,6 +102,7 @@ with
             max(corp_empl) as corp_empl,  -- dummy aggregation
             max(etat) as etat,  -- dummy aggregation
             max(lieu_trav) as lieu_trav,  -- dummy aggregation
+            max(stat_eng) as stat_eng,  -- dummy aggregation
             min(date_eff) as date_eff,  -- The lower bound of the continuity group
             max(date_fin) as date_fin  -- the upper bound of the conitnuity group
         from sumed
@@ -116,6 +120,7 @@ select
     ref_empl,
     corp_empl,
     etat as etat_empl,
+    stat_eng,
     lieu_trav,
     date_eff,
     cast(

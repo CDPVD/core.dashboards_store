@@ -24,18 +24,21 @@ with
     retirements as (
         select
             matr,
-            etat,
+            empl.etat_empl as etat,
             corp_empl,
             lieu_trav,
             stat_eng,
             date_eff as retirement_date,
-            row_number() over (
-                partition by matr order by date_eff, ref_empl desc
-            ) as seqid
-        from {{ ref("i_pai_dos_empl") }} as empl
+            row_number() over (partition by matr order by date_eff desc) as seqid
+        from {{ ref("stg_activity_history") }} as empl
         inner join
-            (select etat_empl from {{ ref("etat_empl") }} where empl_retr = 1) as dim
-            on empl.etat = dim.etat_empl
+            (
+                select etat_empl, school_year
+                from {{ ref("dim_employment_status_yearly") }}
+                where empl_retr = 1
+            ) as dim
+            on empl.etat_empl = dim.etat_empl
+            and empl.school_year = dim.school_year
 
     -- Remove any duplicates
     ),
@@ -54,9 +57,9 @@ with
             frst.lieu_trav,
             frst.stat_eng,
             frst.retirement_date,
-            datediff(year, dos.date_nais, frst.retirement_date) as retirement_age
+            datediff(year, dos.birth_date, frst.retirement_date) as retirement_age
         from first_retirement as frst
-        left join {{ ref("i_pai_dos") }} as dos on frst.matr = dos.matr
+        left join {{ ref("dim_employees") }} as dos on frst.matr = dos.matr
     )
 
 select *

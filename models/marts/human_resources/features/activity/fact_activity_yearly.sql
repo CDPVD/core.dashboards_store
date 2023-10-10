@@ -27,12 +27,13 @@ with
             hst.ref_empl,
             hst.corp_empl,
             hst.etat_empl,
+            hst.stat_eng,
             hst.lieu_trav,
             hst.date_eff,
             hst.date_fin
-        from {{ ref("stg_employment_history") }} as hst
+        from {{ ref("stg_activity_history") }} as hst
         inner join
-            {{ ref("dim_etat_empl_yearly") }} as dm
+            {{ ref("dim_employment_status_yearly") }} as dm
             on hst.school_year = dm.school_year
             and hst.etat_empl = dm.etat_empl
             and dm.etat_actif = 1
@@ -47,6 +48,7 @@ with
             ref_empl,
             corp_empl,
             etat_empl,
+            stat_eng,
             lieu_trav,
             date_eff,
             date_fin
@@ -75,6 +77,7 @@ with
             base.corp_empl,
             base.etat_empl,
             base.lieu_trav,
+            base.stat_eng,
             base.date_eff,
             base.date_fin
         from
@@ -86,6 +89,7 @@ with
                     corp_empl,
                     etat_empl,
                     lieu_trav,
+                    stat_eng,
                     date_eff,
                     date_fin,
                     row_number() over (
@@ -106,6 +110,7 @@ with
             base.corp_empl,
             base.etat_empl,
             base.lieu_trav,
+            base.stat_eng,
             base.date_eff,
             base.date_fin,
             base.is_main_job,
@@ -122,6 +127,7 @@ with
                     src.corp_empl,
                     src.etat_empl,
                     src.lieu_trav,
+                    src.stat_eng,
                     src.date_eff,
                     src.date_fin,
                     case when mn.main_job_ref is null then 0 else 1 end as is_main_job
@@ -152,6 +158,7 @@ with
             ranked.corp_empl,
             ranked.etat_empl,
             ranked.lieu_trav,
+            ranked.stat_eng,
             ranked.date_eff,
             ranked.date_fin,
             case
@@ -177,6 +184,7 @@ with
                     corp_empl,
                     etat_empl,
                     lieu_trav,
+                    stat_eng,
                     date_eff,
                     date_fin,
                     is_main_job,
@@ -201,6 +209,7 @@ with
             base.corp_empl,
             base.etat_empl,
             base.lieu_trav,
+            base.stat_eng,
             base.date_eff,
             base.date_fin,
             case
@@ -218,6 +227,7 @@ with
                     src.corp_empl,
                     src.etat_empl,
                     src.lieu_trav,
+                    src.stat_eng,
                     src.date_eff,
                     src.date_fin,
                     src.is_main_job,
@@ -248,6 +258,7 @@ with
             base.corp_empl,
             base.etat_empl,
             base.lieu_trav,
+            base.stat_eng,
             base.date_eff,
             base.date_fin,
             case
@@ -265,6 +276,7 @@ with
                     src.corp_empl,
                     src.etat_empl,
                     src.lieu_trav,
+                    src.stat_eng,
                     src.date_eff,
                     src.date_fin,
                     src.is_main_job,
@@ -290,6 +302,7 @@ select
     corp_empl,
     etat_empl,
     lieu_trav,
+    stat_eng,
     date_eff,
     date_fin,
     is_main_job
