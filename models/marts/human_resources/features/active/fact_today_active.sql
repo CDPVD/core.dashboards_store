@@ -1,5 +1,5 @@
 with
-    current_employes as (
+    current_employes_one as (
         select distinct
             hchq.matr,
             emp.corp_empl,
@@ -35,7 +35,7 @@ with
         where emp.ind_empl_princ = 1 and etat.etat_actif = 1
     ),
 
-    final as (
+    current_employes_two as (
         select
             *,
             case
@@ -68,20 +68,25 @@ with
                 else 0
             end as is_today_actif,
             row_number() over (partition by matr order by matr asc) row_number
-        from current_employes
+        from current_employes_one
         where year_check = current_year
+    ),
+
+    current_employes_three as (
+        select
+            matr,
+            corp_empl_descr,
+            stat_eng,
+            lieu_trav,
+            year_check,
+            type,
+            is_today_actif,
+            date_cheq,
+            row_number,
+            datediff(day, getdate(), date_cheq) tests
+        from current_employes_two
+        where is_today_actif = 1 and row_number = 1
     )
 
-select
-    matr,
-    corp_empl_descr,
-    stat_eng,
-    lieu_trav,
-    year_check,
-    type,
-    is_today_actif,
-    date_cheq,
-    row_number,
-    datediff(day, getdate(), date_cheq) tests
-from final
-where is_today_actif = 1 and row_number = 1
+select *
+from current_employes_three
