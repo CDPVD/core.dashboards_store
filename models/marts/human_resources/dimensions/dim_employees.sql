@@ -24,11 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with
     dos as (
         select
+            -- Personal information
             matr as matr,
+            sexe,
             nom_legal as legal_name,
             date_nais as birth_date,
             nom as last_name,
             prnom as first_name,
+            -- Paie
             date_dern_paie as last_pay_date
         from {{ ref("i_pai_dos") }}
 
@@ -48,6 +51,7 @@ with
 -- Join the two tables
 select
     dos.matr as matr,
+    dos.sexe as sex,
     dos.legal_name as legal_name,
     dos.birth_date as birth_date,
     dos.last_name as last_name,
