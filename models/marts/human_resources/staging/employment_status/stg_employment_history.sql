@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     This table is a consolidated version of the paie_hempl with only the properties we are interested by,
     Properties are fetched from the paie_hempl table.
 
+    Rows with the same set of attributes are merged together
+
  #}
 {{ config(materialized="table") }}
 

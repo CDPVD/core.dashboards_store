@@ -18,8 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 {# 
     Compute an employee/yearly table with the main job.
 
-    The table try to resolve the main job from the transaction (XML) data first.
-    If the main job is not found, the main job will be guestimate using the time spend in each job during the year
+    The table parse the XML transaction data to get the main job transitions.
 #}
 -- First step : extract the main job from the transactions log
 with
