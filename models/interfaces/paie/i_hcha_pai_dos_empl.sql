@@ -59,16 +59,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             date_creat,
             matr,
             data_inserted.value(
-                ''(/ root / row / @date_eff)[1] '', '' datetime ''
+                '(/ root / row / @date_eff)[1]', 'datetime'
             ) as date_eff,
             data_inserted.value(
-                ''(/ root / row / @ref_empl)[1] '', '' nvarchar(1) ''
+                '(/ root / row / @ref_empl)[1]', 'nvarchar(1)'
             ) as ref_empl
         from {{ database_name }}.hcha.hcha_pai_dos_empl
         where
-            data_inserted.value(
-                ''(/ root / row / @ind_empl_princ)[1] '', '' nvarchar(1) ''
-            )
+            data_inserted.value('(/ root / row / @ind_empl_princ)[1]', 'nvarchar(1)')
             = 1
     {% endif %}
 
