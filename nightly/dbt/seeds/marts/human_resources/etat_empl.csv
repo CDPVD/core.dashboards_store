@@ -1,2 +1,2 @@
-﻿etat_empl,descr,empl_retr,empl_cong,cong_lt,etat_actif
+﻿etat_empl,descr,empl_retr,empl_cong,cong_lt,etat_actif,valid_from,valid_until
 A01, En service,false, false, false, false
