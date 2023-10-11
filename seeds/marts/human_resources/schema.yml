@@ -33,7 +33,7 @@ seeds:
       - name: valid_from
         description: >
           The YEAR (integer) from which the status starts to be valid. The lower bound is included
-          If not populated, the status is valid from the 2000 year.
+          If not populated, the status is valid from the 1950 year.
 
       - name: valid_until
         description: >
@@ -62,16 +62,25 @@ seeds:
       - name: stat_eng
         description: The codified representation of the etat_employe.
         tests:
-          - unique
           - not_null
       - name: descr
         description: The description of the etat_employe.
         tests:
           - not_null
       - name: is_reg
-        description: filterong for general status groups, where 1 - permanant position , 0 - temporary position,
+        description: Is the job belongs satisfies the `regular` definition of a job ?
         tests:
           - not_null
+      - name: valid_from
+        description: >
+          The YEAR (integer) from which the status starts to be valid. The lower bound is included
+          If not populated, the status is valid from the 1950 year.
+
+      - name: valid_until
+        description: >
+          The YEAR (integer) from which the status stops to be valid. The upper bound is excluded from the validity period.
+          If not populated, the status is valid until the current year + 1 .
+
     config:
       tags:
         - human_resources
@@ -81,3 +90,5 @@ seeds:
         stat_eng: nvarchar(3)
         descr: nvarchar(25)
         is_reg: bit
+        valid_from: int
+        valid_until: int
