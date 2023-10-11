@@ -56,6 +56,7 @@ with
     )
 
 select
+    school_year,
     stat_eng,
     is_reg,
     descr,
