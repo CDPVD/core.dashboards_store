@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 -- Fetch the ACTIVE employment history
 with
+    hst as (select * from {{ ref("stg_activity_history") }}),
     histo as (
         select
             hst.matr,
@@ -31,7 +32,7 @@ with
             hst.lieu_trav,
             hst.date_eff,
             hst.date_fin
-        from {{ ref("stg_activity_history") }} as hst
+        from hst
         inner join
             {{ ref("dim_employment_status_yearly") }} as dm
             on hst.school_year = dm.school_year
@@ -130,13 +131,13 @@ with
                     src.stat_eng,
                     src.date_eff,
                     src.date_fin,
-                    case when mn.main_job_ref is null then 0 else 1 end as is_main_job
+                    case when mn.main_job is null then 0 else 1 end as is_main_job
                 from up_to_date as src
                 left join
-                    {{ ref("stg_main_job_transition") }} as mn
+                    {{ ref("fact_main_job_yearly") }} as mn
                     on src.matr = mn.matr
                     and src.school_year = mn.school_year
-                    and src.ref_empl = mn.main_job_ref
+                    and src.ref_empl = mn.main_job
             ) as base
 
     -- Adding the main job log identifies the main job in about 85% of the cases.

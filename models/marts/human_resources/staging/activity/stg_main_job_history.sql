@@ -51,57 +51,29 @@ with
         from flagged
         where new_princ = 1
 
-    -- Yearly expand the table
-    ),
-    expanded as (
-        select
-            base.matr,
-            base.ref_empl,
-            base.school_year + seq.seq_value as school_year,
-            base.date_eff,
-            base.date_end,
-            row_number() over (
-                partition by base.matr, base.school_year + seq.seq_value
-                order by date_eff desc
-            ) as seq_id
-        from
-            (
-                select
-                    matr,
-                    case
-                        when month(date_eff) between 9 and 12
-                        then year(date_eff)
-                        else year(date_eff) - 1
-                    end as school_year,
-                    ref_empl,
-                    date_eff,
-                    lead(date_eff, 1, getdate()) over (
-                        partition by matr order by date_eff
-                    ) as date_end
-                from sequed
-                where seq_id = 1
-            ) as base
-        cross join
-            (
-                select seq_value
-                from {{ ref("int_sequence_0_to_1000") }}
-                where seq_value <= 50
-            ) as seq
-        where
-            case
-                when month(date_end) between 9 and 12
-                then year(date_end)
-                else year(date_end) - 1
-            end
-            >= (school_year + seq.seq_value)
-
-    -- Keep the last switch of the year
+    -- Compute the end date of the main job
     ),
     switches as (
-        select matr, school_year, ref_empl as main_job_ref
-        from expanded
+        select
+            matr,
+            case
+                when month(date_eff) between 9 and 12
+                then year(date_eff)
+                else year(date_eff) - 1
+            end as school_year,
+            ref_empl,
+            date_eff,
+            lead(date_eff, 1, getdate()) over (
+                partition by matr order by date_eff
+            ) as date_end
+        from sequed
         where seq_id = 1
     )
 
-select *
+select
+    school_year,
+    matr,
+    ref_empl as main_job,
+    date_eff as valid_from,
+    date_end as valid_until  -- Excluded
 from switches
