@@ -32,36 +32,4 @@ models:
           The worplace's friendly name.
         tests:
           - not_null
-
-  - name: dim_mapper_employment_status
-    description: >
-      This table maps and formats each employment status to it's friendly name.
-      This dimension is designed to be overriden by the client to add consistent employment status names' formatting.
-    columns:
-      - name: employment_status
-        description: The status id. Use-it to merge this dimension with a fact table.
-        tests:
-          - unique
-          - not_null
-      - name: employment_status_name
-        description: >
-          The status's friendly name.
-        tests:
-          - not_null
-
-  - name: dim_mapper_engagement_status
-    description: >
-      This table maps and formats each engagement status to it's friendly name.
-      This dimension is designed to be overriden by the client to add consistent engagement status names' formatting.
-    columns:
-      - name: engagement_status
-        description: The status id. Use-it to merge this dimension with a fact table.
-        tests:
-          - unique
-          - not_null
-      - name: engagement_status_name
-        description: >
-          The status's friendly name.
-        tests:
-          - not_null
       

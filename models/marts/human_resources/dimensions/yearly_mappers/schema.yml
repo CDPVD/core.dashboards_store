@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: dim_employment_status_yearly
+    description: >
+      This table maps and formats each employment status to it's friendly name.
+      The dimension is build up on the seed employment_status.
+      The dimension is yearly padded, meaning that an additional column named year is infered from the valid_from and valid_unitl seed columns and added to the dimension.
+      The dimension gives, for a given year, the valid employment status for this year.
+      Using this dimension hence requiers you to join on the school year as well as the etat_empl columns.
+      In case you only need the most up-to-date (ie, used during this school year) mapping, you can add the following join clause / filter to your query:
+      `is_current = 1`
+
+      This dimension can be overriden by the client to add consistent employment status names' formatting.
+    columns:
+      - name: etat_empl
+        description: The codified representation of the etat_employe.
+        tests:
+          - not_null
+      - name: descr
+        description: The description of the etat_employe.
+        tests:
+          - not_null
+      - name: etat_actif
+        description: Is the code identifying a currently active employee ?
+        tests:
+          - not_null
+      - name: empl_retr
+        description: Is the code identifying a currently retired employee ?
+        tests:
+          - not_null
+      - name: empl_cong
+        description: Is the code identifying a currently on leave employee ?
+        tests:
+          - not_null
+      - name: cong_lt
+        description: Is the code identifying a currently on long-terme leave employee ?
+        tests:
+          - not_null
+      - name: school_year
+        description: The school year (from september to august the 31 of the following year) for which the status mapping is valid.
+        tests:
+          - not_null
+    tests:
+      - resolution:
+          combination_of_columns:
+            - etat_empl
+            - school_year
+
+  - name: dim_engagement_status_yearly
+    description: >
+      This table maps and formats each engagement status to it's friendly name.
+      The dimension is build up on the seed engagement_status.
+      The dimension is yearly padded, meaning that an additional column named year is infered from the valid_from and valid_unitl seed columns and added to the dimension.
+      The dimension gives, for a given year, the valid engagement status for this year.
+      Using this dimension hence requiers you to join on the school year as well as the stat_eng columns.
+      In case you only need the most up-to-date (ie, used during this school year) mapping, you can add the following join clause / filter to your query:
+      `is_current = 1`
+
+      This dimension is designed to be overriden by the client to add consistent engagement status names' formatting.
+    columns:
+      - name: stat_eng
+        description: The codified representation of the etat_employe.
+        tests:
+          - not_null
+      - name: descr
+        description: The description of the etat_employe.
+        tests:
+          - not_null
+      - name: is_reg
+        description: Is the job satisfies the `regular` definition of a job ?
+        tests:
+          - not_null
+      - name: school_year
+        description: The school year (from september to august the 31 of the following year) for which the status mapping is valid.
+        tests:
+          - not_null
+    tests:
+      - resolution:
+          combination_of_columns:
+            - stat_eng
+            - school_year
