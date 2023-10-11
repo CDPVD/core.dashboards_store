@@ -20,7 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 -- Fetch the ACTIVE employment history
 with
-    hst as (select * from {{ ref("stg_activity_history") }}),
     histo as (
         select
             hst.matr,
@@ -32,14 +31,13 @@ with
             hst.lieu_trav,
             hst.date_eff,
             hst.date_fin
-        from hst
+        from {{ ref("stg_activity_history") }} as hst
         inner join
             {{ ref("dim_employment_status_yearly") }} as dm
             on hst.school_year = dm.school_year
             and hst.etat_empl = dm.etat_empl
             and dm.etat_actif = 1
-    -- where hst.school_year > {{ store.get_current_year() }} - 10  -- Inferring the
-    -- main job before that is shady at best
+
     -- Yearly padd the active history 
     ),
     padded as (
@@ -297,14 +295,5 @@ with
     )
 
 select
-    matr,
-    school_year,
-    ref_empl,
-    corp_empl,
-    etat_empl,
-    lieu_trav,
-    stat_eng,
-    date_eff,
-    date_fin,
-    is_main_job
+    matr, school_year, ref_empl, corp_empl, etat_empl, lieu_trav, stat_eng, is_main_job
 from patch_3
