@@ -43,7 +43,7 @@ with
                 dbt_utils.generate_surrogate_key(
                     ["matr", "ref_empl", "corp_empl", "etat", "lieu_trav", "stat_eng"]
                 )
-            }} as partition_id,
+            }} as sequence_id,
             -- Add the previeous date_eff, for a given property set to check for
             -- continuity
             lag(date_fin) over (
@@ -64,7 +64,7 @@ with
             stat_eng,
             date_eff,
             date_fin,
-            partition_id,
+            sequence_id,
             case
                 when {{ store.weekdays_between("previous_date_fin", "date_eff") }} <= 1
                 then 0
@@ -84,12 +84,12 @@ with
             stat_eng,
             date_eff,
             date_fin,
-            partition_id,
+            sequence_id,
             sum(is_rupture) over (
-                partition by partition_id
+                partition by sequence_id
                 order by date_eff
                 rows between unbounded preceding and current row
-            ) as continuity_group
+            ) as continuity_group_id
         from continuity
 
     -- consolidate the table by partition id and continuity group, so continuous
@@ -104,9 +104,11 @@ with
             max(lieu_trav) as lieu_trav,  -- dummy aggregation
             max(stat_eng) as stat_eng,  -- dummy aggregation
             min(date_eff) as date_eff,  -- The lower bound of the continuity group
-            max(date_fin) as date_fin  -- the upper bound of the conitnuity group
+            max(date_fin) as date_fin,  -- the upper bound of the conitnuity group
+            continuity_group_id,
+            sequence_id
         from sumed
-        group by continuity_group, partition_id
+        group by continuity_group_id, sequence_id
     )
 
 -- Add metadata
