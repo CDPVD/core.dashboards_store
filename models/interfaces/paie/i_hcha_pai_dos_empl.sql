@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {# Check if the {{ var("database_paie") }} rerfers to a linked server or to a co-located server #}
 {% if execute %}
-    {% set items = var("database_paie").split("].[") %}  {# A Linked server will have 2 items : [server].[database] #}
+    {% set items = var("database_paie").split(".") %}  {# A database living on a Linked server, either identified by it's full name or an IP adress will at least have one dot  #}
     {% set is_linked_server = items | length > 1 %}
     {{
         log(
