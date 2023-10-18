@@ -36,8 +36,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     {# Extract the server's name from  #}
     {% if is_linked_server %}
-        {% set server_name = var("database_paie").split("].[")[0] + "]" %}
-        {% set database_name = "[" + var("database_paie").split("].[")[1] %}
+        {% set server_name = var("database_paie").split(".")[0:-1] | join(".") %}
+        {% set database_name = var("database_paie").split(".")[-1] %}
 
         select payload.date_creat, payload.matr, payload.date_eff, payload.ref_empl
         from
