@@ -39,7 +39,6 @@ jobs:
         with:
           github_token: ${{ secrets.CICD_PAT_TOKEN }}
           build_metadata: ${{ steps.date.outputs.today_date }}
-          root_options: -vv
 
   sync-css:
     needs: release

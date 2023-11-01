@@ -21,14 +21,14 @@ jobs:
       - name: Install sqlfmt
         run: pip install shandy-sqlfmt[jinjafmt]
 
-      # # only get the changes files as the other files are not the responsibility of the PR author
-      # - name: Get Changed Files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v34
+      # only get the changes files as the other files are not the responsibility of the PR author
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v34
 
       # Run the formatter
       - name: Run sqlfmt
-        run: sqlfmt . --exclude ./tooling/**/* --exclude ./target/**/* --exclude ./dbt_packages/**/* --check
+        run: sqlfmt --diff ${{ steps.changed-files.outputs.all_changed_files }}
 
       # Disable, many things can goes wrong
       # Auto commit the changes (iiiiiiiiihhhhhh)
