@@ -1,5 +1,5 @@
-name: "store"
-version: "0.7.0"
+name: 'store'
+version: '0.5.3'
 config-version: 2
 
 profile: "replaceMeInLocals"
@@ -134,15 +134,6 @@ models:
                             "{{ store.stamp_model('dashboard_chronic_absenteeism') }}",
                         ]
 
-            predictive_view_aggregated:
-                +tags: ["predictive_view_aggregated"]
-                +schema: "dashboard_predictive_view_aggregated"
-                pbi_tables:
-                    +post-hook:
-                        [
-                            "{{ store.stamp_model('dashboard_predictive_view_aggregated') }}",
-                        ]
-
         interfaces:
             +tags: ["interfaces"]
             +materialized: ephemeral
@@ -157,7 +148,6 @@ vars:
     database_jade: "Replace me in the CSS repositery"
     database_geobus: "Replace me in the CSS repositery" # contains routes, buses, contractors, student files, and related to db GPL.
     database_piastre: "Replace me in the CSS repositery" # financial data on school transport. no connections to db Geobus.
-    database_prodrome: "Replace me in the CSS repositery" # Modelling output from the Sciance's models.
     # res_epreuves's dashboard variables:
     res_epreuves:
         threshold: 70

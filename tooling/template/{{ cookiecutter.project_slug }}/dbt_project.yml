@@ -52,12 +52,8 @@ models:
         +enabled: False
       chronic_absenteeism:
         +enabled: False
-      predictive_view_aggregated:
-        +enabled: False
   
     interfaces:
-      +tags: ["interfaces"]
-      +materialized: ephemeral
       bi_distribution:
         +enabled: False
       paie:
@@ -68,12 +64,13 @@ models:
         +enabled: False
       geobus:
         +enabled: False
-      prodrome:
-        +enabled: False
 
     rls:
       +enabled: false
     +materialized: table
+    interfaces:
+      +tags: ["interfaces"]
+      +materialized: ephemeral
 
 vars:
   # As the code is excuted from the inherited repo, sources schould behave as if there were refs.
@@ -87,7 +84,6 @@ vars:
   database_crif: "[{{ cookiecutter.server_ip }}].[JADECRIF]"
   database_jade: "[{{ cookiecutter.server_ip }}].[JADE]"
   database_geobus: "[{{ cookiecutter.server_ip }}].[GEOBUS]"
-  database_prodrome: "[{{ cookiecutter.server_ip }}].[PRODROME]"
 
   res_epreuves:
     cod_css: <cssRegex>

@@ -48,5 +48,5 @@ reset_cache=true
 exclude=[
     "target/**/*",
     "dbt_packages/**/*",
-    "tooling/templates/**/*"
+    "tolling/templates/**/*"
 ]

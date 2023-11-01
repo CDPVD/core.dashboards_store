@@ -24,6 +24,12 @@ on-run-end:
 models:
   store:
     +enabled: True
+    dashboards:
+      transport:
+        +enabled: False
+    interfaces:
+      geobus:
+        +enabled: False
 
 vars:
   # The source database to pull the data for a css.
@@ -31,8 +37,6 @@ vars:
   database_paie: "[192.168.207.153].[PAIE]"
   database_gpi: "[192.168.207.153].[GPIPRIM]"
   database_jade: "[192.168.207.153].[JADE]"
-  database_geobus: "[192.168.207.153].[GEOBUS_ADRQC]"
-  database_prodrome: PBIRS
 
   is_context_core: false
 

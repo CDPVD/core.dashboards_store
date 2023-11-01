@@ -34,7 +34,7 @@ To update the `nightly` project :
 cd core.data.store
 eval $(ssh-agent)  # So the SSH key can be used by buildx
 ssh-add ~/.ssh/id_rsa # Add your ssh key to the ssh-agent, you might choose another key than id_rsa
-docker buildx build --ssh default -f tooling/nightly/docker/Dockerfile . -t nightly --build-arg CORE_VERSION=<core_version> --build-arg TARGET=<rc|dev>
+docker buildx build --ssh default -f nightly/docker/Dockerfile . -t nightly --build-arg CORE_VERSION=<core_version> --build-arg TARGET=<rc|dev>
 ```
 Where `<core_version>` schould be set to the tag you want the integration to be tested for.
 
