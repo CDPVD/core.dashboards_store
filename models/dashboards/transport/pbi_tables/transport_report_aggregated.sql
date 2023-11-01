@@ -49,7 +49,7 @@ with
         {# Added the sectours abbriviation depends of parcours numbers  #}
         select e.annee, e.fiche, e.bloc_1, e.bloc_2, e.ele_am, e.ele_pm, d.abbr_sector
         from ele as e
-        inner join
+        left join
             {{ ref("transport_report_details") }} as d on e.id_parc = d.id_parc_inter
         group by e.annee, e.fiche, e.bloc_1, e.bloc_2, e.ele_am, e.ele_pm, d.abbr_sector
     ),

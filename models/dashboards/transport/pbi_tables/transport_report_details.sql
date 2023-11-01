@@ -85,68 +85,21 @@ with
         from circ_parc
         where parcours_id is not null
         group by annee, circuit_id, parcours_id, parcours_periode, id_parc_inter
-
-    -- Add metada about the period
-    ),
-    with_meta as (
-        select
-            annee,
-            src.circuit_id,
-            circuit_name,
-            name_sector,
-            abbr_sector,
-            parcours_id,
-            parcours_name,
-            case
-                when parcours_periode = 1 then 'AM' when parcours_periode = 8 then 'PM'
-            end as parcours_periode,
-            'Oui' as actif,
-            id_parc_inter
-        from agg as src
-        left join
-            {{ store.source_or_ref("transport", "stg_sectors") }} as sec
-            on src.circuit_id = sec.circuit_id
-
-    ),
-    flagged as (
-        -- flag the circuit spanning for more 1 period
-        select
-            src.annee,
-            src.circuit_id,
-            src.circuit_name,
-            src.name_sector,
-            src.abbr_sector,
-            src.parcours_id,
-            src.parcours_name,
-            src.parcours_periode,
-            src.actif,
-            src.id_parc_inter,
-            coalesce(blcklst.flag, 0) as is_duplicate
-        from with_meta as src
-        left join
-            (
-                select annee, circuit_id, parcours_id, parcours_periode, 1 as flag
-                from with_meta
-                group by annee, circuit_id, parcours_id, parcours_periode
-                having count(*) > 1
-            ) as blcklst
-            on src.annee = blcklst.annee
-            and src.circuit_id = blcklst.circuit_id
-            and src.parcours_id = blcklst.parcours_id
-            and coalesce(src.parcours_periode, 'unknown')
-            = coalesce(blcklst.parcours_periode, 'unknown')
     )
-
 select
     annee,
-    circuit_id,
+    sec.circuit_id,
     circuit_name,
     name_sector,
     abbr_sector,
     parcours_id,
     parcours_name,
-    parcours_periode,
-    actif,
+    case
+        when parcours_periode = 1 then 'AM' when parcours_periode = 8 then 'PM'
+    end as parcours_periode,
+    'Oui' as actif,
     id_parc_inter
-from flagged
-where is_duplicate = 0
+from agg as src
+left join
+    {{ store.source_or_ref("transport", "stg_sectors") }} as sec
+    on src.circuit_id = sec.circuit_id

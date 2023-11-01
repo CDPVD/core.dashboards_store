@@ -37,7 +37,7 @@ sources:
 
 # Specifies tags and schema for the later-to-be-defined concrete implementation of the adapters.
 models:
-  - name: stg_sectors # Use the file name herem are models' lookup are done one file names. The concrete implementation of this model schould be aliased to stg_sectors.
+  - name: trnsprt_stg_sectors # Use the file name herem are models' lookup are done one file names. The concrete implementation of this model schould be aliased to stg_sectors.
     description: >
       The concrete implementation of the `stg_sectors` source (being aliased to stg_sectors).
       Please refer to the source definition for more information about the concrete implementation to be provided for this file.
