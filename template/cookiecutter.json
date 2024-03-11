@@ -1,8 +1,0 @@
-{
-    "project_slug": "Acme Inc.",
-    "author": "TheCookieMonster",
-    "css_short_name": "cssXX",
-    "server_ip": "192.168.0.0",
-    "server_port": "1433",
-    "db_password": "Don'tLookAtMeI'aSecret"
-}

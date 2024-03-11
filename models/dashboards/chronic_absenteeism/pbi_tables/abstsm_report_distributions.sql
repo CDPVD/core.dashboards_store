@@ -20,7 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {{ config(alias="report_absences_distributions") }}
 
--- Agregated absences at a student X school X year  X sequence length level
+-- Agregated absences at a student X school X year X sequence length level X
+-- category_abs
 with
     absences_aggregated as (
         select
@@ -28,13 +29,14 @@ with
             eco,
             school_year,
             absences_sequence_length,
+            category_abs,
             count(*) as n_absences,
             max(absences_sequence_length) over (
-                partition by fiche, eco, school_year
+                partition by fiche, eco, school_year, category_abs
             ) as max_sequence_length
         from {{ ref("fact_absences_sequence") }}
         where school_year > {{ store.get_current_year() - 10 }}
-        group by fiche, eco, school_year, absences_sequence_length
+        group by fiche, eco, school_year, absences_sequence_length, category_abs
 
     -- Get rid of the students dimension : only keep the most up to date school for
     -- each student
@@ -45,6 +47,7 @@ with
             spi.population,
             src.eco,
             src.school_year,
+            src.category_abs,
             src.absences_sequence_length,
             src.n_absences,
             count(src.fiche) as n_students,
@@ -65,14 +68,18 @@ with
             spi.population,
             src.eco,
             src.school_year,
+            src.category_abs,
             src.absences_sequence_length,
             src.n_absences
 
     )
 
 select
-    {{ dbt_utils.generate_surrogate_key(["eco", "school_year", "population"]) }}
-    as filter_key,
+    {{
+        dbt_utils.generate_surrogate_key(
+            ["eco", "school_year", "population", "category_abs"]
+        )
+    }} as filter_key,
     absences_sequence_length,
     n_absences,
     n_students,

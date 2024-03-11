@@ -4,12 +4,12 @@ FRA400,1,Français - primaire 4 - lecture
 FRA400,2,Français - primaire 4 - écriture
 FRA600,1,Français - primaire 6 - lecture
 FRA600,2,Français - primaire 6 - écriture
-MAT200,1,Maths - primaire 2 - raisonner
-MAT200,2,Maths - primaire 2 - résoudre
-MAT400,1,Maths - primaire 4 - raisonner
-MAT400,2,Maths - primaire 4 - résoudre
-MAT600,1,Maths - primaire 6 - raisonner
-MAT600,2,Maths - primaire 6 - résoudre
+MAT200,2,Maths - primaire 2 - raisonner
+MAT200,1,Maths - primaire 2 - résoudre
+MAT400,2,Maths - primaire 4 - raisonner
+MAT400,1,Maths - primaire 4 - résoudre
+MAT600,2,Maths - primaire 6 - raisonner
+MAT600,1,Maths - primaire 6 - résoudre
 132208,2,Français - secondaire 2 - écriture
 132520,,Français - secondaire 5 - écriture
 134510,,Anglais PB - secondaire 5 - inter. orale

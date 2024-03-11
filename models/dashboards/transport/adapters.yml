@@ -9,7 +9,7 @@ sources:
     tags:
       - transport
       - adapter
-    schema: "{{ target.schema }}_dashboard_transport"
+    schema: "{{ target.schema }}_dashboard_transport_staging"
     tables:
       - name: stg_sectors # Use the ALIAS to refer to this table as the look-up is done on the objects stored in the database, and not on the file name.
         description: >
@@ -37,12 +37,12 @@ sources:
 
 # Specifies tags and schema for the later-to-be-defined concrete implementation of the adapters.
 models:
-  - name: trnsprt_stg_sectors # Use the file name herem are models' lookup are done one file names. The concrete implementation of this model schould be aliased to stg_sectors.
+  - name: stg_sectors # Use the file name herem are models' lookup are done one file names. The concrete implementation of this model schould be aliased to stg_sectors.
     description: >
-      The concrete implementation of the `trnsprt_stg_sectors` source (being aliased to stg_sectors).
+      The concrete implementation of the `stg_sectors` source (being aliased to stg_sectors).
       Please refer to the source definition for more information about the concrete implementation to be provided for this file.
     config:
-      schema: "dashboard_transport"
+      schema: "dashboard_transport_staging"
       tags:
         - transport
         - adapter

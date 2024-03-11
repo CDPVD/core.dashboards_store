@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: fact_retirement
+    description: >
+      This table list all the employees that are retired and provide metadata at the time of their retirement.
+      Provided metadata allow for drill-down by engagement status, workplace, job category, and employment status.
+    config:
+      tags:
+        - retirement
+    columns:
+      - name: matr
+        tests:
+          - unique
+          - not_null
+
+  - name: fact_retirement_forecasts
+    description: >
+      This table combine the survival curves with the list of actives employees to get an estimation of the number of employees that will retire in the future, up to 5 years.
+      The forecasts are done by job category
+    config:
+      tags:
+        - retirement
+    tests:
+      - resolution:
+          combination_of_columns:
+            - school_year
+            - job_group_category

@@ -1,0 +1,38 @@
+name: sqlfmt
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  sqlfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install sqlfmt
+        run: pip install shandy-sqlfmt[jinjafmt]
+
+      # # only get the changes files as the other files are not the responsibility of the PR author
+      # - name: Get Changed Files
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v34
+
+      # Run the formatter
+      - name: Run sqlfmt
+        run: sqlfmt . --exclude ./tooling/**/* --exclude ./target/**/* --exclude ./dbt_packages/**/* --check
+
+      # Disable, many things can goes wrong
+      # Auto commit the changes (iiiiiiiiihhhhhh)
+      # - name: Commit sqlfmt changes
+      #   uses: stefanzweifel/git-auto-commit-action@v5
+      #   with:
+      #     commit_message: "style: applying sqlfmt"

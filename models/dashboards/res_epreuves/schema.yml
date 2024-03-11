@@ -12,9 +12,9 @@ models:
       La table regroupe les notes des matières sujettes à examens. 
       Cette table accumule les résultats pour les matières identifées dans 'rstep_dim_subject_evaluation'.
       Elle sert de point d'entrée à la table 'rstep_fact_evaluations_grades' qui combine ces résultats à ceux d'une éventuelle table custom.
-    tests: 
-      - resolution: 
-          combination_of_columns: 
+    tests:
+      - resolution:
+          combination_of_columns:
             - fiche
             - ecole
             - code_matiere
@@ -25,23 +25,24 @@ models:
         tests:
           - not_null
 
-  - name: rstep_dim_unique_subj_evaluation
-    description: >
-      La table constitue une liste de clé unique (nom de l'épreuve+année) pour servire de jointure entre les deux table de reporting 
-  
   - name: rstep_fact_evaluations_grades
     description: >
       La table regroupe les notes des matières sujettes à examens. Cette table accumulate à la fois les résultats extrait par le processus automatique basé sur rstep_dim_subject_evaluation et aussi les éventuelles tables customs (to be done.)
-  
+
   - name: rstep_fact_evaluations_minist_sec4_sec5
     description: >
       La table extrait les données relatives au épreuves ministéerielles uniques et les adaptent à la forme des données des autres épreuves(locales et obligatoires)
-  
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - ecole
+            - code_matiere
+            - groupe
+            - date_resultat
+
   - name: rstep_report_evaluation_grades_schools
-    description:
-      La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison), par établissement et par année.
-  
+    description: La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison), par établissement et par année.
+
   - name: rstep_report_evaluation_grades
-    description:
-      La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison) par année, au niveau (aggrégé) du CSS.
-  
+    description: La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison) par année, au niveau (aggrégé) du CSS.

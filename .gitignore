@@ -5,3 +5,4 @@ logs/
 
 # Do not track the PBIX since we don't want any data embedded in the repo
 **/*.pbix
+.python-version

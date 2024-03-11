@@ -15,4 +15,5 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select fiche, code_perm, sexe from {{ var("database_gpi") }}.dbo.gpm_e_ele
+select fiche, nom, pnom, code_perm, sexe, date_naiss as date_naissance
+from {{ var("database_gpi") }}.dbo.gpm_e_ele

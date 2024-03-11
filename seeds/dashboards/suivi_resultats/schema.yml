@@ -1,50 +1,44 @@
 version: 2
 
 seeds:
-  - name: tracked_courses
+  - name: default_tracked_courses
     description: >
       List all the courses to tracked by default.
       You can override this dimension in your css specific repo.
     columns:
-      - name: course_code
+      - name: code_matiere
         description: The code of the course to track.
         tests:
           - not_null
           - unique
-      - name: course_name
+      - name: description_matiere 
         description: The friendly name of the course to track.
-        tests:
-          - not_null
-      - name: course_group
-        description: A arbitrary way to regroup courses together. Each group will be diplayed in it's own vue in the final report.
-        tests:
-          - not_null
-      - name: level
-        description: The school level the course is supposed to be taken. 
         tests:
           - not_null
     config:
       tags:
         - suivi_resultats
       column_types:
-        course_code: nvarchar(32)
-        course_name: nvarchar(128)
-        course_group: nvarchar(32)
-        level: nvarchar(32) 
+        code_matiere: nvarchar(32)
+        description_matiere : nvarchar(128)
 
-  - name: tracked_levels
-    description: >
-      List all the levels to tracked by default. If you add some custom courses, you might want to add some custom levels to, to be able to track them. 
-      You can override this dimension in your css specific repo.
-    config:
-      tags:
-        - suivi_resultats
-      schema: suivi_resultats_seeds
-      column_type:
-        level: nvarchar(32)
+  - name: custom_tracked_courses
+    description: An optional mapping of courses to be tracked by the dahsboard
     columns:
-      - name: level
-        description: The school level to track. By default, only 'sec1', 'sec2', 'sec3' are tracked.
+      - name: code_matiere
+        description: The unique code of the subject AS IT IS in the database.
         tests:
           - not_null
           - unique
+      - name: description_matiere 
+        description: The friendly name of the course to track.
+        tests:
+          - not_null
+    config:
+      tags: 
+        - suivi_resultats
+      schema: dashboard_suivi_resultats
+      column_types:
+        code_matiere: nvarchar(32)
+        description_matiere : nvarchar(32)
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+poetry run dbt $@ --profile etl_profile 

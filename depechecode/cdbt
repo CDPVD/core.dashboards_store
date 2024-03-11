@@ -1,2 +1,0 @@
-#!/bin/sh
-poetry run dbt --profiles-dir /root/.dbt $@ --profile etl_profile 

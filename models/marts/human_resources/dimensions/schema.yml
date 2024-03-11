@@ -1,67 +1,25 @@
 version: 2
 
 models:
-  - name: dim_mapper_job_group
+  - name: dim_employees
     description: >
-      This table maps each job group to a job group category.
-      This dimension is designed to be overriden by the client to add custom job group categories.
+      Provide employees level static informations.
     columns:
-      - name: job_group
-        description: The job group code. Use-it to merge this dimension with a fact table.
+      - name: matr
+        description: The unique identifier of an employee.
         tests:
           - unique
-          - not_null
-      - name: job_group_category
-        description: >
-          The job group category.
-        tests:
-          - not_null
-
-  - name: dim_mapper_workplace
-    description: >
-      This table maps each workplace to a friendly name.
-      This dimension is designed to be overriden by the client to add consistent workplace names' formatting.
-    columns:
-      - name: workplace
-        description: The workplace id. Use-it to merge this dimension with a fact table.
-        tests:
-          - unique
-          - not_null
-      - name: workplace_name
-        description: >
-          The worplace's friendly name.
-        tests:
-          - not_null
-
-  - name: dim_mapper_employment_status
-    description: >
-      This table maps and formats each employment status to it's friendly name.
-      This dimension is designed to be overriden by the client to add consistent employment status names' formatting.
-    columns:
-      - name: employment_status
-        description: The status id. Use-it to merge this dimension with a fact table.
-        tests:
-          - unique
-          - not_null
-      - name: employment_status_name
-        description: >
-          The status's friendly name.
-        tests:
-          - not_null
-
-  - name: dim_mapper_engagement_status
-    description: >
-      This table maps and formats each engagement status to it's friendly name.
-      This dimension is designed to be overriden by the client to add consistent engagement status names' formatting.
-    columns:
-      - name: engagement_status
-        description: The status id. Use-it to merge this dimension with a fact table.
-        tests:
-          - unique
-          - not_null
-      - name: engagement_status_name
-        description: >
-          The status's friendly name.
-        tests:
-          - not_null
-      
+      - name: sex
+        description: The sex of an employee.
+      - name: legal_name
+        description: The legal name of the employee
+      - name: birth_date
+        description: The birth date of the employee
+      - name: last_name
+        description: The last name (preferred name) of an employee
+      - name: first_name
+        description: The first name (preferred name) of an employee
+      - name: email_address
+        description: The email address of an employee
+      - name: last_pay_date
+        description: The last pay date of an employee

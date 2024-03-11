@@ -35,6 +35,7 @@ with
             spi.population,
             src.eco,
             src.school_year,
+            src.category_abs,
             bra.name as bracket_name,
             count(src.absence_sequence_id) as n_absences
         from {{ ref("fact_absences_sequence") }} as src
@@ -49,22 +50,29 @@ with
             on src.absences_sequence_length >= bra.lower_bound
             and src.absences_sequence_length < bra.upper_bound
         where school_year > {{ store.get_current_year() - 10 }}
-        group by src.fiche, spi.population, src.eco, src.school_year, bra.name
+        group by
+            src.fiche,
+            spi.population,
+            src.eco,
+            src.school_year,
+            src.category_abs,
+            bra.name
 
     ),
     running as (
         select
             eco,
             population,
+            category_abs,
             school_year,
             bracket_name,
             1.0 * count(fiche) over (
-                partition by population, eco, school_year, bracket_name
+                partition by population, eco, school_year, category_abs, bracket_name
                 order by n_absences desc
                 rows between unbounded preceding and current row
             ) as running_count_students,
             1.0 * sum(n_absences) over (
-                partition by population, eco, school_year, bracket_name
+                partition by population, eco, school_year, category_abs, bracket_name
                 order by n_absences desc
                 rows between unbounded preceding and current row
             ) as running_sum_absences
@@ -76,13 +84,14 @@ with
         select
             eco,
             population,
+            category_abs,
             school_year,
             bracket_name,
             running_count_students / max(running_count_students) over (
-                partition by population, eco, school_year, bracket_name
+                partition by population, eco, school_year, category_abs, bracket_name
             ) as percentage_of_students,
             running_sum_absences / max(running_sum_absences) over (
-                partition by population, eco, school_year, bracket_name
+                partition by population, eco, school_year, category_abs, bracket_name
             ) as percentage_of_absences,
             running_count_students as weight  -- To ponderate the comnbinated graphs
         from running
@@ -104,6 +113,7 @@ with
             dst.population,
             dst.eco,
             dst.school_year,
+            dst.category_abs,
             dst.bracket_name,
             dst.percentage_of_absences,
             dst.distance,
@@ -113,6 +123,7 @@ with
                 partition by
                     dst.population,
                     dst.eco,
+                    dst.category_abs,
                     dst.school_year,
                     dst.bracket_name,
                     dst.perc_target
@@ -123,6 +134,7 @@ with
                 select
                     obs.population,
                     obs.eco,
+                    obs.category_abs,
                     obs.school_year,
                     obs.bracket_name,
                     obs.percentage_of_students,
@@ -139,11 +151,10 @@ with
     )
 
 select
-    {{ dbt_utils.generate_surrogate_key(["eco", "school_year", "population"]) }}
-    as filter_key,
-    bracket_name,
-    percentage_of_absences,
-    perc_target,
-    weight
+    {{
+        dbt_utils.generate_surrogate_key(
+            ["eco", "school_year", "population", "category_abs"]
+        )
+    }} as filter_key, bracket_name, percentage_of_absences, perc_target, weight
 from distance
 where rank = 1  -- Keep only the closest distance for each target percentile

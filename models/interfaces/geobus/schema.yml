@@ -9,4 +9,6 @@ models:
     tags: ["interface"]
     description: >
       Table d'interface. Utilisée uniquement pour pallier à une list des  cercuites et la connection with nomer contractors
-  
+  - name: i_geo_e_trnsp_parc
+    tags: ["interface"]
+    description: Table d'interface. utilisé pour répertorier les étudiants sur les parcoures

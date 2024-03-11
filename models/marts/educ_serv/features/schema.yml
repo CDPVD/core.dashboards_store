@@ -1,7 +1,6 @@
 version: 2
 
 models:
-  
   - name: fact_absences_sequence
     description: >
       List the sequence of absences for each student.
@@ -14,3 +13,202 @@ models:
             - fiche
             - eco
             - absence_sequence_id
+            - category_abs
+
+  - name: fact_resultat_bilan_competence
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      List the competency results of all students
+    columns:
+      - name: annee
+        description: The school year
+      - name: fiche
+        description: Unique ID of the student
+      - name: id_eco
+        description: Unique ID of the school per year
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
+        description: The group which the student is related to the subject
+      - name: id_obj_mat
+        description: The unique ID of the competence which is related to the subject
+      - name: no_comp
+        description: The competency number of the subject
+      - name: etat
+        description: The state of the subject
+      - name: res_comp
+        description: The result
+      - name: is_reussite
+        description: Indicate if its a success
+      - name: is_reprise
+        description: Indicate a retake
+      - name: res_num_comp
+        description: The results of the student per no_comp, per mat
+      - name: is_current_echec
+        description: Indicate if the result is current year AND under 60 (configurable)
+      - name: is_current_difficulte
+        description: Indicate if the result is current year AND between 60 and 69 (configurable)
+      - name: is_current_maitrise
+        description: Indicate if the result is current year AND over 70 (configurable)
+      - name: is_previous_echec
+        description: Indicate if the result is last year AND under 60 (configurable)
+      - name: is_previous_difficulte
+        description: Indicate if the result is last year AND between 60 and 69 (configurable)
+      - name: is_previous_maitrise
+        description: Indicate if the result is last year AND over 70 (configurable)
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - no_comp
+            - groupe_matiere
+
+  - name: fact_resultat_bilan_matiere
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      List the competency results of all students
+    columns:
+      - name: id_eco
+        description: Unique ID of the school per year
+      - name: annee
+        description: The school year
+      - name: fiche
+        description: Unique ID of the student
+      - name: id_mat_ele
+        description: Unique ID of the subject per student per year
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
+        description: The group which the student is related to the subject
+      - name: etat
+        description: The state of the subject
+      - name: is_reussite
+        description: Indicate if its a success
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+
+  - name: fact_resultat_etape_competence
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      List the result to the subject of all students
+    columns:
+      - name: annee
+        description: The school year
+      - name: fiche
+        description: Unique ID of the student
+      - name: id_eco
+        description: Unique ID of the school
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
+        description: The group which the student is related to the subject
+      - name: id_obj_mat
+        description: The unique ID of the competence which is related to the subject
+      - name: no_comp
+        description: The competency number of the subject
+      - name: etat
+        description: The state of the subject
+      - name: etape
+        description: The stage of the subject
+      - name: res_etape_num
+        description: The result
+      - name: is_reussite
+        description: Indicate if its a success
+      - name: is_reprise
+        description: Indicate a retake
+      - name: is_echec
+        description: Indicate if the result is considered a failure
+      - name: is_difficulte
+        description: Indicate if the result is considered in difficulty
+      - name: is_maitrise
+        description: Indicate if the result is considered a maitrise
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - etape
+            - groupe_matiere
+            - id_obj_mat
+
+  - name: fact_resultat_etape_matiere
+    config:
+      tags:
+        - res_scolaires
+    description: >
+        List the result of all student
+    columns:
+      - name: annee
+        description: The school year
+      - name: fiche
+        description: Unique ID of the student
+      - name: id_eco
+        description: Unique ID of the school
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
+        description: The group which the student is related to the subject
+      - name: etat
+        description: The state of the subject
+      - name: is_reprise
+        description: Indicate a retake
+      - name: etape
+        description: The stage of the subject
+      - name: res_etape_num
+        description: The result in numeric
+      - name: is_reussite
+        description: Indicate if its a success
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - etape
+            - groupe_matiere
+            - code_matiere
+
+  - name: fact_yearly_student
+    config:
+      tags:
+        - res_scolaires
+    description: >
+        Grouping of the spine students including some information used for filters.
+    columns:
+      - name: code_perm
+        description: Unique ID of the student
+      - name: id_eco
+        description: Unique ID of the school per year
+      - name: annee
+        description: The school year
+      - name: fiche
+        description: Unique ID of the student
+      - name: population
+        description: Identification of a student within the order of education
+      - name: eco
+        description: The school dedicated number
+      - name: code_ecole
+        description: The school number concat with the school name
+      - name: ordre_ens
+        description: The order of education
+      - name: niveau_scolaire
+        description: The grade of the student
+    tests:
+      - resolution:
+          combination_of_columns:
+            - code_perm
+            - id_eco
+            - annee
+            - population

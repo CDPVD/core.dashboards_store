@@ -1,0 +1,8 @@
+[
+    {
+        "include": [
+            "**/*.sql"
+        ],
+        "license": "./tooling/licence/sql-header.txt"
+    }
+]

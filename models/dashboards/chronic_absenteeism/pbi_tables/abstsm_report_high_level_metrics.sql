@@ -20,19 +20,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {{ config(alias="report_absences_high_level_metrics") }}
 
--- Agregated absences at a student X school level X year level
+-- Agregated absences at a student X school level X year level X category_abs
 with
     absences_aggregated as (
         select
             fiche,
             eco,
             school_year,
+            category_abs,
             count(*) as n_absences,
             avg(1.0 * absences_sequence_length) as avg_absences_sequence_length,
             max(absences_sequence_length) as max_absences_sequence_length
         from {{ ref("fact_absences_sequence") }}
         where school_year > {{ store.get_current_year() - 10 }}
-        group by fiche, eco, school_year
+        group by fiche, eco, school_year, category_abs
 
     -- Left join on the population table to get the 0 absences case, AND the
     -- populations at the same time
@@ -43,24 +44,31 @@ with
             spi.eco,
             spi.annee as school_year,
             spi.population,
+            dim_abs.category_abs,
             abs.n_absences,  -- Keep the null as the the average schould not took into account the 0 absences
             abs.avg_absences_sequence_length,  -- Keep the null as the the average schould not took into account the 0 absences
             abs.max_absences_sequence_length  -- Keep the null as the the average schould not took into account the 0 absences
         from {{ ref("spine") }} as spi
+        cross join
+            (
+                select distinct category_abs from {{ ref("fact_absences_sequence") }}
+            ) as dim_abs
         left join
             absences_aggregated as abs
             on spi.fiche = abs.fiche
             and spi.eco = abs.eco
             and spi.annee = abs.school_year
+            and dim_abs.category_abs = abs.category_abs
         where spi.seqid = 1
 
-    -- Aggregated absences at a school X year X population
+    -- Aggregated absences at a school X year X population X category_abs
     ),
     aggregated as (
         select
             eco,
             school_year,
             population,
+            category_abs,
             avg(
                 case when n_absences is not null then 1. else 0 end
             ) as proportion_of_absentees,
@@ -74,13 +82,16 @@ with
             ) as avg_max_absences_sequence_length_for_absentees,
             count(*) as n_students
         from padded
-        group by eco, school_year, population
+        group by eco, school_year, population, category_abs
 
     )
 
 select
-    {{ dbt_utils.generate_surrogate_key(["eco", "school_year", "population"]) }}
-    as filter_key,
+    {{
+        dbt_utils.generate_surrogate_key(
+            ["eco", "school_year", "population", "category_abs"]
+        )
+    }} as filter_key,
     school_year,
     proportion_of_absentees,
     avg_n_absences_for_absentees,

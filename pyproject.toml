@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "core.data.store"
-version = "0.2.0"
+version = "0.9.0"
 description = ""
-authors = ["alluardj <alluardj@csvdc.qc.ca>"]
+authors = ["hugo juhel <juhel.hugo@sciance.ca>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-dbt-core = "~1.4"
-dbt-sqlserver = "~1.4"
+dbt-core = "~1.6"
+dbt-fabric = {git = "https://github.com/Sciance-Inc/dbt-fabric.git", rev = "v0.16.0"}
 pyodbc = "~4.0"
 python-semantic-release = "^7.33.4"
 
@@ -27,19 +27,13 @@ version_variable = [
     "pyproject.toml:tool.poetry:version",
 ]
 
+[tool.semantic_release.changelog]
+template_dir = "tooling/release/templates"
+
 [tool.semantic_release.branches.master]
 match = "(main|master)"
 prerelease = false
 
-[tool.semantic_release.branches.develop]
-match = "develop"
-prerelease = true
-prerelease_token = 'dev'
-
-[tool.semantic_release.branches.release]
-match = "release.*"
-prerelease = true
-prerelease_token = 'rc'
 
 [tool.sqlfmt]
 line_length = 88
@@ -47,5 +41,6 @@ quiet=true
 reset_cache=true
 exclude=[
     "target/**/*",
-     "dbt_packages/**/*"
+    "dbt_packages/**/*",
+    "tooling/templates/**/*"
 ]

@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: pevr_dim_indicateurs_matiere
+    description: >
+      Table de dimension qui mappe les indicateurs communs avec les indicateurs personalisés, qui sont lié à des matières et compétences spécifiques.
+      La table est constuite en unionant la dimension commune (core/seeds/pevr/common_indicateurs_pevr_matiere.csv) et la dimension personalisée (cssss/seeds/pevr/custom_indicateurs_pevr_matiere.csv).
+      La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des indicateurs.
+    columns:
+      - name: id_indicateur
+        description: identifiant de l'indicateur.
+      - name: description_indicateur
+        description: Description de l'indicateur
+      - name: code_matiere
+        description: Code de la matière lié à l'indicateur si elle existe.
+      - name: no_competence
+        description: Description de la compétence si elle existe     
+    config:
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)      
+        code_matiere: nvarchar(32)
+        no_competence: nvarchar(32)
+
+  - name: pevr_dim_indicateurs
+    description: >
+      Table de dimension qui mappe les indicateurs communs avec les indicateurs personalisés.
+      La table est constuite en unionant la dimension commune (core/seeds/pevr/common_indicateurs_pevr.csv) et la dimension personalisée (cssss/seeds/pevr/custom_indicateurs_pevr.csv).
+      La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des indicateurs.
+    columns:
+      - name: id_indicateur
+        description: identifiant de l'indicateur.
+      - name: description_indicateur
+        description: Description de l'indicateur
+     
+    config:
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)      
+
+  - name: pevr_indicateurs_epreuves
+    description: liste des indicateurs du pevr lié aux épreuves du MEQ. 
+    tests:
+      - resolution:
+          combination_of_columns:
+            - id_indicateur
+            - annee
+            - etape
+            - eco
+            - genre  
+            - plan_interv_ehdaa
+            - population
+            - is_francisation            
+
+  - name: pevr_indicateurs_ppp
+    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers. 
+    tests:
+      - resolution:
+          combination_of_columns:
+            - id_indicateur
+            - annee
+            - eco
+
+

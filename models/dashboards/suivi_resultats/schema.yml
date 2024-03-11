@@ -1,65 +1,32 @@
 version: 2
 
 models:
-  - name: rslt_stg_resultats
-    description: >
-      A stagging table to track the results for the courses identified in the dim_tracked_courses table.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - fiche
-            - annee
-            - course_code
 
-  - name: rslt_stg_spine
+  - name: srslt_dim_matieres_suivi
     description: >
-      A stagging table to track all the students/years we want to track the result for.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - fiche
-            - annee
-            - niveau_scolaire
+      Table de dimensions listant les codes_matières et leur description.
+      La table est constuite en unionant la dimension par défaut (core/seeds/res_suivi/default_tracked_courses.csv) et la dimension custom (cssss/seeds/res_epreuves/custom_tracked_courses.csv).
+      La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des matières.
 
-  - name: rslt_fact_resultats
+  - name: srslt_report_portrait_eleve
     description: >
-      A fact table tracking the grades obtained in critical courses by students in difficulty.
-      A student is in difficulty if he/she failed in at least one (critical) course in the 4 previous years.
+      Cette table donne un portrait de l'élèves en combinant les résultats des compétences de base aux informations personnelles de l'élève.
     tests:
       - resolution:
           combination_of_columns:
             - annee
             - fiche
-            - niveau_scolaire
-            - course_code
-    columns:
-      - name: resultat
-        tests:
-          - not_null
-
-  - name: rslt_report_resultats
+            - eco
+            - niveau_res
+  
+  - name: srslt_report_suivi_resultats
     description: >
-      The reporting table combine the data from the results tables to the dimension tables to produce the final report table for the report.
+      Cette table permet d'avoir les résultats historique des 5 dernières années pour les élèves actuels avec la possibilité de filtré les élèves en dificulté, en maitrise ou en échec.
     tests:
       - resolution:
           combination_of_columns:
-            - annee
+            - id_eco
             - fiche
-            - niveau_scolaire
-            - course_code
-    columns:
-      - name: status
-        tests:
-          - not_null
-      - name: resultat
-        tests:
-          - not_null
-
-  - name: rslt_dim_eleve
-    description: >
-      The table gather some eleve-year information. The fields from this table are later used to add filtering capabilities to the dashboard.
-    tests:
-      - resolution:
-          combination_of_columns:
+            - code_matiere
             - annee
-            - fiche
+            - no_comp

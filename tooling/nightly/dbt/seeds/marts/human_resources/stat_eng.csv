@@ -1,0 +1,52 @@
+﻿stat_eng,descr,is_reg,valid_from,valid_until
+94,Aide devoirs/Écoles forme,0
+95,Fond jeunesse,0
+97,Non recensé/e PERCOS,0
+98,Non recensé/e PERCOS,0
+E1,Temps plein régulier,1
+E2,Non légalement qualifié/e,0
+E3,Temps partiel,0
+E4,À la leçon,0
+E5,À taux horaire,0
+E6,Supp occ 20 jrs et moins,0
+E7,Supp occ + 20 jrs cons ,0
+E8,Tempo. remplaçant,0
+G1,Régulier temps plein,1
+G2,Régulier temps partiel,1
+G3,Tempo. remplaçant <2ms,0
+G4,Tempo. remplaçant >=2ms,0
+G5,Temp. rempl. ext. <2ms,0
+G6,Temp. rempl. ext.>=2ms<an,0
+G7,Temp. rempl. ext. >=an,0
+G8,Autres gestionnaires,0
+P1,Regulier temps plein,1
+P2,Regulier temps partiel,1
+P3,Remplaçant < 6 mois,0
+P4,Rempl. t. plein 6ms et +,0
+P6,Rempl. t. part. 6ms et +,0
+P7,NIL Octr temps pl <6ms,0
+P8,NIL Octr temps pl >6ms,0
+P9,NIL Octr temps pa <6ms,0
+PA,NIL Octr temps pa >6ms,0
+PB,Surnuméraire < 6 mois,0
+PC,Surnum. t. plein 6ms et +,0
+PE,Surnum. t. part. 6ms et +,0
+S1,Regulier temps plein,1
+S2,Regulier t. partiel +15h.,1
+S3,Surcroît courte durée,0
+S5,Remplaçant moins de 6ms,0
+S6,Rempl. t. plein 6ms et +,0
+S8,Rempl. t. part. 6ms+ +15h,0
+S9,Education des adultes,0
+SA,Ne plus utiliser,0
+SC,Cafétéria.       15h et -,0
+SD,Surveillant 15h ou moins,0
+SE,A l'essai temps plein,0
+SF,A l'essai t.partiel  +15h,0
+SG,Ne plus utiliser,0
+SH,Rég. t. partiel  15h et -,1
+SI,NILSoutien form prof ch10,0
+SJ,Ne plus utiliser,0
+SK,Surcroît longue durée,0
+SL,Rempl. t. part. 6ms+ 15h-,0
+SM,Surcroît long. durée 15h-,0

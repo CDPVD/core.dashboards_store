@@ -1,0 +1,108 @@
+version: 2
+
+seeds:
+  - name: common_indicateurs_pevr_matiere
+    description: Mapping des indicateurs communs avec leur description, leur code_matière, si c'est le cas, et leur numéros de compétences.   
+    columns:
+      - name: id_indicateur
+        description: Identifiant de l'indicateur
+        tests:
+          - not_null
+          - unique    
+      - name: description_indicateur
+        description: Description de l'indicateur
+        tests:
+          - not_null
+          - unique            
+      - name: code_matiere
+        description: Code de la matière visée par l'indicateur pevr
+        tests:
+          - not_null
+          - unique       
+      - name: no_competence
+        description: numéro de la compétence visé par l'indicateur pevr
+        tests:
+          - not_null
+    config:
+      tags: 
+        - pevr
+      schema: pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)      
+        code_matiere: nvarchar(32)
+        no_competence: nvarchar(32)
+  
+  - name: custom_indicateurs_pevr_matiere
+    description: mapping optionnel des indicateurs personalisés des css.
+    columns:
+      - name: id_indicateur
+        description: Identifiant de l'indicateur
+        tests:
+          - not_null
+          - unique    
+      - name: description_indicateur
+        description: Description de l'indicateur
+        tests:
+          - not_null
+          - unique       
+      - name: code_matiere
+        description: Code de la matière visée par l'indicateur pevr
+        tests:
+          - not_null
+          - unique       
+      - name: no_competence
+        description: numéro de la compétence visé par l'indicateur pevr
+        tests:
+          - not_null
+    config:
+      tags: 
+        - pevr
+      schema: pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)      
+        code_matiere: nvarchar(32)
+        no_competence: nvarchar(32)
+
+  - name: common_indicateurs_pevr
+    description: Mapping des indicateurs communs avec leur description.   
+    columns:
+      - name: id_indicateur
+        description: Identifiant de l'indicateur
+        tests:
+          - not_null
+          - unique    
+      - name: description_indicateur
+        description: Description de l'indicateur
+        tests:
+          - not_null
+          - unique            
+    config:
+      tags: 
+        - pevr
+      schema: pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)
+  
+  - name: custom_indicateurs_pevr
+    description: mapping optionnel des indicateurs personalisés des css.
+    columns:
+      - name: id_indicateur
+        description: Identifiant de l'indicateur
+        tests:
+          - not_null
+          - unique    
+      - name: description_indicateur
+        description: Description de l'indicateur
+        tests:
+          - not_null
+          - unique             
+    config:
+      tags: 
+        - pevr
+      schema: pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(8)
+        description_indicateur: nvarchar(max)      

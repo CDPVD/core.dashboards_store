@@ -1,4 +1,0 @@
-packages:
-  - local: ../core.data.store
-  #- git: git@github.com:Sciance-Inc/core.dashboards_store.git
-  #  revision: v0.3.0

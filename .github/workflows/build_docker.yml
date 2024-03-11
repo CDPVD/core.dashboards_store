@@ -5,10 +5,6 @@ on:
     branches:
       - master
       - develop
-  pull_request:
-    branches:
-      - master
-      - develop
   workflow_dispatch:
     branches:
       - master
@@ -68,7 +64,7 @@ jobs:
           push: true
           tags: ${{ steps.docker-tag.outputs.tags }}
           context: .
-          file: depechecode/Dockerfile
+          file: tooling/depechecode/Dockerfile
 
       - name: Microsoft Teams Notification
         uses: skitionek/notify-microsoft-teams@master

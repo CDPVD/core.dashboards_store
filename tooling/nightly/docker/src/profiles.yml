@@ -1,0 +1,33 @@
+nightly_profile:
+  target: "{{ env_var('DBT_TARGET') }}"
+  outputs:
+    dev:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: "{{ env_var('DBT_SERVER') }}"
+      port: "{{ env_var('DBT_PORT') | int }}"
+      database: "store_nightly"
+      schema: dev
+      user: "{{ env_var('DBT_USERNAME') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      trust_cert: True
+    rc:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: "{{ env_var('DBT_SERVER') }}"
+      port: "{{ env_var('DBT_PORT') | int }}"
+      database: "store_nightly"
+      schema: rc
+      user: "{{ env_var('DBT_USERNAME') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      trust_cert: True
+    stable:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: "{{ env_var('DBT_SERVER') }}"
+      port: "{{ env_var('DBT_PORT') | int }}"
+      database: "store_nightly"
+      schema: stable
+      user: "{{ env_var('DBT_USERNAME') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      trust_cert: True

@@ -9,8 +9,7 @@ seeds:
       - name: etat_empl
         description: The codified representation of the etat_employe.
         tests:
-          - unique
-          - not_null     
+          - not_null
       - name: descr
         description: The description of the etat_employe.
         tests:
@@ -31,10 +30,17 @@ seeds:
         description: Is the code identifiing a currently on long-terme leave employee ?
         tests:
           - not_null
+      - name: valid_from
+        description: >
+          The YEAR (integer) from which the status starts to be valid. The lower bound is included
+          If not populated, the status is valid from the 1950 year.
+      - name: valid_until
+        description: >
+          The YEAR (integer) from which the status stops to be valid. The upper bound is excluded from the validity period.
+          If not populated, the status is valid until the current year + 1 .
     config:
       tags:
         - human_resources
-        - emp_actif
       schema: human_resources_seeds
       column_types:
         etat_empl: nvarchar(3)
@@ -43,6 +49,9 @@ seeds:
         empl_cong: bit
         cong_lt: bit
         etat_actif: bit
+        valid_from: int
+        valid_until: int
+
   - name: stat_eng
     description: >
       A mapping table between the employees status and arbitray meta-datas such as the description of the status, the status of the employee (active or not), the status of the employee (on leave or not), the status of the employee (on leave with pay or not), the status of the employee (on leave without pay or not).
@@ -51,22 +60,30 @@ seeds:
       - name: stat_eng
         description: The codified representation of the etat_employe.
         tests:
-          - unique
-          - not_null     
+          - not_null
       - name: descr
         description: The description of the etat_employe.
         tests:
           - not_null
       - name: is_reg
-        description: filterong for general status groups, where 1 - permanant position , 0 - temporary position,
+        description: Is the job satisfies the `regular` definition of a job ?
         tests:
           - not_null
+      - name: valid_from
+        description: >
+          The YEAR (integer) from which the status starts to be valid. The lower bound is included
+          If not populated, the status is valid from the 1950 year.
+      - name: valid_until
+        description: >
+          The YEAR (integer) from which the status stops to be valid. The upper bound is excluded from the validity period.
+          If not populated, the status is valid until the current year + 1 .
     config:
       tags:
         - human_resources
-        - prospectif_cdp
       schema: human_resources_seeds
       column_types:
         stat_eng: nvarchar(3)
         descr: nvarchar(25)
         is_reg: bit
+        valid_from: int
+        valid_until: int

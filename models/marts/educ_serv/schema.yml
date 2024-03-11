@@ -48,3 +48,130 @@ models:
             - annee
             - population
             - eco
+
+  - name: stg_descr_mat
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui lie chaque matières à sa description selon l'école.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - id_eco
+            - mat
+
+  - name: stg_descr_comp
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui lie chaque compétence à sa description par matière.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - mat
+            - obj_01
+
+  - name: stg_yearly_eleve_matiere_groupe
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats des matière par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+
+  - name: stg_yearly_eleve_matiere_groupe_competence
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats des compétences par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+            - no_comp
+
+  - name: stg_res_bilan_comp
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats au bilan des compétences par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+            - no_comp
+
+  - name: stg_res_bilan_mat
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats au bilan des matières par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+
+  - name: stg_res_etape_comp
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats aux étapes des compétences par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+            - no_comp
+            - etape
+
+  - name: stg_res_etape_mat
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste les résultats aux étapes des matières par élève par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+            - code_matiere
+            - groupe_matiere
+            - etape
+
+  - name: stg_type_mesure
+    config:
+      tags:
+        - res_scolaires
+    description: >
+      Table de staging qui liste des élèves qui ont des types de mesure (frnacisation etc) par année.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+

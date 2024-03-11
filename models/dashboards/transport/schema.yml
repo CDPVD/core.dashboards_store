@@ -1,29 +1,50 @@
 version: 2
 
 models:
-  - name: trnsprt_report_details
+  - name: transport_report_details
     description: >
-      - list of active transport and routes, taking into account mornings and afternoons work shifts
-    tests:
-      - resolution:
-          combination_of_columns:
+      - list of active transport and routes, taking into account tomorrow's and afternoon work shifts
+    tests: 
+      - resolution: 
+          combination_of_columns: 
             - annee
             - parcours_id
             - circuit_id
             - parcours_periode
-    columns:
+    columns: 
       - name: annee
-        tests:
-          - not_null
+        tests: 
+            - not_null
       - name: parcours_id
-        tests:
-          - not_null
+        tests: 
+            - not_null
       - name: circuit_id
-        tests:
-          - not_null
+        tests: 
+            - not_null
       - name: name_sector
-        tests:
-          - not_null
+        tests: 
+            - not_null
       - name: abbr_sector
-        tests:
-          - not_null
+        tests: 
+            - not_null
+  - name: transport_report_aggregated
+    description: >
+        - aggregated number of students by  year for which 1 or 2 blocks of transport are booked
+    columns: 
+      - name: annee
+        tests: 
+            - not_null
+      - name: eleves
+        tests: 
+            - not_null
+      - name: ele_seule_addr
+        tests: 
+            - not_null
+  - name: transport_dim_annee_scolaire
+    description: list  of school years
+    tests: 
+      - resolution: 
+          combination_of_columns: 
+            - annee
+            - nom_prolonge
+                  

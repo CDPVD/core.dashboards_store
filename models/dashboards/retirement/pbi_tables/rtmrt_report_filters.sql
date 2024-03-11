@@ -71,17 +71,19 @@ with
 -- Join the friendly name
 select
     src.sexe,
-    empl.employment_status_name,
-    eng.engagement_status_name,
+    empl.etat_empl as employment_status_name,
+    eng.stat_eng as engagement_status_name,
     work.workplace_name,
     src.job_group_category,
     src.filter_key,
     src.filter_source
 from one_for_all as src
 left join
-    {{ ref("dim_mapper_employment_status") }} as empl
-    on src.etat = empl.employment_status
+    {{ ref("dim_employment_status_yearly") }} as empl
+    on src.etat = empl.etat_empl
+    and empl.is_current = 1  -- Only keep the active valid data
 left join
-    {{ ref("dim_mapper_engagement_status") }} as eng
-    on src.stat_eng = eng.engagement_status
+    {{ ref("dim_engagement_status_yearly") }} as eng
+    on src.stat_eng = eng.stat_eng
+    and eng.is_current = 1  -- Only keep the active valid data
 left join {{ ref("dim_mapper_workplace") }} as work on src.lieu_trav = work.workplace

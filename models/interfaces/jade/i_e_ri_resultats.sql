@@ -33,5 +33,6 @@ select
     resofffinal as res_off_final,
     annee as annee,
     typeformcharl as type_form_charl,
-    secteurenseignfreq as secteur_enseign_freq
+    secteurenseignfreq as secteur_enseign_freq,
+    datehrerecup as date_heure_recup
 from {{ var("database_jade") }}.dbo.e_ri_resultats

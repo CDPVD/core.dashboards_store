@@ -23,14 +23,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 select
     {{
         dbt_utils.generate_surrogate_key(
-            ["src.eco", "src.school_year", "spi.population"]
+            ["src.eco", "src.school_year", "spi.population", "src.category_abs"]
         )
     }} as filter_key,
     spi.fiche,
     src.eco,
     bra.name as bracket_name,
     src.absence_start_date,
-    src.absences_sequence_length
+    src.absences_sequence_length,
+    src.last_description_abs
 from {{ ref("fact_absences_sequence") }} as src
 inner join
     {{ ref("spine") }} as spi

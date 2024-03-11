@@ -1,5 +1,5 @@
-name: 'store'
-version: '0.5.3'
+name: "store"
+version: "0.9.0"
 config-version: 2
 
 profile: "replaceMeInLocals"
@@ -37,9 +37,15 @@ seeds:
             suivi_resultats:
                 +tags: ["suivi_resultats"]
                 +schema: "dashboard_suivi_resultats"
+            res_scolaires:
+                +tags: ["res_scolaires"]
+                +schema: "dashboard_res_scolaires"
             chronic_absenteeism:
                 +tags: ["chronic_absenteeism"]
                 +schema: "dashboard_chronic_absenteeism"
+            pevr:
+                +tags: ["pevr"]
+                +schema: "dashboard_pevr"                
 models:
     +materialized: table
     store:
@@ -108,6 +114,13 @@ models:
                     +post-hook:
                         ["{{ store.stamp_model('dashboard_suivi_resultats') }}"]
 
+            res_scolaires:
+                +tags: ["res_scolaires"]
+                +schema: "dashboard_res_scolaires"
+                pbi_tables:
+                    +post-hook:
+                        ["{{ store.stamp_model('dashboard_res_scolaires') }}"]
+
             retirement:
                 +tags: ["retirement"]
                 +schema: "dashboard_retirement"
@@ -124,6 +137,24 @@ models:
                             "{{ store.stamp_model('dashboard_chronic_absenteeism') }}",
                         ]
 
+            predictive_view_aggregated:
+                +tags: ["predictive_view_aggregated"]
+                +schema: "dashboard_predictive_view_aggregated"
+                pbi_tables:
+                    +post-hook:
+                        [
+                            "{{ store.stamp_model('dashboard_predictive_view_aggregated') }}",
+                        ]
+
+            pevr:
+                +tags: ["pevr"]
+                +schema: "dashboard_pevr"
+                pbi_tables:
+                    +post-hook:
+                        [
+                            "{{ store.stamp_model('dashboard_pevr') }}",
+                        ]                        
+
         interfaces:
             +tags: ["interfaces"]
             +materialized: ephemeral
@@ -138,9 +169,12 @@ vars:
     database_jade: "Replace me in the CSS repositery"
     database_geobus: "Replace me in the CSS repositery" # contains routes, buses, contractors, student files, and related to db GPL.
     database_piastre: "Replace me in the CSS repositery" # financial data on school transport. no connections to db Geobus.
+    database_prodrome: "Replace me in the CSS repositery" # Modelling output from the Sciance's models.
     # res_epreuves's dashboard variables:
     res_epreuves:
         threshold: 70
         cod_css: "Replace me in the CSS repositery"
+    res_scolaires:
+        threshold: 70
     emp_actif:
         nbrs_sem_dern_paie: 1

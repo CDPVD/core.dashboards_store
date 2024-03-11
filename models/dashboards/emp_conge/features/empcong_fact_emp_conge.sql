@@ -41,7 +41,14 @@ with
         inner join
             {{ ref("i_pai_tab_lieu_trav") }} as lieu on emp.lieu_trav = lieu.lieu_trav
         inner join
-            {{ ref("etat_empl") }} as empl_status on emp.etat = empl_status.etat_empl
+            {{ ref("dim_employment_status_yearly") }} as empl_status
+            on emp.etat = empl_status.etat_empl
+            and case
+                when month(emp.date_eff) < 7
+                then year(emp.date_eff) - 1
+                else year(emp.date_eff)
+            end
+            = empl_status.school_year
         where empl_status.empl_cong = 1  -- Empl en congé  
     ),
 

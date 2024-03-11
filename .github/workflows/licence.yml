@@ -1,0 +1,23 @@
+name: licence-checker
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
+    branches:
+      - develop
+
+jobs:
+  licence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v3
+
+      - name: Check license headers
+        uses: viperproject/check-license-header@v2
+        with:
+          config: ./tooling/licence/license-checker-config.json
+          strict: false

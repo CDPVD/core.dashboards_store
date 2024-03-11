@@ -20,7 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {{ return(adapter.dispatch("init_metadata_table", "store")()) }}
 {% endmacro %}
 
-
 {% macro purge_metadata_table() %}
     {{ return(adapter.dispatch("purge_metadata_table", "store")()) }}
 {% endmacro %}
@@ -31,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 {# SQL Server dispatch #}
-{% macro sqlserver__init_metadata_table() %}
+{% macro fabric__init_metadata_table() %}
 
     {% if execute %}
 
@@ -60,7 +59,7 @@ CREATE TABLE {{ table_name }} (
     {% endif %}
 {% endmacro %}
 
-{% macro sqlserver__purge_metadata_table() %}
+{% macro fabric__purge_metadata_table() %}
 
     -- Delete the old stamps data
     {% set table_name = target.schema + "_metadata.stamper" %}
@@ -90,7 +89,7 @@ CREATE TABLE {{ table_name }} (
 
 {% endmacro %}
 
-{% macro sqlserver__stamp_model(dashboard_name) %}
+{% macro fabric__stamp_model(dashboard_name) %}
 
     {% set table_name = target.schema + "_metadata.stamper" %}
     {% set schema_name = target.schema + "_metadata" %}
@@ -116,4 +115,18 @@ CREATE TABLE {{ table_name }} (
 
     {% endif %}
 
+{% endmacro %}
+
+
+{# sqlserver dispatch #}
+{% macro sqlserver__init_metadata_table() %}
+    {{ fabric__init_metadata_table() }}
+{% endmacro %}
+
+{% macro sqlserver__purge_metadata_table() %}
+    {{ fabric__purge_metadata_table() }}
+{% endmacro %}
+
+{% macro sqlserver__stamp_model(dashboard_name) %}
+    {{ fabric__stamp_model(dashboard_name) }}
 {% endmacro %}

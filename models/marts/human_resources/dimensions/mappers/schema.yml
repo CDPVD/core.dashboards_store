@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_mapper_job_group
+    description: >
+      This table maps each job group to a job group category.
+      This dimension is designed to be overriden by the client to add custom job group categories.
+    columns:
+      - name: job_group
+        description: The job group code. Use-it to merge this dimension with a fact table.
+        tests:
+          - unique
+          - not_null
+      - name: job_group_category
+        description: >
+          The job group category.
+        tests:
+          - not_null
+
+  - name: dim_mapper_workplace
+    description: >
+      This table maps each workplace to a friendly name.
+      This dimension is designed to be overriden by the client to add consistent workplace names' formatting.
+    columns:
+      - name: workplace
+        description: The workplace id. Use-it to merge this dimension with a fact table.
+        tests:
+          - unique
+          - not_null
+      - name: workplace_name
+        description: >
+          The worplace's friendly name.
+        tests:
+          - not_null
+      

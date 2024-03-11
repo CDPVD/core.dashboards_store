@@ -19,16 +19,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     Extract the grades from the e_ri_resultats and adapt them to fit with local exam table  .
 #}
 {{ config(alias="fact_evaluations_minist_sec4_sec5", schema="res_epreuves_staging") }}
+
+-- Keep the last upserted value
 with
     resmin as (
-        select distinct
+        select
             fiche,
             ecole,
             matiere as code_matiere,
             annee,
             res_off_conv as resultat,
             res_off_conv as resultat_numerique,
-            case when res_off_conv > 59 then 'R' else 'E' end as code_reussite
+            groupe,
+            date_resultat,
+            case when res_off_conv > 59 then 'R' else 'E' end as code_reussite,
+            row_number() over (
+                partition by fiche, ecole, matiere, groupe, date_resultat
+                order by date_heure_recup desc
+            ) as seq_id
         from {{ ref("i_e_ri_resultats") }} as resmin
         where
             mois_resultat = '6'
@@ -38,5 +46,16 @@ with
             and ecole like ('{{ var("res_epreuves")["cod_css"] }}')
             and res_off_conv != ''
     )
-select *
+select
+    fiche,
+    ecole,
+    code_matiere,
+    annee,
+    resultat,
+    resultat_numerique,
+    code_reussite,
+    -- Tests hooks
+    groupe,
+    date_resultat
 from resmin
+where seq_id = 1

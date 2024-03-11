@@ -1,0 +1,39 @@
+{{ cookiecutter.css_short_name + '_dashboards_store' }}:
+  target: dev
+  outputs:
+    # The target to be used by default, to work on the database without tampering with neither the production data, nor the others schemas
+    dev:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: {{ cookiecutter.server_ip }}
+      port: {{ cookiecutter.server_port }}
+      database: store_dev
+      schema: {{ cookiecutter.author }}
+      user: {{ cookiecutter.author }}
+      password: dontLookAtMeImSecret
+      trust_cert: True
+      threads: 1
+    # The staging environement : to test the data before pushing them to production. Schould probably only be used by an automated tool such as a CI/CD pipeline or cronjob.
+    staging:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: {{ cookiecutter.server_ip }}
+      port: {{ cookiecutter.server_port }}
+      database: store_dev
+      schema: dbo
+      user: {{ cookiecutter.author }}
+      password: dontLookAtMeImSecret
+      trust_cert: True
+      threads: 1
+    # The production environement : the serious one, where the data are used by the end users. Be carefull when targetting this environement.
+    prod:
+      type: fabric
+      driver: "ODBC Driver 17 for SQL Server"
+      server: {{ cookiecutter.server_ip }}
+      port: {{ cookiecutter.server_port }}
+      database: store
+      schema: dbo
+      user: {{ cookiecutter.author }}
+      password: dontLookAtMeImSecret
+      trust_cert: True
+      threads: 1

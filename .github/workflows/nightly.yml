@@ -3,6 +3,9 @@ name: Run the Nightly Build
 on:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
+    branches:
+      - develop
 
 env:
   REGISTRY: ghcr.io
@@ -12,37 +15,23 @@ jobs:
   build_nightly:
     runs-on: [self-hosted, maas]
     strategy:
+      fail-fast: false # if one matrix fails, continue with the others
       max-parallel: 1
       matrix:
         configs:
-          # - pattern: .*rc+.*$
-          #   tag: rc
-          #   target: rc
-          - pattern: ^v([0-9]+)\.([0-9]+)\.([0-9]+)\+.*$
+          - branch: master
             tag: stable
             target: stable
-          - pattern: .*dev+.*$
+          - branch: develop
             tag: dev
             target: dev
 
     steps:
-      # Get the latest release matching the matrix pattern
-      - name: Get the latest release ID matching the provided pattern
-        uses: joutvhu/get-release@v1
-        id: get_release
-        with:
-          debug: true
-          latest: true
-          pattern: ${{ matrix.configs.pattern }}
-          prerelease: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.CICD_PAT_TOKEN }}
-
       # Clone the repo
       - name: Checkout the latest release
         uses: actions/checkout@v3
         with:
-          ref: ${{ steps.get_release.outputs.tag_name }}
+          ref: ${{ matrix.configs.branch }}
           token: ${{ secrets.CICD_PAT_TOKEN }}
 
       # Log into the Github container registry
@@ -77,10 +66,10 @@ jobs:
           push: true
           tags: ${{ steps.docker-tag.outputs.tags }}
           context: .
-          file: nightly/docker/Dockerfile
+          file: tooling/nightly/docker/Dockerfile
           pull: true
           build-args: |
-            CORE_VERSION=${{ steps.get_release.outputs.tag_name }}
+            CORE_VERSION=${{ matrix.configs.branch }}
             TARGET=${{ matrix.configs.target }}
           ssh: |
             default=${{ env.SSH_AUTH_SOCK }}

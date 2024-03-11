@@ -17,19 +17,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {{ config(alias="stg_populations_fgj") }}
 
-select code_perm, id_eco, annee, 'prescolaire' as population
+select code_perm, id_eco, annee, 'Prescolaire' as population
 from {{ source_or_ref("populations", "stg_ele_prescolaire") }}
 union
-select code_perm, id_eco, annee, 'primaire_reg' as population
+select code_perm, id_eco, annee, 'Primaire régulier' as population
 from {{ source_or_ref("populations", "stg_ele_primaire_reg") }}
 union
-select code_perm, id_eco, annee, 'primaire_adapt' as population
+select code_perm, id_eco, annee, 'Primaire adapté' as population
 from {{ source_or_ref("populations", "stg_ele_primaire_adapt") }}
 union
-select code_perm, id_eco, annee, 'secondaire_reg' as population
+select code_perm, id_eco, annee, 'Secondaire régulier' as population
 from {{ source_or_ref("populations", "stg_ele_secondaire_reg") }}
 union
-select code_perm, id_eco, annee, 'secondaire_adapt' as population
+select code_perm, id_eco, annee, 'Secondaire adapté' as population
 from {{ source_or_ref("populations", "stg_ele_secondaire_adapt") }}
 union
 select code_perm, id_eco, annee, population

@@ -1,0 +1,16 @@
+﻿model,target
+dropout,p6_s2_to_s5
+dropout,s1_s2_to_s5
+dropout,s2_s3_to_s5
+dropout,s4_s4_to_s5
+exam_meq,math_p6_utiliser
+exam_meq,math_p6_resoudre
+exam_meq,fr_p6_lire
+exam_meq,fr_p6_ecrire
+exam_meq,fr_p4_lire
+exam_meq,fr_p4_ecrire
+diplomation,p6
+diplomation,s1
+diplomation,s2
+diplomation,s3
+diplomation,s4

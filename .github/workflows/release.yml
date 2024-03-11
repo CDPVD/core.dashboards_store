@@ -3,7 +3,7 @@ name: Release on Github
 on:
   push:
     branches:
-      - "**" # matches every branch
+      - master
 
 concurrency:
   group: ${{ github.ref }}-release
@@ -37,19 +37,22 @@ jobs:
         with:
           github_token: ${{ secrets.CICD_PAT_TOKEN }}
           build_metadata: ${{ steps.date.outputs.today_date }}
+          root_options: -v
 
-  sync-css:
-    needs: release
-    runs-on: ubuntu-latest
-    concurrency: release
+  # sync-css:
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   concurrency: release
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.CICD_PAT_TOKEN }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #         token: ${{ secrets.CICD_PAT_TOKEN }}
 
-      - name: Sync the tags to CSSVDC
-        env:
-          TOKEN: ${{ secrets.PAT_CSSVDC }}
-        run: git push https://$TOKEN@dev.azure.com/Centre-Expertise-IA/COTRA-CE/_git/core.data.tbe --tags
+  #     - name: Sync the tags to CSSVDC
+  #       env:
+  #         TOKEN: ${{ secrets.PAT_CSSVDC }}
+  #       run: |
+  #         git push https://$TOKEN@dev.azure.com/Centre-Expertise-IA/COTRA-CE/_git/core.data.tbe --force
+  #         git push https://$TOKEN@dev.azure.com/Centre-Expertise-IA/COTRA-CE/_git/core.data.tbe --tags

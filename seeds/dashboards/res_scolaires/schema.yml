@@ -1,0 +1,34 @@
+version: 2
+
+seeds:
+  - name: default_matiere
+    description: Mapping of the pre-selected courses to their cod_matiere
+    columns:
+      - name: cod_matiere
+        description: The unique code of the subject.
+        tests:
+          - not_null
+          - unique
+    config:
+      tags: 
+        - res_scolaires
+      schema: res_scolaires_seeds
+      column_types:
+        cod_matiere: nvarchar(32)
+        des_matiere: nvarchar(32)
+  
+  - name: custom_matiere
+    description: An optional mapping of courses to be tracked by the dahsboard
+    columns:
+      - name: cod_matiere
+        description: The unique code of the subject AS IT IS in the database.
+        tests:
+          - not_null
+          - unique
+    config:
+      tags: 
+        - res_scolaires
+      schema: res_scolaires_seeds
+      column_types:
+        cod_matiere: nvarchar(32)
+        des_matiere: nvarchar(32)
