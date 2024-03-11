@@ -1,15 +1,51 @@
-version: 2 
+version: 2
 
 models:
-  - name : report_emp_active 
+  - name: emp_actif_fact_emp_actif
     description: >
-        Table uniquement pour les employés actifs qui sont actifs actuellement
-    tests: 
-      - resolution: 
-          combination_of_columns: 
-            - matricule
-            - annee                 
-            - today_is_active
-            - today_job_categories
-            - stat_eng
-            - corp_empl_descr
+      Table qui extrait toutes les donnnées requises pour ce tableau de bord
+    tests:
+      - resolution:
+          combination_of_columns:
+            - matr
+            - sex_friendly_name
+            - workplace_name
+            - job_class
+            - job_department
+  - name: emp_actif_report_emp_actif
+    description: >
+      Table qui permet d'afficher toutes les données requises avec une surrogate_key
+    tests:
+      - resolution:
+          combination_of_columns:
+            - matr
+            - sex_friendly_name
+            - workplace_name
+            - job_class
+            - job_department
+            - type        
+  - name: emp_actif_report_stat
+    description: >
+      Table avec laquelle, les principaux calculs ont été faits.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - sex_friendly_name
+            - workplace_name
+            - job_class
+            - job_department
+            - type      
+            - is_current  
+  - name: emp_actif_report_filter
+    description: >
+      Une table qui permet d'avoir un filtrage cohérent sur toutes les pages du rapport.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - sex_friendly_name
+            - workplace_name
+            - job_class
+            - job_department
+            - type
+            - filter_key
+            
