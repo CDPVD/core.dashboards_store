@@ -26,6 +26,7 @@ select
     etat,
     date_dern_jr_trav,
     date_eff,
+    mode_cour,
     type,
     gr_paie
 from {{ var("database_paie") }}.dbo.pai_dos_empl
