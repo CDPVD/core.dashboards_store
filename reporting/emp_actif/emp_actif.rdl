@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report MustUnderstand="df" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns:df="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition/defaultfontfamily">
+<Report MustUnderstand="df" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:df="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition/defaultfontfamily">
   <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
-    <DataSource Name="DataSource2">
+    <DataSource Name="actif">
       <ConnectionProperties>
         <DataProvider>SQL</DataProvider>
         <ConnectString>Data Source=ssql3virw19\lum;Initial Catalog=tbe_dev</ConnectString>
@@ -15,7 +15,7 @@
   <DataSets>
     <DataSet Name="Données">
       <Query>
-        <DataSourceName>DataSource2</DataSourceName>
+        <DataSourceName>actif</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@Lieu">
             <Value>=Parameters!Lieu.Value</Value>
@@ -29,125 +29,198 @@
           <QueryParameter Name="@Statut">
             <Value>=Parameters!Statut.Value</Value>
           </QueryParameter>
+          <QueryParameter Name="@Actif">
+            <Value>=Parameters!Actif.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@cat">
+            <Value>=Parameters!cat.Value</Value>
+          </QueryParameter>
         </QueryParameters>
-        <CommandText>SELECT
-   dbo_dashboard_emp_actif.report_emp_active.LIEU_TRAV
-  ,dbo_dashboard_emp_actif.report_emp_active.MATRICULE
-  ,dbo_dashboard_emp_actif.report_emp_active.NOM
-  ,dbo_dashboard_emp_actif.report_emp_active.CORP_EMPL_DESCR
-  ,dbo_dashboard_emp_actif.report_emp_active.STAT_ENG
-  ,dbo_dashboard_emp_actif.report_emp_active.type
-,dbo_dashboard_emp_actif.report_emp_active.ADR_ELECTRNQ_PORTAIL
+        <CommandText>	SELECT
+    [workplace_name]
+  , [matr]
+  , [legal_name]
+  , [job_class]
+  , [employment_status_name]
+  , [type]
+	, [email_address]
 
 FROM 
-  dbo_dashboard_emp_actif.report_emp_active
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
 WHERE 
-  dbo_dashboard_emp_actif.report_emp_active.LIEU_TRAV IN (@Lieu)
-  AND dbo_dashboard_emp_actif.report_emp_active.CORP_EMPL_DESCR IN (@Ce)
-  AND dbo_dashboard_emp_actif.report_emp_active.type IN (@Type)
-  AND dbo_dashboard_emp_actif.report_emp_active.STAT_ENG IN (@Statut)</CommandText>
+  [workplace_name] IN (@Lieu)
+  AND [job_class] IN (@Ce)
+  AND [type] IN (@Type)
+	AND [employment_status_name] IN (@Statut)
+	AND [is_current] IN (@Actif)
+AND job_department IN (@cat)</CommandText>
         <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
       </Query>
       <Fields>
-        <Field Name="LIEU_TRAV">
-          <DataField>LIEU_TRAV</DataField>
+        <Field Name="workplace_name">
+          <DataField>workplace_name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="matricule">
-          <DataField>MATRICULE</DataField>
+        <Field Name="matr">
+          <DataField>matr</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="nom">
-          <DataField>NOM</DataField>
+        <Field Name="legal_name">
+          <DataField>legal_name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="CORP_EMPL_DESCR">
-          <DataField>CORP_EMPL_DESCR</DataField>
+        <Field Name="job_class">
+          <DataField>job_class</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="STAT_ENG">
-          <DataField>STAT_ENG</DataField>
+        <Field Name="employment_status_name">
+          <DataField>employment_status_name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="type">
           <DataField>type</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="ADR_ELECTRNQ_PORTAIL">
-          <DataField>ADR_ELECTRNQ_PORTAIL</DataField>
+        <Field Name="email_address">
+          <DataField>email_address</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
     <DataSet Name="Lieu">
       <Query>
-        <DataSourceName>DataSource2</DataSourceName>
-        <CommandText>  SELECT DISTINCT
-  dbo_dashboard_emp_actif.report_emp_active.LIEU_TRAV
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT [workplace_name]
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
 
-FROM
-  dbo_dashboard_emp_actif.report_emp_active
-
-ORDER BY  dbo_dashboard_emp_actif.report_emp_active.LIEU_TRAV ASC</CommandText>
+ORDER BY  [workplace_name] ASC</CommandText>
       </Query>
       <Fields>
-        <Field Name="LIEU_TRAV">
-          <DataField>LIEU_TRAV</DataField>
+        <Field Name="workplace_name">
+          <DataField>workplace_name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
     <DataSet Name="Corps_demploi">
       <Query>
-        <DataSourceName>DataSource2</DataSourceName>
-        <CommandText>SELECT distinct
-  dbo_dashboard_emp_actif.report_emp_active.CORP_EMPL_DESCR
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT [job_class]
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
 
-FROM
-  dbo_dashboard_emp_actif.report_emp_active
-
-ORDER BY   dbo_dashboard_emp_actif.report_emp_active.CORP_EMPL_DESCR ASC</CommandText>
+ORDER BY  [job_class] ASC</CommandText>
       </Query>
       <Fields>
-        <Field Name="CORP_EMPL_DESCR">
-          <DataField>CORP_EMPL_DESCR</DataField>
+        <Field Name="job_class">
+          <DataField>job_class</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
     <DataSet Name="Statut">
       <Query>
-        <DataSourceName>DataSource2</DataSourceName>
-        <CommandText>SELECT DISTINCT
-  dbo_dashboard_emp_actif.report_emp_active.STAT_ENG
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT [employment_status_name]
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
 
-FROM
-  dbo_dashboard_emp_actif.report_emp_active
-
-ORDER BY   dbo_dashboard_emp_actif.report_emp_active.STAT_ENG ASC</CommandText>
+ORDER BY  [employment_status_name] ASC</CommandText>
       </Query>
       <Fields>
-        <Field Name="STAT_ENG">
-          <DataField>STAT_ENG</DataField>
+        <Field Name="employment_status_name">
+          <DataField>employment_status_name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
     <DataSet Name="Type_rémunérations">
       <Query>
-        <DataSourceName>DataSource2</DataSourceName>
-        <CommandText>SELECT DISTINCT
-  dbo_dashboard_emp_actif.report_emp_active.TYPE
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT [type]
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
 
-FROM
-  dbo_dashboard_emp_actif.report_emp_active
-
-
-ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
+ORDER BY  [type] ASC</CommandText>
       </Query>
       <Fields>
         <Field Name="TYPE">
-          <DataField>TYPE</DataField>
+          <DataField>type</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Actif">
+      <Query>
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT [is_current]
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
+
+ORDER BY  [is_current] ASC</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="is_current">
+          <DataField>is_current</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Nombre">
+      <Query>
+        <DataSourceName>actif</DataSourceName>
+        <QueryParameters>
+          <QueryParameter Name="@Lieu">
+            <Value>=Parameters!Lieu.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Ce">
+            <Value>=Parameters!Ce.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Type">
+            <Value>=Parameters!Type.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Statut">
+            <Value>=Parameters!Statut.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Actif">
+            <Value>=Parameters!Actif.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@cat">
+            <Value>=Parameters!cat.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <CommandText>	SELECT
+count(matr) AS nbr
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
+WHERE 
+  [workplace_name] IN (@Lieu)
+  AND [job_class] IN (@Ce)
+  AND [type] IN (@Type)
+	AND [employment_status_name] IN (@Statut)
+	AND [is_current] IN (@Actif)
+AND job_department IN (@cat)</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="nbr">
+          <DataField>nbr</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Groupe">
+      <Query>
+        <DataSourceName>actif</DataSourceName>
+        <CommandText>SELECT DISTINCT job_department
+FROM 
+  [tbe_dev].[dbo_dashboard_emp_actif].[emp_actif_report_emp_actif]
+
+ORDER BY  job_department ASC</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="job_department">
+          <DataField>job_department</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
@@ -592,7 +665,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!matricule.Value</Value>
+                                  <Value>=Fields!matr.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -645,7 +718,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!nom.Value</Value>
+                                  <Value>=Fields!legal_name.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -698,7 +771,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!CORP_EMPL_DESCR.Value</Value>
+                                  <Value>=Fields!job_class.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -751,7 +824,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!STAT_ENG.Value</Value>
+                                  <Value>=Fields!employment_status_name.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -804,7 +877,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!LIEU_TRAV.Value</Value>
+                                  <Value>=Fields!workplace_name.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -910,7 +983,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ADR_ELECTRNQ_PORTAIL.Value</Value>
+                                  <Value>=Fields!email_address.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -1014,11 +1087,6 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                 <Width>2.25pt</Width>
               </RightBorder>
             </Style>
-            <cl:ComponentMetadata>
-              <cl:ComponentId>6e6617c1-7f16-453a-9ca0-5adf8968715b</cl:ComponentId>
-              <cl:SourcePath>/Report Parts/Tableau</cl:SourcePath>
-              <cl:SyncDate>2023-10-05T22:36:03.5607550-04:00</cl:SyncDate>
-            </cl:ComponentMetadata>
           </Tablix>
           <Textbox Name="Textbox12">
             <CanGrow>true</CanGrow>
@@ -1027,7 +1095,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Liste des employé(e)s actifs en date d'aujourd'hui</Value>
+                    <Value>Liste des employé(e)s actifs</Value>
                     <Style>
                       <FontFamily>Arial Black</FontFamily>
                       <FontSize>14pt</FontSize>
@@ -1093,7 +1161,7 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                   <Paragraph>
                     <TextRuns>
                       <TextRun>
-                        <Value>Cette vue présente l'ensemble des employé(e)s dit actif et ce en date du jour actuel. </Value>
+                        <Value>Cette vue présente l'ensemble des employé(e)s dit actif et ce en date du jour actuel.</Value>
                         <Style />
                       </TextRun>
                     </TextRuns>
@@ -1104,7 +1172,24 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                   <Paragraph>
                     <TextRuns>
                       <TextRun>
-                        <Value>Il est possible de trier les salariés avec leur corps d'emploi, lieu de travail, statut et leur type de rémunération.</Value>
+                        <Value>Il est possible de trier les salariés avec leur catégorie d'emploi, lieu de travail, corps d'emploistatut, et si l'employé est actif présentement.</Value>
+                        <Style />
+                      </TextRun>
+                    </TextRuns>
+                    <ListStyle>Bulleted</ListStyle>
+                    <ListLevel>1</ListLevel>
+                    <Style />
+                  </Paragraph>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>Employé actif actuellement </Value>
+                        <Style>
+                          <FontWeight>Bold</FontWeight>
+                        </Style>
+                      </TextRun>
+                      <TextRun>
+                        <Value>: employé ayant reçu une rémunération au cours des deux dernières semaines.</Value>
                         <Style />
                       </TextRun>
                     </TextRuns>
@@ -1114,9 +1199,79 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                   </Paragraph>
                 </Paragraphs>
                 <rd:DefaultName>Textbox13</rd:DefaultName>
-                <Top>0.49286cm</Top>
-                <Height>1.52273cm</Height>
-                <Width>22.41296cm</Width>
+                <Left>0.05317cm</Left>
+                <Height>2.01559cm</Height>
+                <Width>24.10629cm</Width>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <VerticalAlign>Middle</VerticalAlign>
+                  <PaddingLeft>2pt</PaddingLeft>
+                  <PaddingRight>2pt</PaddingRight>
+                  <PaddingTop>2pt</PaddingTop>
+                  <PaddingBottom>2pt</PaddingBottom>
+                </Style>
+              </Textbox>
+              <Textbox Name="nbr">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>=Sum(Fields!nbr.Value, "Nombre")</Value>
+                        <Style>
+                          <FontFamily>Arial Black</FontFamily>
+                          <FontSize>12pt</FontSize>
+                          <FontWeight>Bold</FontWeight>
+                          <Color>#223654</Color>
+                        </Style>
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>nbr</rd:DefaultName>
+                <Top>0.76729cm</Top>
+                <Left>29.86293cm</Left>
+                <Height>0.89104cm</Height>
+                <Width>3.66889cm</Width>
+                <ZIndex>1</ZIndex>
+                <Style>
+                  <Border>
+                    <Style>None</Style>
+                  </Border>
+                  <PaddingLeft>2pt</PaddingLeft>
+                  <PaddingRight>2pt</PaddingRight>
+                  <PaddingTop>2pt</PaddingTop>
+                  <PaddingBottom>2pt</PaddingBottom>
+                </Style>
+              </Textbox>
+              <Textbox Name="Textbox21">
+                <CanGrow>true</CanGrow>
+                <KeepTogether>true</KeepTogether>
+                <Paragraphs>
+                  <Paragraph>
+                    <TextRuns>
+                      <TextRun>
+                        <Value>Nombre d'employés actifs :</Value>
+                        <Style />
+                      </TextRun>
+                    </TextRuns>
+                    <Style>
+                      <TextAlign>Right</TextAlign>
+                    </Style>
+                  </Paragraph>
+                </Paragraphs>
+                <rd:DefaultName>Textbox21</rd:DefaultName>
+                <Top>0.34713cm</Top>
+                <Left>28.62411cm</Left>
+                <Height>0.6cm</Height>
+                <Width>4.90771cm</Width>
+                <ZIndex>2</ZIndex>
                 <Style>
                   <Border>
                     <Style>None</Style>
@@ -1160,11 +1315,6 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                 <Width>1pt</Width>
               </RightBorder>
             </Style>
-            <cl:ComponentMetadata>
-              <cl:ComponentId>f024df2f-cd9b-41f9-bf3b-b5b6e2e8d2ce</cl:ComponentId>
-              <cl:SourcePath>/Report Parts/Rectangle2</cl:SourcePath>
-              <cl:SyncDate>2023-10-05T22:36:03.9514123-04:00</cl:SyncDate>
-            </cl:ComponentMetadata>
           </Rectangle>
           <Image Name="Image4">
             <Source>Embedded</Source>
@@ -1180,11 +1330,6 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                 <Style>None</Style>
               </Border>
             </Style>
-            <cl:ComponentMetadata>
-              <cl:ComponentId>ef43342f-6fd6-44e4-b449-a68e656ba7ea</cl:ComponentId>
-              <cl:SourcePath>/Report Parts/Image4</cl:SourcePath>
-              <cl:SyncDate>2023-10-05T22:36:04.0920563-04:00</cl:SyncDate>
-            </cl:ComponentMetadata>
           </Image>
           <Line Name="Line2">
             <Top>2.18415cm</Top>
@@ -1271,11 +1416,6 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
                   <Style>None</Style>
                 </Border>
               </Style>
-              <cl:ComponentMetadata>
-                <cl:ComponentId>5e02328e-c8ec-4fe1-95ab-f9dac7fb0333</cl:ComponentId>
-                <cl:SourcePath>/Report Parts/Image2</cl:SourcePath>
-                <cl:SyncDate>2023-10-05T22:36:04.2952218-04:00</cl:SyncDate>
-              </cl:ComponentMetadata>
             </Image>
           </ReportItems>
           <Style>
@@ -1301,46 +1441,34 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
       <DefaultValue>
         <DataSetReference>
           <DataSetName>Lieu</DataSetName>
-          <ValueField>LIEU_TRAV</ValueField>
+          <ValueField>workplace_name</ValueField>
         </DataSetReference>
       </DefaultValue>
       <Prompt>Lieux de travail</Prompt>
       <ValidValues>
         <DataSetReference>
           <DataSetName>Lieu</DataSetName>
-          <ValueField>LIEU_TRAV</ValueField>
-          <LabelField>LIEU_TRAV</LabelField>
+          <ValueField>workplace_name</ValueField>
         </DataSetReference>
       </ValidValues>
       <MultiValue>true</MultiValue>
-      <cl:ComponentMetadata>
-        <cl:ComponentId>19240c85-bc8c-43fc-a3f5-16772701d6dc</cl:ComponentId>
-        <cl:SourcePath>/Report Parts/Lieu</cl:SourcePath>
-        <cl:SyncDate>2023-10-05T22:36:01.9043530-04:00</cl:SyncDate>
-      </cl:ComponentMetadata>
     </ReportParameter>
     <ReportParameter Name="Ce">
       <DataType>String</DataType>
       <DefaultValue>
         <DataSetReference>
           <DataSetName>Corps_demploi</DataSetName>
-          <ValueField>CORP_EMPL_DESCR</ValueField>
+          <ValueField>job_class</ValueField>
         </DataSetReference>
       </DefaultValue>
       <Prompt>Corps d'emploi</Prompt>
       <ValidValues>
         <DataSetReference>
           <DataSetName>Corps_demploi</DataSetName>
-          <ValueField>CORP_EMPL_DESCR</ValueField>
-          <LabelField>CORP_EMPL_DESCR</LabelField>
+          <ValueField>job_class</ValueField>
         </DataSetReference>
       </ValidValues>
       <MultiValue>true</MultiValue>
-      <cl:ComponentMetadata>
-        <cl:ComponentId>065a09ba-ef9a-4145-9348-939be240f51f</cl:ComponentId>
-        <cl:SourcePath>/Report Parts/Ce</cl:SourcePath>
-        <cl:SyncDate>2023-10-05T22:36:03.1232254-04:00</cl:SyncDate>
-      </cl:ComponentMetadata>
     </ReportParameter>
     <ReportParameter Name="Type">
       <DataType>String</DataType>
@@ -1359,34 +1487,57 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
         </DataSetReference>
       </ValidValues>
       <MultiValue>true</MultiValue>
-      <cl:ComponentMetadata>
-        <cl:ComponentId>f42e90ac-a93c-4edf-9563-6bc7ca0953f0</cl:ComponentId>
-        <cl:SourcePath>/Report Parts/Type</cl:SourcePath>
-        <cl:SyncDate>2023-10-05T22:36:03.2638469-04:00</cl:SyncDate>
-      </cl:ComponentMetadata>
     </ReportParameter>
     <ReportParameter Name="Statut">
       <DataType>String</DataType>
       <DefaultValue>
         <DataSetReference>
           <DataSetName>Statut</DataSetName>
-          <ValueField>STAT_ENG</ValueField>
+          <ValueField>employment_status_name</ValueField>
         </DataSetReference>
       </DefaultValue>
       <Prompt>Statut</Prompt>
       <ValidValues>
         <DataSetReference>
           <DataSetName>Statut</DataSetName>
-          <ValueField>STAT_ENG</ValueField>
-          <LabelField>STAT_ENG</LabelField>
+          <ValueField>employment_status_name</ValueField>
         </DataSetReference>
       </ValidValues>
       <MultiValue>true</MultiValue>
-      <cl:ComponentMetadata>
-        <cl:ComponentId>2f27b71e-c7ac-438c-97fc-3d92ac25a838</cl:ComponentId>
-        <cl:SourcePath>/Report Parts/Statut</cl:SourcePath>
-        <cl:SyncDate>2023-10-05T22:36:03.3732391-04:00</cl:SyncDate>
-      </cl:ComponentMetadata>
+    </ReportParameter>
+    <ReportParameter Name="Actif">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>Actif</DataSetName>
+          <ValueField>is_current</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>Actif actuellement</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>Actif</DataSetName>
+          <ValueField>is_current</ValueField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="cat">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>Groupe</DataSetName>
+          <ValueField>job_department</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>Catégorie d'emploi</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>Groupe</DataSetName>
+          <ValueField>job_department</ValueField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
@@ -1413,6 +1564,16 @@ ORDER BY dbo_dashboard_emp_actif.report_emp_active.TYPE ASC</CommandText>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>1</RowIndex>
           <ParameterName>Type</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>2</ColumnIndex>
+          <RowIndex>1</RowIndex>
+          <ParameterName>Actif</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>3</ColumnIndex>
+          <RowIndex>1</RowIndex>
+          <ParameterName>cat</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1648,6 +1809,5 @@ UUUUAFV7n+H8asVXuf4fxoAsv/rG+ppKV/8AWN9TSUAFFFFABRRRQAVzXizwhb+IoBLGfIvo+Yph/I10
     </EmbeddedImage>
   </EmbeddedImages>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportServerUrl>http://spbi1virw22/ReportServer</rd:ReportServerUrl>
   <rd:ReportID>f1955689-1724-4ff4-b7ba-97ecc5900033</rd:ReportID>
 </Report>
