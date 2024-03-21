@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: fact_abs
+    description: >
+        Table uniquement pour les absences des employés.
+    columns:
+      - name: matr
+        description: le matricule de l'employé
+        tests:
+          - not_null
+          - unique  

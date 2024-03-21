@@ -79,6 +79,13 @@ models:
                     +post-hook:
                         ["{{ store.stamp_model('dashboard_emp_conge') }}"]
 
+            emp_conge:
+                +tags: ["emp_abs"]
+                +schema: dashboard_emp_abs
+                pbi_tables:
+                    +post-hook:
+                        ["{{ store.stamp_model('dashboard_emp_abs') }}"]                        
+
             emp_actif:
                 +tags: ["emp_actif"]
                 +schema: dashboard_emp_actif
