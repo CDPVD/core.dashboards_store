@@ -2,9 +2,6 @@
 version: 2
 
 models:
-  - name: fact_tps_partial
-    description: >
-      Table de faits, de résolution année / ecole, qui comptabilise le nombre d'employés à temps partiel par année et école.  
   - name: fact_permanence
     config:
       tags:
@@ -26,19 +23,3 @@ models:
       - resolution:
           combination_of_columns:
             - matr
-
-  - name: fact_today_active
-    config:
-      tags:
-        - hr_active
-        - hr  
-    description: > 
-      This table list all the employees who are currently active as of today. We take the "stat_empl" seed, to see if the employee is active
-    tests:
-      - resolution:
-          combination_of_columns:
-            - matr
-            - corp_empl
-            - is_today_actif
-            - Type
-            - year_check

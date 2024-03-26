@@ -55,7 +55,7 @@ select
         else 'Autres'
     end as 'type'
 from {{ ref("emp_actif_fact_base") }} as act
-left join {{ ref("dim_employees") }} as emp on act.matr = emp.matr
+inner join {{ ref("dim_employees") }} as emp on act.matr = emp.matr
 left join {{ ref("dim_mapper_workplace") }} lieu on act.workplace = lieu.workplace
 left join
     {{ ref("dim_mapper_job_class") }} as job_class on job_class.code_job = act.corp_empl
