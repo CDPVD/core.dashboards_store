@@ -19,9 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 select
     act.matr,
-    act.type as 'asdf34',
     emp.legal_name,
-    emp.sex as gender,
+    emp.genre as gender,
     emp.email_address,
     emp.sex_friendly_name,
     lieu.workplace_name,

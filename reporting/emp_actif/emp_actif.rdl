@@ -1257,7 +1257,7 @@ ORDER BY  job_department ASC</CommandText>
                   <Paragraph>
                     <TextRuns>
                       <TextRun>
-                        <Value>Nombre d'employés actifs :</Value>
+                        <Value>Nombre d'employés actifs : </Value>
                         <Style />
                       </TextRun>
                     </TextRuns>

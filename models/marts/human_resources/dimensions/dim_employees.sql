@@ -51,7 +51,7 @@ with
 -- Join the two tables
 select
     dos.matr as matr,
-    dos.sexe as sex,
+    dos.sexe as genre,
     case
         when sexe = 'm' then 'homme' when sexe = 'f' then 'femme'
     end as sex_friendly_name,
