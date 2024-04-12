@@ -30,4 +30,5 @@ select
 from {{ ref("dim_employees") }} as util
 left join {{ ref("i_pai_dos_empl") }} emp on util.matr = emp.matr
 left join {{ ref("fact_activity_current") }} ca on util.matr = ca.matr
-where emp.etat like 'a%' and emp.ind_empl_princ = 1
+left join {{ ref("etat_empl") }} state on emp.etat = state.etat_empl
+where state.etat_actif = 1 and emp.ind_empl_princ = 1
