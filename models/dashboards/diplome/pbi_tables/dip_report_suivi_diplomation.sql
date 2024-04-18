@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
+    -- Prend les résultats au volet de la matière Français 5. Le volet est un critère
+    -- à l'obtention pour ce cours.
     _volet as (
         select
             res_mat.annee,
@@ -31,6 +33,7 @@ with
             res_mat.etat = 1 and res_mat.code_matiere in ('132510', '132520', '132530')
         group by res_mat.annee, ele.fiche
     ),
+    -- Prend les résultats des matières en cours de l'année courante.
     src_res_mat as (
         select
             res_mat.annee,
@@ -55,14 +58,14 @@ with
             mat.friendly_name as regroupement_matière,
             case
                 when left(right(res_mat.code_matiere, 3), 1) = '4' then 1 else 0
-            end as is_g4,
+            end as is_g4,  -- Le cours est en secondaire 4
             case
                 when left(right(res_mat.code_matiere, 3), 1) = '5' then 1 else 0
-            end as is_g5,
+            end as is_g5,  -- Le cours est en secondaire 5
             res_mat.is_reussite as ind_reussite,
             _volet.ind_reus_volet_fra_5,
             res_mat.res_som as resultat,
-            '1' as 'En_cours',
+            '1' as 'En_cours',  -- Est considéré comme 'En cours'
             res_mat.unites
         from {{ ref("fact_resultat_bilan_matiere") }} as res_mat
         inner join
@@ -112,7 +115,7 @@ with
             ri_res.ind_reus_charl as ind_reussite,
             _volet.ind_reus_volet_fra_5,
             ri_res.nb_unite_charl as unites,
-            '0' as 'En_cours',
+            '0' as 'En_cours',  -- Ne contient pas les résultats de l'année courante avant la fin de l'année.
             row_number() over (
                 partition by ele.fiche, ri_res.matiere
                 order by ri_res.date_resultat desc
@@ -128,7 +131,7 @@ with
             nb_unite_charl != ''  -- Enlève les compétences
             and left(right(ri_res.matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
     ),
-
+    -- L'union des deux tables de résultat
     _union as (
         select
             annee,
@@ -178,6 +181,7 @@ with
         from src_res_mat
     ),
 
+    -- L'aggrégation de toute les données.
     aggre as (
         select
             max(annee) as annee,
@@ -200,7 +204,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ','
-            ) as res_fra_5,
+            ) as res_fra_5,  -- Le résultat en Français 5
             max(
                 case
                     when
@@ -209,7 +213,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_fra_5,
+            ) as ind_sanct_fra_5,  -- L'indicateur d'une note de passage en Français 5
             string_agg(
                 case
                     when regroupement_matière = 'Mathématique 4' and en_cours = '0'
@@ -218,7 +222,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_mat_4,
+            ) as res_mat_4,  -- Le résultat en Mathématique 4
             max(
                 case
                     when
@@ -227,7 +231,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_mat_4,
+            ) as ind_sanct_mat_4,  -- L'indicateur d'une note de passage en Mathématique 4
             string_agg(
                 case
                     when regroupement_matière = 'Anglais 5' and en_cours = '0'
@@ -236,7 +240,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_ang_5,
+            ) as res_ang_5,  -- Le résultat en Anglais 5
             max(
                 case
                     when
@@ -245,7 +249,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_anglais_5,
+            ) as ind_sanct_anglais_5,  -- L'indicateur d'une note de passage en Anglais 5
             string_agg(
                 case
                     when regroupement_matière = 'Science 4' and en_cours = '0'
@@ -254,7 +258,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_sci_4,
+            ) as res_sci_4,  -- Le résultat en Science 4
             max(
                 case
                     when
@@ -263,7 +267,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_science_4,
+            ) as ind_sanct_science_4,  -- L'indicateur d'une note de passage en Science 4
             string_agg(
                 case
                     when regroupement_matière = 'Histoire 4' and en_cours = '0'
@@ -272,7 +276,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_hist_4,
+            ) as res_hist_4,  -- Le résultat en Histoire 4
             max(
                 case
                     when
@@ -281,7 +285,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_histoire_4,
+            ) as ind_sanct_histoire_4,  -- L'indicateur d'une note de passage en Histoire 4
             string_agg(
                 case
                     when
@@ -294,7 +298,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_4_arts,
+            ) as res_compl_4_arts,  -- Le résultat en Complémentaire 4 (Arts)
             string_agg(
                 case
                     when
@@ -307,7 +311,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_4_mus,
+            ) as res_compl_4_mus,  -- Le résultat en Complémentaire 4 (Mus)
             string_agg(
                 case
                     when
@@ -320,7 +324,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_4_art_d,
+            ) as res_compl_4_art_d,  -- Le résultat en Complémentaire 4 (Art D.)
             string_agg(
                 case
                     when
@@ -333,7 +337,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_4_danse,
+            ) as res_compl_4_danse,  -- Le résultat en Complémentaire 4 (Danse)
             max(
                 case
                     when
@@ -350,7 +354,7 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_complementaire_4,
+            ) as ind_sanct_complementaire_4,  -- L'indicateur d'une note de passage dans un cours complémentaire 4
             string_agg(
                 case
                     when
@@ -363,7 +367,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_5_eth,
+            ) as res_compl_5_eth,  -- Le résultat en Complémentaire 5 (Eth)
             string_agg(
                 case
                     when
@@ -376,7 +380,7 @@ with
                     then concat(convert(nvarchar, resultat), ' (En cours)')
                 end,
                 ', '
-            ) as res_compl_5_éduc,
+            ) as res_compl_5_éduc,  -- Le résultat en Complémentaire 5 (Éduc)
             max(
                 case
                     when
@@ -389,31 +393,31 @@ with
                     then 1
                     else 0
                 end
-            ) as ind_sanct_complementaire_5,
+            ) as ind_sanct_complementaire_5,  -- L'indicateur d'une note de passage dans un cours complémentaire 5
             sum(
                 case
                     when is_g4 = 1 and ind_reussite = 'RE'
                     then convert(int, unites)
                     else 0
                 end
-            ) as nb_unites_acquis_g4,
+            ) as nb_unites_acquis_g4,  -- La somme des unités acquis en secondaire 4. Contient toutes les matières.
             sum(
                 case
                     when is_g4 = 1 and en_cours = '1' then convert(int, unites) else 0
                 end
-            ) as nb_unites_g4_en_cours,
+            ) as nb_unites_g4_en_cours,  -- La somme des unités en cours en secondaire 4. Contient toutes les matières.
             sum(
                 case
                     when is_g5 = 1 and ind_reussite = 'RE'
                     then convert(int, unites)
                     else 0
                 end
-            ) as nb_unites_acquis_g5,
+            ) as nb_unites_acquis_g5,  -- La somme des unités acquis en secondaire 5. Contient toutes les matières.
             sum(
                 case
                     when is_g5 = 1 and en_cours = '1' then convert(int, unites) else 0
                 end
-            ) as nb_unites_g5_en_cours,
+            ) as nb_unites_g5_en_cours,  -- La somme des unités en cours en secondaire 5. Contient toutes les matières.
             sum(
                 case
                     when
@@ -424,7 +428,7 @@ with
                     then convert(int, unites)
                     else 0
                 end
-            ) as nb_unites_previsionnel_4,
+            ) as nb_unites_previsionnel_4,  -- La somme des unités prévisionnel en cours ou non en secondaire 4. Contient toutes les matières.
             sum(
                 case
                     when
@@ -435,7 +439,7 @@ with
                     then convert(int, unites)
                     else 0
                 end
-            ) as nb_unites_previsionnel_5,
+            ) as nb_unites_previsionnel_5,  -- La somme des unités prévisionnel en cours ou non en secondaire 5. Contient toutes les matières.
             sum(
                 case
                     when
@@ -452,7 +456,7 @@ with
                     then convert(int, unites)
                     else 0
                 end
-            ) as nb_unites_previsionnel_total
+            ) as nb_unites_previsionnel_total  -- La somme des unités prévisionnel 4 et 5
         from _union
         group by
             fiche,
@@ -484,7 +488,7 @@ with
                     )
                 then 1
                 else 0
-            end as rgp_ind_cours_sanction
+            end as rgp_ind_cours_sanction  -- Le regroupement des indicateurs pour les cours en sanction réussi.
         from aggre
     ),
 
@@ -498,7 +502,7 @@ with
                     and (rgp_ind_cours_sanction = 1)
                 then 1
                 else 0
-            end as ind_obtention_dip_previsionnel
+            end as ind_obtention_dip_previsionnel  -- L'indicateur prévisionnel à la possibilité de l'obtention du diplôme.
         from _rgp_ind_sanct
         where annee = {{ get_current_year() }}
     )
