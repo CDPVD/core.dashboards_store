@@ -25,6 +25,23 @@ models:
         tests:
           - not_null
 
+  - name: rstep_fact_epreuves_uniques
+    description: >
+      (à modifier)La table regroupe les notes des matières sujettes à examens. 
+      Cette table accumule les résultats pour les matières identifées dans 'rstep_dim_subject_evaluation'.
+      Elle sert de point d'entrée à la table 'rstep_fact_evaluations_grades' qui combine ces résultats à ceux d'une éventuelle table custom.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee
+            - code_matiere
+            - mois_resultat
+    columns:
+      - name: res_ministere_final
+        tests:
+          - not_null          
+
   - name: rstep_fact_evaluations_grades
     description: >
       La table regroupe les notes des matières sujettes à examens. Cette table accumulate à la fois les résultats extrait par le processus automatique basé sur rstep_dim_subject_evaluation et aussi les éventuelles tables customs (to be done.)
@@ -46,3 +63,14 @@ models:
 
   - name: rstep_report_evaluation_grades
     description: La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison) par année, au niveau (aggrégé) du CSS.
+
+  - name: rstep_report_liste_eleves_epreuves_uniques
+    description: >
+      à venir
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee
+            - code_matiere
+            - mois_resultat
