@@ -45,11 +45,13 @@ models:
           combination_of_columns:
             - id_indicateur
             - annee
-            - eco
-            - nom_ecole
+            - school_friendly_name
             - genre
             - plan_interv_ehdaa
             - population
+            - dist
+            - grp_rep
+            - class
 
   - name: pevr_indicateurs_epreuves
     description: liste des indicateurs du pevr lié aux épreuves du MEQ. 
@@ -58,12 +60,14 @@ models:
           combination_of_columns:
             - id_indicateur
             - annee
-            - etape
-            - eco
+            - school_friendly_name
             - genre
             - plan_interv_ehdaa
             - population
-            - is_francisation
+            - dist
+            - grp_rep
+            - class
+
 
   - name: pevr_indicateurs_ppp
     description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers. 
@@ -72,6 +76,13 @@ models:
           combination_of_columns:
             - id_indicateur
             - annee
-            - eco
+            - school_friendly_name
+            - genre
+            - plan_interv_ehdaa
+            - population
+            - dist
+            - grp_rep
+            - class
+
 
 

@@ -23,11 +23,15 @@ with
         select
             res.annee,
             res.fiche,
-            sch.eco,
+            sch.school_friendly_name,
             el.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
-            y_stud.is_francisation,
+            case when y_stud.dist is null then '-' else y_stud.dist end as dist,
+            case when y_stud.class is null then '-' else y_stud.class end as class,
+            case
+                when y_stud.grp_rep is null then '-' else y_stud.grp_rep
+            end as grp_rep,
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -46,48 +50,70 @@ with
         where
             res.annee
             between {{ store.get_current_year() }}
-            - 2 and {{ store.get_current_year() }}
+            - 3 and {{ store.get_current_year() }}
+            and etape = 'EX'
     ),
+
     agg as (
         select
             annee,
-            eco,
+            school_friendly_name,
             genre,
             plan_interv_ehdaa,
             population,
-            is_francisation,
+            dist,
+            grp_rep,
+            class,
             code_matiere,
-            no_competence,
-            etape,
             count(fiche) nb_resultat,
             avg(is_maitrise) tx_maitrise
         from src
         group by
             annee,
-            code_matiere,
-            no_competence,
-            etape, cube (eco, genre, plan_interv_ehdaa, population, is_francisation)
+            code_matiere, cube (
+                school_friendly_name,
+                genre,
+                plan_interv_ehdaa,
+                population,
+                dist,
+                grp_rep,
+                class
+            )
+    ),
+
+    _coalesce as (
+        select
+            ind.id_indicateur,
+            ind.description_indicateur,
+            agg.annee,
+            coalesce(school_friendly_name, 'CSS') as school_friendly_name,
+            coalesce(genre, 'Tout') as genre,
+            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(population, 'Tout') as population,
+            coalesce(dist, 'Tout') as dist,
+            coalesce(grp_rep, 'Tout') as grp_rep,
+            coalesce(class, 'Tout') as class,
+            nb_resultat,
+            tx_maitrise
+        from agg
+        inner join
+            {{ ref("pevr_dim_indicateurs_matiere") }} as ind
+            on agg.code_matiere = ind.code_matiere
     )
+
 select
-    ind.id_indicateur,
-    ind.description_indicateur,
-    agg.annee,
-    coalesce(agg.eco, 'CSS') as eco,
-    coalesce(school_friendly_name, 'CSS') as nom_ecole,
-    coalesce(genre, 'Tout') as genre,
-    coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-    coalesce(population, 'Tout') as population,
-    coalesce(cast(is_francisation as varchar), 'Tout') as is_francisation,
-    agg.code_matiere,
-    agg.no_competence,
-    etape,
-    nb_resultat,
-    tx_maitrise
-from agg
-left join
-    {{ ref("dim_mapper_schools") }} as sch
-    on agg.annee = sch.annee
-    and agg.eco = sch.eco
-inner join
-    {{ ref("pevr_dim_indicateurs_matiere") }} as ind
-    on agg.code_matiere = ind.code_matiere
+    *,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "school_friendly_name",
+                "plan_interv_ehdaa",
+                "genre",
+                "population",
+                "dist",
+                "grp_rep",
+                "class",
+            ]
+        )
+    }} as filter_key
+from _coalesce
