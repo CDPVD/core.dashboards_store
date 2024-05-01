@@ -18,27 +18,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with
     src as (
         select
-            src.annee,
+            sch.annee,
             src.fiche,
             sch.school_friendly_name,
-            el.genre,
-            src.plan_interv_ehdaa,
-            src.population,
-            case when src.dist is null then '-' else src.dist end as dist,
-            case when src.grp_rep is null then '-' else src.grp_rep end as grp_rep,
-            case when src.class is null then '-' else src.class end as class,
             case
                 when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
             end as 'ind_obtention'
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
         left join {{ ref("i_e_ri_mentions") }} as mentions on src.fiche = mentions.fiche
-        left join {{ ref("dim_eleve") }} as el on src.fiche = el.fiche
-        left join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
+        inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         where
             mentions.prog_charl = '6200'
-            and src.annee
+            and sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
+    ),
+
+    _filtre as (
+        select
+            src.annee,
+            src.fiche,
+            src.school_friendly_name,
+            src.ind_obtention,
+            ele.genre,
+            y_stud.plan_interv_ehdaa,
+            y_stud.population,
+            case
+                when y_stud.dist is null then '-' else y_stud.dist
+            end as code_distribution,
+            case
+                when y_stud.grp_rep is null then '-' else y_stud.grp_rep
+            end as grp_rep,
+            case
+                when y_stud.class is null then '-' else y_stud.class
+            end as classification
+        from src
+        inner join
+            {{ ref("fact_yearly_student") }} as y_stud
+            on src.fiche = y_stud.fiche
+            and src.annee = y_stud.annee
+        inner join {{ ref("dim_eleve") }} as ele on src.fiche = ele.fiche
     ),
 
     agg_dip as (
@@ -49,21 +68,21 @@ with
             genre,
             plan_interv_ehdaa,
             population,
-            dist,
+            code_distribution,
             grp_rep,
-            class,
+            classification,
             count(fiche) nb_resultat,
-            avg(ind_obtention) as avg_diplo
-        from src
+            avg(ind_obtention) as taux_diplomation
+        from _filtre
         group by
             annee, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
                 population,
-                dist,
+                code_distribution,
                 grp_rep,
-                class
+                classification
             )
     ),
 
@@ -76,11 +95,11 @@ with
             coalesce(agg_dip.genre, 'Tout') as genre,
             coalesce(agg_dip.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(agg_dip.population, 'Tout') as population,
-            coalesce(dist, 'Tout') as dist,
-            coalesce(grp_rep, 'Tout') as grp_rep,
-            coalesce(class, 'Tout') as class,
-            nb_resultat,
-            avg_diplo
+            coalesce(agg_dip.code_distribution, 'Tout') as code_distribution,
+            coalesce(agg_dip.grp_rep, 'Tout') as grp_rep,
+            coalesce(agg_dip.classification, 'Tout') as classification,
+            agg_dip.nb_resultat,
+            agg_dip.taux_diplomation
         from agg_dip
         inner join
             {{ ref("pevr_dim_indicateurs") }} as ind
@@ -88,7 +107,11 @@ with
     )
 
 select
-    *,
+    id_indicateur,
+    description_indicateur,
+    annee,
+    nb_resultat,
+    taux_diplomation,
     {{
         dbt_utils.generate_surrogate_key(
             [
@@ -96,10 +119,10 @@ select
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "dist",
+                "code_distribution",
                 "grp_rep",
-                "class",
+                "classification",
             ]
         )
-    }} as filter_key
+    }} as id_filtre
 from _coalesce

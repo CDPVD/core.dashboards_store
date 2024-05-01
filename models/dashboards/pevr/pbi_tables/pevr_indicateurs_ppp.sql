@@ -26,11 +26,15 @@ with
             ele.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
-            case when y_stud.dist is null then '-' else y_stud.dist end as dist,
-            case when y_stud.class is null then '-' else y_stud.class end as class,
+            case
+                when y_stud.dist is null then '-' else y_stud.dist
+            end as code_distribution,
             case
                 when y_stud.grp_rep is null then '-' else y_stud.grp_rep
             end as grp_rep,
+            case
+                when y_stud.class is null then '-' else y_stud.class
+            end as classification
             case when y_stud.is_ppp = 1 then 1. else 0. end as is_ppp
         from {{ ref("fact_yearly_student") }} y_stud
         inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche
@@ -48,15 +52,22 @@ with
             genre,
             plan_interv_ehdaa,
             population,
-            dist,
+            code_distribution,
             grp_rep,
-            class,
+            classification,
             sum(is_ppp) as nb_ppp,
-            avg(is_ppp) as tx_ppp
+            avg(is_ppp) as taux_ppp
         from src
         group by
-            annee,
-            cube (eco, genre, plan_interv_ehdaa, population, dist, grp_rep, class)
+            annee, cube (
+                eco,
+                genre,
+                plan_interv_ehdaa,
+                population,
+                code_distribution,
+                grp_rep,
+                classification
+            )
     ),
 
     _coalesce as (
@@ -65,14 +76,14 @@ with
             ind.description_indicateur,
             ppp.annee,
             coalesce(sch.school_friendly_name, 'CSS') as school_friendly_name,
-            coalesce(genre, 'Tout') as genre,
-            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-            coalesce(population, 'Tout') as population,
-            coalesce(dist, 'Tout') as dist,
-            coalesce(grp_rep, 'Tout') as grp_rep,
-            coalesce(class, 'Tout') as class,
+            coalesce(ppp.genre, 'Tout') as genre,
+            coalesce(ppp.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(ppp.population, 'Tout') as population,
+            coalesce(ppp.code_distribution, 'Tout') as code_distribution,
+            coalesce(ppp.grp_rep, 'Tout') as grp_rep,
+            coalesce(ppp.classification, 'Tout') as classification,
             nb_ppp,
-            tx_ppp
+            taux_ppp
         from ppp
         left join
             {{ ref("dim_mapper_schools") }} as sch
@@ -84,7 +95,11 @@ with
     )
 
 select
-    *,
+    id_indicateur,
+    description_indicateur,
+    annee,
+    nb_resultat,
+    taux_ppp,
     {{
         dbt_utils.generate_surrogate_key(
             [
@@ -92,10 +107,10 @@ select
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "dist",
+                "code_distribution",
                 "grp_rep",
-                "class",
+                "classification",
             ]
         )
-    }} as filter_key
+    }} as id_filtre
 from _coalesce
