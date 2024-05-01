@@ -55,7 +55,7 @@ with
         inner join
             {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
             on res_mat.fiche = ele.fiche
-            and res_mat.annee = ele.annee
+            and res_mat.id_eco = ele.id_eco
         inner join _volet on res_mat.fiche = _volet.fiche
         left join
             {{ ref("matiere_evalue") }} as mat

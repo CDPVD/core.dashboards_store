@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
     src as (
-        select y_stud.annee, y_stud.fiche
+        select y_stud.fiche, y_stud.id_eco
         from {{ ref("fact_yearly_student") }} as y_stud
         where
             y_stud.ordre_ens = '4'  -- Secondaire

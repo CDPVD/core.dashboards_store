@@ -83,7 +83,7 @@ models:
       - resolution:
           combination_of_columns:
             - fiche
-            - annee
+            - id_eco
 
   - name: stg_yearly_eleve_matiere_groupe
     config:
