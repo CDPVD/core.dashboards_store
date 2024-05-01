@@ -82,9 +82,8 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - code_perm
-            - population
-            - id_eco
+            - fiche
+            - annee
 
   - name: stg_yearly_eleve_matiere_groupe
     config:

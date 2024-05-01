@@ -17,23 +17,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
     src as (
-        select
-            y_stud.code_perm,
-            y_stud.fiche,
-            y_stud.population,
-            y_stud.plan_interv_ehdaa,
-            ele.genre,
-            y_stud.age_30_sept,
-            y_stud.is_francisation,
-            y_stud.is_ppp,
-            y_stud.grp_rep,
-            y_stud.dist,
-            y_stud.class,
-            y_stud.annee,
-            y_stud.id_eco,
-            y_stud.eco
+        select y_stud.annee, y_stud.fiche
         from {{ ref("fact_yearly_student") }} as y_stud
-        inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche
         where
             y_stud.ordre_ens = '4'  -- Secondaire
             and y_stud.niveau_scolaire = 'Sec 5'  -- L'élève est en sec 5

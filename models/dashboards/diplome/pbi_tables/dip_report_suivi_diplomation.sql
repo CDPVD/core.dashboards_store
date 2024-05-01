@@ -38,22 +38,6 @@ with
         select
             res_mat.annee,
             ele.fiche,
-            ele.population,
-            ele.genre,
-            ele.plan_interv_ehdaa,
-            cast(ele.age_30_sept as nvarchar) as age_30_sept,
-            case
-                when ele.is_francisation = 0
-                then 'Non'
-                when ele.is_francisation = 1
-                then 'Oui'
-            end as francisation,
-            case
-                when ele.is_ppp = 0 then 'Non' when ele.is_ppp = 1 then 'Oui'
-            end as ppp,
-            ele.grp_rep,
-            ele.dist,
-            ele.class,
             res_mat.code_matiere as code_matiere,
             mat.friendly_name as regroupement_matière,
             case
@@ -87,22 +71,6 @@ with
         select
             ri_res.annee,
             ele.fiche,
-            ele.population,
-            ele.genre,
-            ele.plan_interv_ehdaa,
-            cast(ele.age_30_sept as nvarchar) as age_30_sept,
-            case
-                when ele.is_francisation = 0
-                then 'Non'
-                when ele.is_francisation = 1
-                then 'Oui'
-            end as francisation,
-            case
-                when ele.is_ppp = 0 then 'Non' when ele.is_ppp = 1 then 'Oui'
-            end as ppp,
-            ele.grp_rep,
-            ele.dist,
-            ele.class,
             ri_res.matiere as code_matiere,
             mat.friendly_name as regroupement_matière,
             case
@@ -136,15 +104,6 @@ with
         select
             annee,
             fiche,
-            population,
-            genre,
-            plan_interv_ehdaa,
-            age_30_sept,
-            francisation,
-            ppp,
-            grp_rep,
-            dist,
-            class,
             code_matiere,
             regroupement_matière,
             resultat,
@@ -160,15 +119,6 @@ with
         select
             annee,
             fiche,
-            population,
-            genre,
-            plan_interv_ehdaa,
-            age_30_sept,
-            francisation,
-            ppp,
-            grp_rep,
-            dist,
-            class,
             code_matiere,
             regroupement_matière,
             resultat,
@@ -186,15 +136,6 @@ with
         select
             max(annee) as annee,
             fiche,
-            population,
-            genre,
-            plan_interv_ehdaa,
-            age_30_sept,
-            francisation,
-            ppp,
-            grp_rep,
-            dist,
-            class,
             min(ind_reus_volet_fra_5) as ind_reus_volet_fra_5,
             string_agg(
                 case
@@ -458,17 +399,7 @@ with
                 end
             ) as nb_unites_previsionnel_total  -- La somme des unités prévisionnel 4 et 5
         from _union
-        group by
-            fiche,
-            population,
-            genre,
-            plan_interv_ehdaa,
-            age_30_sept,
-            francisation,
-            ppp,
-            grp_rep,
-            dist,
-            class
+        group by fiche
     ),
 
     _rgp_ind_sanct as (
@@ -505,11 +436,41 @@ with
             end as ind_obtention_dip_previsionnel  -- L'indicateur prévisionnel à la possibilité de l'obtention du diplôme.
         from _rgp_ind_sanct
         where annee = {{ get_current_year() }}
+    ),
+
+    filtre_eleve as (
+        select
+            _diplomable.*,
+            y_stud.code_perm,
+            y_stud.population,
+            y_stud.plan_interv_ehdaa,
+            ele.genre,
+            cast(y_stud.age_30_sept as nvarchar) as age_30_sept,
+            case
+                when y_stud.is_francisation = 0
+                then 'Non'
+                when y_stud.is_francisation = 1
+                then 'Oui'
+            end as francisation,
+            case
+                when y_stud.is_ppp = 0 then 'Non' when y_stud.is_ppp = 1 then 'Oui'
+            end as ppp,
+            y_stud.grp_rep,
+            y_stud.dist,
+            y_stud.class
+        from _diplomable
+        inner join
+            {{ ref("fact_yearly_student") }} as y_stud
+            on _diplomable.fiche = y_stud.fiche
+            and _diplomable.annee = y_stud.annee
+        inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche
+
     )
 
 select
     annee,
     fiche,
+    code_perm,
     population,
     genre,
     plan_interv_ehdaa,
@@ -538,4 +499,4 @@ select
     nb_unites_previsionnel_5,
     nb_unites_previsionnel_total,
     ind_obtention_dip_previsionnel
-from _diplomable
+from filtre_eleve

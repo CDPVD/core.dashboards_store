@@ -84,5 +84,5 @@ models:
             - grp_rep
             - class
 
-
-
+  - name: pevr_filtres
+    description: Table de filtre pour le tableau de bord PEVR.
