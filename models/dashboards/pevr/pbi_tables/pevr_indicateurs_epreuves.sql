@@ -27,11 +27,15 @@ with
             el.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
-            case when y_stud.dist is null then '-' else y_stud.dist end as dist,
-            case when y_stud.class is null then '-' else y_stud.class end as class,
+            case
+                when y_stud.dist is null then '-' else y_stud.dist
+            end as code_distribution,
             case
                 when y_stud.grp_rep is null then '-' else y_stud.grp_rep
             end as grp_rep,
+            case
+                when y_stud.class is null then '-' else y_stud.class
+            end as classification
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -61,12 +65,12 @@ with
             genre,
             plan_interv_ehdaa,
             population,
-            dist,
+            code_distribution,
             grp_rep,
-            class,
+            classification,
             code_matiere,
             count(fiche) nb_resultat,
-            avg(is_maitrise) tx_maitrise
+            avg(is_maitrise) taux_maitrise
         from src
         group by
             annee,
@@ -75,9 +79,9 @@ with
                 genre,
                 plan_interv_ehdaa,
                 population,
-                dist,
+                code_distribution,
                 grp_rep,
-                class
+                classification
             )
     ),
 
@@ -86,15 +90,15 @@ with
             ind.id_indicateur,
             ind.description_indicateur,
             agg.annee,
-            coalesce(school_friendly_name, 'CSS') as school_friendly_name,
-            coalesce(genre, 'Tout') as genre,
-            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-            coalesce(population, 'Tout') as population,
-            coalesce(dist, 'Tout') as dist,
-            coalesce(grp_rep, 'Tout') as grp_rep,
-            coalesce(class, 'Tout') as class,
+            coalesce(agg.school_friendly_name, 'CSS') as school_friendly_name,
+            coalesce(agg.genre, 'Tout') as genre,
+            coalesce(agg.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(agg.population, 'Tout') as population,
+            coalesce(agg.code_distribution, 'Tout') as code_distribution,
+            coalesce(agg.grp_rep, 'Tout') as grp_rep,
+            coalesce(agg.classification, 'Tout') as classification,
             nb_resultat,
-            tx_maitrise
+            taux_maitrise
         from agg
         inner join
             {{ ref("pevr_dim_indicateurs_matiere") }} as ind
@@ -102,7 +106,11 @@ with
     )
 
 select
-    *,
+    id_indicateur,
+    description_indicateur,
+    annee,
+    nb_resultat,
+    taux_maitrise,
     {{
         dbt_utils.generate_surrogate_key(
             [
@@ -110,10 +118,10 @@ select
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "dist",
+                "code_distribution",
                 "grp_rep",
-                "class",
+                "classification",
             ]
         )
-    }} as filter_key
+    }} as id_filtre
 from _coalesce

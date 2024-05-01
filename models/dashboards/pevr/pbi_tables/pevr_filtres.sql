@@ -16,49 +16,96 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
-    ecole as (
-        select distinct school_friendly_name from {{ ref("pevr_indicateur_des") }}
+    eco_unique as (
+        select
+            eco,
+            school_friendly_name,
+            row_number() over (partition by eco order by annee desc) as seqid
+        from {{ ref("dim_mapper_schools") }}
     ),
-    _plan as (select distinct plan_interv_ehdaa from {{ ref("pevr_indicateur_des") }}),
-    gre as (select distinct genre from {{ ref("pevr_indicateur_des") }}),
-    pop as (select distinct population from {{ ref("pevr_indicateur_des") }}),
-    dis as (select distinct dist from {{ ref("pevr_indicateur_des") }}),
-    grp_r as (select distinct grp_rep from {{ ref("pevr_indicateur_des") }}),
-    classi as (select distinct class from {{ ref("pevr_indicateur_des") }})
+    eco as (
+        select school_friendly_name as ecole
+        from eco_unique
+        where seqid = 1
+        union
+        select 'CSS' as ecole
+    ),
+    edhaa as (
+        select distinct plan_interv_ehdaa
+        from {{ ref("fact_yearly_student") }}
+        where annee = {{ store.get_current_year() }}
+        union
+        select 'Tous' as plan_interv_ehdaa
+    ),
+    genre as (
+        select distinct genre
+        from {{ ref("dim_eleve") }}
+        where genre != 'X'
+        union
+        select 'Tous' as genre
+    ),
+    pop as (
+        select distinct population
+        from {{ ref("fact_yearly_student") }}
+        where annee = {{ store.get_current_year() }}
+        union
+        select 'Tous' as population
+    ),
+    dist as (
+        select distinct dist as code_distribution
+        from {{ ref("fact_yearly_student") }}
+        where annee = {{ store.get_current_year() }}
+        union
+        select 'Tous' as code_distribution
+    ),
+    grp_rep as (
+        select distinct grp_rep
+        from {{ ref("fact_yearly_student") }}
+        where annee = {{ store.get_current_year() }}
+        union
+        select 'Tous' as grp_rep
+    ),
+    class as (
+        select distinct class as classification
+        from {{ ref("fact_yearly_student") }}
+        where annee = {{ store.get_current_year() }}
+        union
+        select 'Tous' as classification
+    )
 
 select
-    ecole.school_friendly_name,
-    _plan.plan_interv_ehdaa,
-    gre.genre,
+    eco.ecole,
+    edhaa.plan_interv_ehdaa,
+    genre.genre,
     pop.population,
-    dis.dist,
-    grp_r.grp_rep,
-    classi.class,
+    dist.code_distribution,
+    grp_rep.grp_rep,
+    class.classification,
     {{
         dbt_utils.generate_surrogate_key(
             [
-                "school_friendly_name",
+                "ecole",
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "dist",
+                "code_distribution",
                 "grp_rep",
-                "class",
+                "classification",
             ]
         )
     }} as filter_key
-from ecole
-cross join _plan as _plan
-cross join gre as gre
-cross join pop as pop
-cross join dis as dis
-cross join grp_r as grp_r
-cross join classi as classi
+from eco
+cross join edhaa
+cross join genre
+cross join pop
+cross join dist
+cross join grp_rep
+cross join class
 where
-    ecole.school_friendly_name is not null
-    and _plan.plan_interv_ehdaa is not null
-    and gre.genre is not null
+    eco.ecole is not null
+    and edhaa.plan_interv_ehdaa is not null
+    and genre.genre is not null
     and pop.population is not null
-    and dis.dist is not null
-    and grp_r.grp_rep is not null
-    and classi.class is not null
+    and dist.code_distribution is not null
+    and grp_rep.grp_rep is not null
+    and class.classification is not null
