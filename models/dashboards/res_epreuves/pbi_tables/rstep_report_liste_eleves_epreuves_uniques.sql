@@ -47,7 +47,7 @@ select
     res_ministere_brute,
     res_ministere_conv,
     res_ministere_final,
-    is_reussite_charl,
+    ind_reussite_charl,
     moderation,
     res_ministere_num,
     res_final_num,

@@ -40,7 +40,7 @@ with
             res_off_brute as res_ministere_brute,
             res_off_conv as res_ministere_conv,
             res_off_final as res_ministere_final,
-            is_reus_charl as is_reussite_charl,
+            ind_reus_charl as ind_reussite_charl,
             case
                 when res_eco_mod = 'RIN'
                 then null
@@ -121,7 +121,7 @@ select
         when res_ministere_conv = '' then null else res_ministere_conv
     end as res_ministere_conv,
     res_ministere_final,
-    is_reussite_charl,
+    ind_reussite_charl,
     moderation,
     res_ministere_num,
     res_final_num,
