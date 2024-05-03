@@ -98,7 +98,7 @@ select
     id_indicateur,
     description_indicateur,
     annee,
-    nb_resultat,
+    nb_ppp,
     taux_ppp,
     {{
         dbt_utils.generate_surrogate_key(
