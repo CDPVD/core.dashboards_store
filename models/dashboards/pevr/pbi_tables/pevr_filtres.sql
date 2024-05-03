@@ -16,12 +16,19 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
-    eco as (
-        select distinct school_friendly_name
+    eco_unique as (
+        select
+            eco,
+            school_friendly_name,
+            row_number() over (partition by eco order by annee desc) as seqid
         from {{ ref("dim_mapper_schools") }}
-        where annee = {{ store.get_current_year() }}
+    ),
+    eco as (
+        select school_friendly_name as ecole
+        from eco_unique
+        where seqid = 1
         union
-        select 'CSS' as school_friendly_name
+        select 'CSS' as ecole
     ),
     edhaa as (
         select distinct plan_interv_ehdaa
@@ -33,6 +40,7 @@ with
     genre as (
         select distinct genre
         from {{ ref("dim_eleve") }}
+        where genre != 'X'
         union
         select 'Tous' as genre
     ),
@@ -66,7 +74,7 @@ with
     )
 
 select
-    eco.school_friendly_name,
+    eco.ecole,
     edhaa.plan_interv_ehdaa,
     genre.genre,
     pop.population,
@@ -76,7 +84,7 @@ select
     {{
         dbt_utils.generate_surrogate_key(
             [
-                "school_friendly_name",
+                "ecole",
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
@@ -94,7 +102,7 @@ cross join dist
 cross join grp_rep
 cross join class
 where
-    eco.school_friendly_name is not null
+    eco.ecole is not null
     and edhaa.plan_interv_ehdaa is not null
     and genre.genre is not null
     and pop.population is not null
