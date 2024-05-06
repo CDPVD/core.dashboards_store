@@ -441,10 +441,12 @@ with
     filtre_eleve as (
         select
             _diplomable.*,
+            y_stud.id_eco,
             y_stud.code_perm,
             y_stud.population,
             y_stud.plan_interv_ehdaa,
             ele.genre,
+            ele.nom_prenom_fiche,
             cast(y_stud.age_30_sept as nvarchar) as age_30_sept,
             case
                 when y_stud.is_francisation = 0
@@ -468,18 +470,18 @@ with
     )
 
 select
-    annee,
     fiche,
-    code_perm,
+    el.annee,
+    nom_prenom_fiche,
+    school_friendly_name as ecole,
     population,
     genre,
     plan_interv_ehdaa,
     age_30_sept,
     francisation,
-    ppp,
     grp_rep,
-    dist,
-    class,
+    dist code_distribution,
+    class as code_classification,
     res_fra_5,
     res_mat_4,
     res_ang_5,
@@ -499,4 +501,5 @@ select
     nb_unites_previsionnel_5,
     nb_unites_previsionnel_total,
     ind_obtention_dip_previsionnel
-from filtre_eleve
+from filtre_eleve as el
+left join {{ ref("dim_mapper_schools") }} as eco on el.id_eco = eco.id_eco
