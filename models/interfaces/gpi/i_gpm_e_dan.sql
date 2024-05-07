@@ -33,5 +33,6 @@ select
     age_30_sept,
     categ_prog_part,
     type_prog_part,
-    regrp_ehdaa
+    regrp_ehdaa,
+    motif_depart
 from {{ var("database_gpi") }}.dbo.gpm_e_dan
