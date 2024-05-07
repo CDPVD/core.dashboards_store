@@ -19,6 +19,7 @@ with
     src as (
         select
             sch.annee,
+            sch.annee_scolaire,
             src.fiche,
             sch.school_friendly_name,
             case
@@ -37,18 +38,13 @@ with
     _filtre as (
         select
             src.annee,
+            src.annee_scolaire,
             src.fiche,
             src.school_friendly_name,
             src.ind_obtention,
             ele.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
-            case
-                when y_stud.dist is null then '-' else y_stud.dist
-            end as code_distribution,
-            case
-                when y_stud.grp_rep is null then '-' else y_stud.grp_rep
-            end as grp_rep,
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification
@@ -63,25 +59,21 @@ with
     agg_dip as (
         select
             '1.1.1.1' as id_indicateur,
-            annee,
+            annee_scolaire,
             school_friendly_name,
             genre,
             plan_interv_ehdaa,
             population,
-            code_distribution,
-            grp_rep,
             classification,
             count(fiche) nb_resultat,
             avg(ind_obtention) as taux_diplomation
         from _filtre
         group by
-            annee, cube (
+            annee_scolaire, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
                 population,
-                code_distribution,
-                grp_rep,
                 classification
             )
     ),
@@ -90,13 +82,11 @@ with
         select
             ind.id_indicateur,
             ind.description_indicateur,
-            agg_dip.annee,
-            coalesce(agg_dip.school_friendly_name, 'CSS') as school_friendly_name,
+            agg_dip.annee_scolaire,
+            coalesce(agg_dip.school_friendly_name, 'CSS') as ecole,
             coalesce(agg_dip.genre, 'Tout') as genre,
             coalesce(agg_dip.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(agg_dip.population, 'Tout') as population,
-            coalesce(agg_dip.code_distribution, 'Tout') as code_distribution,
-            coalesce(agg_dip.grp_rep, 'Tout') as grp_rep,
             coalesce(agg_dip.classification, 'Tout') as classification,
             agg_dip.nb_resultat,
             agg_dip.taux_diplomation
@@ -109,18 +99,16 @@ with
 select
     id_indicateur,
     description_indicateur,
-    annee,
+    annee_scolaire,
     nb_resultat,
     taux_diplomation,
     {{
         dbt_utils.generate_surrogate_key(
             [
-                "school_friendly_name",
+                "ecole",
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "code_distribution",
-                "grp_rep",
                 "classification",
             ]
         )

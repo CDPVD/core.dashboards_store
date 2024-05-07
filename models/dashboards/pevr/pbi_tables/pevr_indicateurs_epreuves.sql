@@ -22,20 +22,18 @@ with
     src as (
         select
             res.annee,
+            sch.annee_scolaire,
             res.fiche,
             sch.school_friendly_name,
             el.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
             case
-                when y_stud.dist is null then '-' else y_stud.dist
-            end as code_distribution,
-            case
                 when y_stud.grp_rep is null then '-' else y_stud.grp_rep
             end as grp_rep,
             case
                 when y_stud.class is null then '-' else y_stud.class
-            end as classification
+            end as classification,
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -60,27 +58,23 @@ with
 
     agg as (
         select
-            annee,
+            annee_scolaire,
             school_friendly_name,
             genre,
             plan_interv_ehdaa,
             population,
-            code_distribution,
-            grp_rep,
             classification,
             code_matiere,
             count(fiche) nb_resultat,
             avg(is_maitrise) taux_maitrise
         from src
         group by
-            annee,
+            annee_scolaire,
             code_matiere, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
                 population,
-                code_distribution,
-                grp_rep,
                 classification
             )
     ),
@@ -89,13 +83,11 @@ with
         select
             ind.id_indicateur,
             ind.description_indicateur,
-            agg.annee,
-            coalesce(agg.school_friendly_name, 'CSS') as school_friendly_name,
+            agg.annee_scolaire,
+            coalesce(agg.school_friendly_name, 'CSS') as ecole,
             coalesce(agg.genre, 'Tout') as genre,
             coalesce(agg.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(agg.population, 'Tout') as population,
-            coalesce(agg.code_distribution, 'Tout') as code_distribution,
-            coalesce(agg.grp_rep, 'Tout') as grp_rep,
             coalesce(agg.classification, 'Tout') as classification,
             nb_resultat,
             taux_maitrise
@@ -108,18 +100,16 @@ with
 select
     id_indicateur,
     description_indicateur,
-    annee,
+    annee_scolaire,
     nb_resultat,
     taux_maitrise,
     {{
         dbt_utils.generate_surrogate_key(
             [
-                "school_friendly_name",
+                "ecole",
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "code_distribution",
-                "grp_rep",
                 "classification",
             ]
         )

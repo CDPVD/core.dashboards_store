@@ -43,46 +43,28 @@ models:
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - id_indicateur
-            - annee
-            - school_friendly_name
-            - genre
-            - plan_interv_ehdaa
-            - population
-            - dist
-            - grp_rep
-            - class
+            - id_filtre
 
   - name: pevr_indicateurs_epreuves
-    description: liste des indicateurs du pevr lié aux épreuves du MEQ. 
+    description: liste des indicateurs du pevr lié aux épreuves du MEQ.
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - id_indicateur
-            - annee
-            - school_friendly_name
-            - genre
-            - plan_interv_ehdaa
-            - population
-            - dist
-            - grp_rep
-            - class
+            - id_filtre
 
 
   - name: pevr_indicateurs_ppp
-    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers. 
+    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - id_indicateur
-            - annee
-            - school_friendly_name
-            - genre
-            - plan_interv_ehdaa
-            - population
-            - dist
-            - grp_rep
-            - class
+            - id_filtre
 
   - name: pevr_filtres
     description: Table de filtre pour le tableau de bord PEVR.

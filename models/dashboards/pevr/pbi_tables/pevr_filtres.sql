@@ -33,44 +33,27 @@ with
     edhaa as (
         select distinct plan_interv_ehdaa
         from {{ ref("fact_yearly_student") }}
-        where annee = {{ store.get_current_year() }}
         union
-        select 'Tous' as plan_interv_ehdaa
+        select 'Tout' as plan_interv_ehdaa
     ),
     genre as (
         select distinct genre
         from {{ ref("dim_eleve") }}
         where genre != 'X'
         union
-        select 'Tous' as genre
+        select 'Tout' as genre
     ),
     pop as (
         select distinct population
         from {{ ref("fact_yearly_student") }}
-        where annee = {{ store.get_current_year() }}
         union
-        select 'Tous' as population
-    ),
-    dist as (
-        select distinct dist as code_distribution
-        from {{ ref("fact_yearly_student") }}
-        where annee = {{ store.get_current_year() }}
-        union
-        select 'Tous' as code_distribution
-    ),
-    grp_rep as (
-        select distinct grp_rep
-        from {{ ref("fact_yearly_student") }}
-        where annee = {{ store.get_current_year() }}
-        union
-        select 'Tous' as grp_rep
+        select 'Tout' as population
     ),
     class as (
         select distinct class as classification
         from {{ ref("fact_yearly_student") }}
-        where annee = {{ store.get_current_year() }}
         union
-        select 'Tous' as classification
+        select 'Tout' as classification
     )
 
 select
@@ -78,8 +61,6 @@ select
     edhaa.plan_interv_ehdaa,
     genre.genre,
     pop.population,
-    dist.code_distribution,
-    grp_rep.grp_rep,
     class.classification,
     {{
         dbt_utils.generate_surrogate_key(
@@ -88,24 +69,18 @@ select
                 "plan_interv_ehdaa",
                 "genre",
                 "population",
-                "code_distribution",
-                "grp_rep",
                 "classification",
             ]
         )
-    }} as filter_key
+    }} as id_filtre
 from eco
 cross join edhaa
 cross join genre
 cross join pop
-cross join dist
-cross join grp_rep
 cross join class
 where
     eco.ecole is not null
     and edhaa.plan_interv_ehdaa is not null
     and genre.genre is not null
     and pop.population is not null
-    and dist.code_distribution is not null
-    and grp_rep.grp_rep is not null
     and class.classification is not null

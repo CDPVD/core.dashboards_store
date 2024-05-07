@@ -20,5 +20,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   Feel free to override me to get your own custom litle mapping.
 #}
-select id_eco, annee, eco, concat('(', eco, ') - ', nom_eco) as school_friendly_name
+select
+    id_eco,
+    annee,
+    eco,
+    concat('(', eco, ') - ', nom_eco) as school_friendly_name,
+    concat(annee, ' - ', annee + 1) as annee_scolaire
 from {{ ref("i_gpm_t_eco") }}
