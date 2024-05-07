@@ -13,13 +13,4 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - matricule
-            - corps_emploi
-            - permanence
-
-    description: > 
-      This table list all the active employees and provide metadata at the time of the ETL's run.
-    tests:
-      - resolution:
-          combination_of_columns:
             - matr
