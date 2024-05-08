@@ -15,18 +15,20 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{# 
+    Compute a yearly version of the employment history restricted to only active status
+#}
 select
-    matr,
-    date_entr,
-    lieu_trav,
-    stat_eng,  -- - indicator to filter. classification of regular posts to full or part-time employment. where if like S% - service, P% - Professional and E% - teacher
-    ind_empl_princ,  -- indicator to filter ' if primary employee indicator is 1 then true'
-    ref_empl,
-    corp_empl,  -- indicator to filter -engagement status. abbreviations do not match between CSS, so it is suggested to use the description descr AS 'etat_description'
-    etat,
-    date_dern_jr_trav,
-    date_eff,
-    mode_cour,
-    type,
-    gr_paie
-from {{ var("database_paie") }}.dbo.pai_dos_empl
+    util.matr,
+    emp.etat as etat_empl,
+    emp.lieu_trav as workplace,
+    emp.stat_eng,
+    emp.type,
+    emp.mode_cour,
+    emp.corp_empl,
+    ca.emp_actif
+from {{ ref("dim_employees") }} as util
+left join {{ ref("i_pai_dos_empl") }} emp on util.matr = emp.matr
+left join {{ ref("fact_activity_current") }} ca on util.matr = ca.matr
+left join {{ ref("etat_empl") }} state on emp.etat = state.etat_empl
+where state.etat_actif = 1 and emp.ind_empl_princ = 1

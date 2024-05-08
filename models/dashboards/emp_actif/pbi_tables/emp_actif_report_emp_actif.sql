@@ -15,18 +15,20 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{{ config(alias="emp_actif_report_emp_actif") }}
+
 select
-    matr,
-    date_entr,
-    lieu_trav,
-    stat_eng,  -- - indicator to filter. classification of regular posts to full or part-time employment. where if like S% - service, P% - Professional and E% - teacher
-    ind_empl_princ,  -- indicator to filter ' if primary employee indicator is 1 then true'
-    ref_empl,
-    corp_empl,  -- indicator to filter -engagement status. abbreviations do not match between CSS, so it is suggested to use the description descr AS 'etat_description'
-    etat,
-    date_dern_jr_trav,
-    date_eff,
-    mode_cour,
-    type,
-    gr_paie
-from {{ var("database_paie") }}.dbo.pai_dos_empl
+    *,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "job_department",
+                "workplace_name",
+                "job_class",
+                "type",
+                "sex_friendly_name",
+                "is_current",
+            ]
+        )
+    }} as filter_key
+from {{ ref("emp_actif_fact_emp_actif") }}

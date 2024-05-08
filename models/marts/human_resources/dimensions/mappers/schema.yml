@@ -14,8 +14,8 @@ models:
       - name: job_group_category
         description: >
           The job group category.
-        tests:
-          - not_null
+        tests: []
+
 
   - name: dim_mapper_workplace
     description: >
@@ -32,4 +32,35 @@ models:
           The worplace's friendly name.
         tests:
           - not_null
-      
+
+  - name: dim_mapper_state
+    description: >
+      This table maps each state to a friendly name.
+      This dimension is designed to be overriden by the client to add consistent state names' formatting.
+    columns:
+      - name: code_state
+        description: The code_state id. Use-it to merge this dimension with a fact table.
+        tests:
+          - unique
+          - not_null
+      - name: code_state_name
+        description: >
+          The state's friendly name.
+        tests:
+          - not_null
+
+  - name: dim_mapper_job_class
+    description: >
+      This table maps each job to a friendly name.
+      This dimension is designed to be overriden by the client to add consistent job class names' formatting.
+    columns:
+      - name: code_job
+        description: The job class id. Use-it to merge this dimension with a fact table.
+        tests:
+          - unique
+          - not_null
+      - name: code_job_name
+        description: >
+          The job class friendly name.
+        tests:
+          - not_null

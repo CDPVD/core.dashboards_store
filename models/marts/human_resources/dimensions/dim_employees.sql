@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {#
-    Gather employees's level static information from the interfaces
+    Gather employeess level static information from the interfaces
 
     Used as a base table for the dim_employees table
 #}
@@ -51,7 +51,10 @@ with
 -- Join the two tables
 select
     dos.matr as matr,
-    dos.sexe as sex,
+    dos.sexe as genre,
+    case
+        when sexe = 'm' then 'homme' when sexe = 'f' then 'femme'
+    end as sex_friendly_name,
     dos.legal_name as legal_name,
     dos.birth_date as birth_date,
     dos.last_name as last_name,

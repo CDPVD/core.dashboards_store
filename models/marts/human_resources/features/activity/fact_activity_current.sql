@@ -31,7 +31,8 @@ with
         where school_year = {{ store.get_current_year() }} and is_main_job = 1  -- Retain metadata for the main job only
     )
 
-select src.matr, src.corp_empl, src.etat_empl, src.lieu_trav, src.stat_eng
+select
+    src.matr, src.corp_empl, src.etat_empl, src.lieu_trav, src.stat_eng, 1 as emp_actif
 from actives_etat_empl as src
 left join {{ ref("dim_employees") }} as dme on src.matr = dme.matr
 where last_pay_date > dateadd(week, -2, getdate())  -- Make sure the activte employes have been paid in the last two weeks
