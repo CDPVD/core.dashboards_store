@@ -2,7 +2,7 @@ version: 2
 
 seeds:
   - name: matiere_evalue
-    description: Contient les matières mandataires du secondaire 4 et 5 à l'obtention du diplome DEC.
+    description: Contient les matières mandataires du secondaire 4 et 5 à l'obtention du diplome DES.
     columns:
       - name: code_matiere
         description: Le numéro unique dédié à une matière
