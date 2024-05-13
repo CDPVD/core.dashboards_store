@@ -43,7 +43,8 @@ with
             res_mat.etat = 1 and res_mat.code_matiere in ('132510', '132520', '132530')
         group by res_mat.annee, ele.fiche
     ),
-
+    -- si un eleve a des resultats aux volets dans 2 annees différentes, on considere
+    -- uniquement s'ils st validés ou non
     agg_volet as (
         select fiche, max(ind_reus_volet_fra_5) as ind_reus_volet_fra_5
         from _volet
