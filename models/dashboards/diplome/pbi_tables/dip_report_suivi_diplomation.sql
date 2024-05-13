@@ -16,6 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
+    -- identifier le perimètre des élève de l'année en cours
+    perim as (
+        select fiche, ele.id_eco
+        from {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
+        inner join
+            {{ ref("dim_mapper_schools") }} as eco
+            on ele.id_eco = eco.id_eco
+            and annee = {{ get_current_year() }}
+
+    ),
     -- Prend les résultats au volet de la matière Français 5. Le volet est un critère
     -- à l'obtention pour ce cours.
     _volet as (
@@ -25,13 +35,19 @@ with
             min(
                 (case when res_mat.res_num_som >= 50 then 1 else 0 end)
             ) as ind_reus_volet_fra_5
-        from {{ ref("fact_resultat_bilan_matiere") }} as res_mat
-        inner join
-            {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
+        from perim as ele
+        left join
+            {{ ref("fact_resultat_bilan_matiere") }} as res_mat
             on res_mat.fiche = ele.fiche
         where
             res_mat.etat = 1 and res_mat.code_matiere in ('132510', '132520', '132530')
         group by res_mat.annee, ele.fiche
+    ),
+
+    agg_volet as (
+        select fiche, max(ind_reus_volet_fra_5) as ind_reus_volet_fra_5
+        from _volet
+        group by fiche
     ),
     -- Prend les résultats des matières en cours de l'année courante.
     src_res_mat as (
@@ -47,22 +63,20 @@ with
                 when left(right(res_mat.code_matiere, 3), 1) = '5' then 1 else 0
             end as is_g5,  -- Le cours est en secondaire 5
             res_mat.is_reussite as ind_reussite,
-            _volet.ind_reus_volet_fra_5,
+            agg_volet.ind_reus_volet_fra_5,
             res_mat.res_som as resultat,
             '1' as 'En_cours',  -- Est considéré comme 'En cours'
             res_mat.unites
-        from {{ ref("fact_resultat_bilan_matiere") }} as res_mat
-        inner join
-            {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
+        from perim as ele
+        left join
+            {{ ref("fact_resultat_bilan_matiere") }} as res_mat
             on res_mat.fiche = ele.fiche
-            and res_mat.id_eco = ele.id_eco
-        inner join _volet on res_mat.fiche = _volet.fiche
+        left join agg_volet on res_mat.fiche = agg_volet.fiche
         left join
             {{ ref("matiere_evalue") }} as mat
             on res_mat.code_matiere = mat.code_matiere
         where
-            res_mat.annee = {{ get_current_year() }}  -- Prend seulement les résultat de l'année en cours
-            and res_mat.unites is not null  -- Enlève les compétences
+            res_mat.unites is not null  -- Enlève les compétences
             and res_mat.etat = 1  -- La matière est actif pour l'année courante
             and left(right(res_mat.code_matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
     ),
@@ -81,18 +95,16 @@ with
             end as is_g5,
             ri_res.res_off_final as resultat,
             ri_res.ind_reus_charl as ind_reussite,
-            _volet.ind_reus_volet_fra_5,
+            agg_volet.ind_reus_volet_fra_5,
             ri_res.nb_unite_charl as unites,
             '0' as 'En_cours',  -- Ne contient pas les résultats de l'année courante avant la fin de l'année.
             row_number() over (
                 partition by ele.fiche, ri_res.matiere
-                order by ri_res.date_resultat desc
+                order by ri_res.date_resultat desc, date_heure_recup desc
             ) as seqid
-        from {{ ref("i_e_ri_resultats") }} as ri_res
-        inner join
-            {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
-            on ri_res.fiche = ele.fiche
-        inner join _volet on ri_res.fiche = _volet.fiche
+        from perim as ele
+        left join {{ ref("i_e_ri_resultats") }} as ri_res on ri_res.fiche = ele.fiche
+        left join agg_volet on ri_res.fiche = agg_volet.fiche
         inner join
             {{ ref("matiere_evalue") }} as mat on ri_res.matiere = mat.code_matiere
         where
@@ -134,7 +146,6 @@ with
     -- L'aggrégation de toute les données.
     aggre as (
         select
-            max(annee) as annee,
             fiche,
             min(ind_reus_volet_fra_5) as ind_reus_volet_fra_5,
             string_agg(
@@ -435,12 +446,12 @@ with
                 else 0
             end as ind_obtention_dip_previsionnel  -- L'indicateur prévisionnel à la possibilité de l'obtention du diplôme.
         from _rgp_ind_sanct
-        where annee = {{ get_current_year() }}
     ),
 
     filtre_eleve as (
         select
             _diplomable.*,
+            y_stud.annee,
             y_stud.id_eco,
             y_stud.code_perm,
             y_stud.population,
@@ -464,7 +475,7 @@ with
         inner join
             {{ ref("fact_yearly_student") }} as y_stud
             on _diplomable.fiche = y_stud.fiche
-            and _diplomable.annee = y_stud.annee
+            and y_stud.annee = {{ get_current_year() }}
         inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche
 
     )
