@@ -80,6 +80,14 @@ with
             res_mat.unites is not null  -- Enlève les compétences
             and res_mat.etat = 1  -- La matière est actif pour l'année courante
             and left(right(res_mat.code_matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
+            and (
+                res_mat.code_matiere not in (
+                    select code_matiere
+                    from "tbe_dev"."sadqimo_dashboard_diplome"."matiere_evalue"
+                )  -- ne prendre que les résultats de l'année en cours pour les matière avec des épreuve unique 
+                or res_mat.annee = {{ get_current_year() }}
+                and month(getdate()) < 7
+            )  -- pour l'année antérieur nous allons récupérer les résultats ministériels   
     ),
 
     src_ri_res as (
@@ -108,9 +116,7 @@ with
         left join agg_volet on ri_res.fiche = agg_volet.fiche
         inner join
             {{ ref("matiere_evalue") }} as mat on ri_res.matiere = mat.code_matiere
-        where
-            nb_unite_charl != ''  -- Enlève les compétences
-            and left(right(ri_res.matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
+        where left(right(ri_res.matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
     ),
     -- L'union des deux tables de résultat
     _union as (
@@ -373,22 +379,14 @@ with
             ) as nb_unites_g5_en_cours,  -- La somme des unités en cours en secondaire 5. Contient toutes les matières.
             sum(
                 case
-                    when
-                        (
-                            (is_g4 = 1 and (en_cours = '1' or en_cours = '0'))
-                            and convert(nvarchar, resultat) >= '60'
-                        )
+                    when (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
                     then convert(int, unites)
                     else 0
                 end
             ) as nb_unites_previsionnel_4,  -- La somme des unités prévisionnel en cours ou non en secondaire 4. Contient toutes les matières.
             sum(
                 case
-                    when
-                        (
-                            (is_g5 = 1 and (en_cours = '1' or en_cours = '0'))
-                            and convert(nvarchar, resultat) >= '60'
-                        )
+                    when (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
                     then convert(int, unites)
                     else 0
                 end
@@ -397,14 +395,8 @@ with
                 case
                     when
                         (
-                            (
-                                (is_g4 = 1 and (en_cours = '1' or en_cours = '0'))
-                                and convert(nvarchar, resultat) >= '60'
-                            )
-                            or (
-                                (is_g5 = 1 and (en_cours = '1' or en_cours = '0'))
-                                and convert(nvarchar, resultat) >= '60'
-                            )
+                            (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
+                            or (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
                         )
                     then convert(int, unites)
                     else 0

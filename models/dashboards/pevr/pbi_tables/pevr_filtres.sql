@@ -15,26 +15,34 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{{ config(alias="filtres") }}
+
 with
     eco_unique as (
         select
             eco,
             school_friendly_name,
+            cat_eco,
             row_number() over (partition by eco order by annee desc) as seqid
         from {{ ref("dim_mapper_schools") }}
+        where cat_eco in ('PRI', 'SEC')
     ),
     eco as (
-        select school_friendly_name as ecole
+        select eco, school_friendly_name as ecole
         from eco_unique
         where seqid = 1
         union
-        select 'CSS' as ecole
+        select 'CSS' as eco, 'CSS' as ecole
     ),
-    edhaa as (
-        select distinct plan_interv_ehdaa
+    ehdaa as (
+        select distinct plan_interv_ehdaa, eco
         from {{ ref("fact_yearly_student") }}
         union
-        select 'Tout' as plan_interv_ehdaa
+        select 'Tout' as plan_interv_ehdaa, eco
+        from eco
+        union all
+        select distinct plan_interv_ehdaa, 'CSS' as eco
+        from {{ ref("fact_yearly_student") }}
     ),
     genre as (
         select distinct genre
@@ -44,21 +52,45 @@ with
         select 'Tout' as genre
     ),
     pop as (
-        select distinct population
+        select distinct population, eco
         from {{ ref("fact_yearly_student") }}
-        union
-        select 'Tout' as population
+        union all
+        select 'Tout' as population, eco
+        from eco
+        union all
+        select distinct population, 'CSS' as eco
+        from {{ ref("fact_yearly_student") }}
     ),
     class as (
-        select distinct class as classification
-        from {{ ref("fact_yearly_student") }}
-        union
-        select 'Tout' as classification
+        select classification, eco, population
+        from
+            (
+                select distinct class as classification, eco, population
+                from {{ ref("fact_yearly_student") }}
+                union
+                select distinct 'Tout' as classification, eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct class as classification, 'CSS' as eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct class as classification, eco, 'Tout' as population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct 'Tout' as classification, 'CSS' as eco, population
+                from {{ ref("fact_yearly_student") }} el
+                union all
+                select distinct
+                    class as classification, 'CSS' as eco, 'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                union all
+                select distinct 'Tout' as classification, eco, 'Tout' as population
+                from eco
+            ) as tab
     )
-
 select
     eco.ecole,
-    edhaa.plan_interv_ehdaa,
+    ehdaa.plan_interv_ehdaa,
     genre.genre,
     pop.population,
     class.classification,
@@ -68,19 +100,18 @@ select
                 "ecole",
                 "plan_interv_ehdaa",
                 "genre",
-                "population",
+                "pop.population",
                 "classification",
             ]
         )
     }} as id_filtre
 from eco
-cross join edhaa
+cross join ehdaa
 cross join genre
 cross join pop
 cross join class
 where
-    eco.ecole is not null
-    and edhaa.plan_interv_ehdaa is not null
-    and genre.genre is not null
-    and pop.population is not null
-    and class.classification is not null
+    ehdaa.eco = eco.eco
+    and pop.eco = eco.eco
+    and class.eco = eco.eco
+    and class.population = pop.population

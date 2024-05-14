@@ -24,6 +24,7 @@ select
     id_eco,
     annee,
     eco,
+    cat_eco,
     concat('(', eco, ') - ', nom_eco) as school_friendly_name,
     concat(annee, ' - ', annee + 1) as annee_scolaire
 from {{ ref("i_gpm_t_eco") }}
