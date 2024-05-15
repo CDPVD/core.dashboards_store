@@ -11,7 +11,7 @@ models:
             - matricule
             - corps_emploi 
             - etat_description
-  - name: reporting_emp_conge
+  - name: empcong_report_emp_conge
     description: >
         Table de rapports qui comptabilise le nombre de congés des employés selon l'année, le lieu de travail et le corps d'emploi.
     tests:

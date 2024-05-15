@@ -15,60 +15,59 @@ models:
             - absence_sequence_id
             - category_abs
 
-  - name: fact_res_bilan_comp
+  - name: fact_resultat_bilan_competence
     config:
       tags:
         - res_scolaires
     description: >
       List the competency results of all students
     columns:
-      - name: code_perm
-        description: Unique ID of the student
-      - name: id_eco
-        description: Unique ID of the school per year
       - name: annee
         description: The school year
       - name: fiche
         description: Unique ID of the student
-      - name: population
-        description: Identification of a student within the order of education
-      - name: ordre_ens
-        description: The order of education
-      - name: genre
-        description: The gender of the student
-      - name: plan_interv_ehdaa
-        description: Intervention plan
-      - name: niveau_scolaire
-        description: The grade of the student
-      - name: id_mat_ele
-        description: Unique ID of the subject per student per year
-      - name: mat
-        description: Description of the subject
-      - name: grp
+      - name: id_eco
+        description: Unique ID of the school per year
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
         description: The group which the student is related to the subject
-      - name: etat
-        description: The state of the subject
-      - name: is_reprise
-        description: Indicate if its a retake
+      - name: id_obj_mat
+        description: The unique ID of the competence which is related to the subject
       - name: no_comp
         description: The competency number of the subject
-      - name: descr
-        description: The description of the subject
-      - name: descr_abreg
-        description: The description of the subject abbreviated
+      - name: etat
+        description: The state of the subject
+      - name: res_comp
+        description: The result
+      - name: is_reussite
+        description: Indicate if its a success
+      - name: is_reprise
+        description: Indicate a retake
       - name: res_num_comp
         description: The results of the student per no_comp, per mat
+      - name: is_current_echec
+        description: Indicate if the result is current year AND under 60 (configurable)
+      - name: is_current_difficulte
+        description: Indicate if the result is current year AND between 60 and 69 (configurable)
+      - name: is_current_maitrise
+        description: Indicate if the result is current year AND over 70 (configurable)
+      - name: is_previous_echec
+        description: Indicate if the result is last year AND under 60 (configurable)
+      - name: is_previous_difficulte
+        description: Indicate if the result is last year AND between 60 and 69 (configurable)
+      - name: is_previous_maitrise
+        description: Indicate if the result is last year AND over 70 (configurable)
     tests:
       - resolution:
           combination_of_columns:
             - fiche
             - id_eco
-            - is_reprise
-            - mat
+            - code_matiere
             - no_comp
-            - grp
+            - groupe_matiere
 
-  - name: fact_res_bilan_mat
+  - name: fact_resultat_bilan_matiere
     config:
       tags:
         - res_scolaires
@@ -83,29 +82,23 @@ models:
         description: Unique ID of the student
       - name: id_mat_ele
         description: Unique ID of the subject per student per year
-      - name: mat
-        description: The subject
-      - name: grp
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
         description: The group which the student is related to the subject
       - name: etat
         description: The state of the subject
-      - name: is_reprise
-        description: Indicate if its a retake
       - name: is_reussite
         description: Indicate if its a success
-      - name: res_num_som
-        description: The results of the student per mat
     tests:
       - resolution:
           combination_of_columns:
             - fiche
             - id_eco
-            - is_reprise
-            - mat
-            - grp
+            - code_matiere
+            - groupe_matiere
 
-
-  - name: fact_res_etape_comp
+  - name: fact_resultat_etape_competence
     config:
       tags:
         - res_scolaires
@@ -118,9 +111,9 @@ models:
         description: Unique ID of the student
       - name: id_eco
         description: Unique ID of the school
-      - name: mat
-        description: The subject
-      - name: grp
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
         description: The group which the student is related to the subject
       - name: id_obj_mat
         description: The unique ID of the competence which is related to the subject
@@ -130,22 +123,28 @@ models:
         description: The state of the subject
       - name: etape
         description: The stage of the subject
-      - name: res_comp_num
-        description: The result in numeric
+      - name: res_etape_num
+        description: The result
       - name: is_reussite
         description: Indicate if its a success
       - name: is_reprise
         description: Indicate a retake
+      - name: is_echec
+        description: Indicate if the result is considered a failure
+      - name: is_difficulte
+        description: Indicate if the result is considered in difficulty
+      - name: is_maitrise
+        description: Indicate if the result is considered a maitrise
     tests:
       - resolution:
           combination_of_columns:
             - fiche
             - id_eco
             - etape
-            - grp
+            - groupe_matiere
             - id_obj_mat
 
-  - name: fact_res_etape_mat
+  - name: fact_resultat_etape_matiere
     config:
       tags:
         - res_scolaires
@@ -158,30 +157,28 @@ models:
         description: Unique ID of the student
       - name: id_eco
         description: Unique ID of the school
-      - name: mat
-        description: The subject
-      - name: descr
-        description: The description of the subject
-      - name: grp
+      - name: code_matiere
+        description: The subject unique number
+      - name: groupe_matiere
         description: The group which the student is related to the subject
       - name: etat
         description: The state of the subject
+      - name: is_reprise
+        description: Indicate a retake
       - name: etape
         description: The stage of the subject
       - name: res_etape_num
         description: The result in numeric
       - name: is_reussite
         description: Indicate if its a success
-      - name: is_reprise
-        description: Indicate a retake
     tests:
       - resolution:
           combination_of_columns:
             - fiche
             - id_eco
             - etape
-            - grp
-            - mat
+            - groupe_matiere
+            - code_matiere
 
   - name: fact_yearly_student
     config:

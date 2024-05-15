@@ -15,7 +15,7 @@ models:
   - name: abstsm_report_absences_listing
     description: A list of students / schools and their corresponding sequences of absences.
 
-  - name: abstsm_report_absences_distributions
+  - name: abstsm_report_distributions
     description: The empirical statistical distributions of the number of sequences and the length of sequences of absences.
     tests:
       - resolution:
