@@ -14,11 +14,11 @@ models:
       - name: code_matiere
         description: Code de la matière lié à l'indicateur si elle existe.
       - name: no_competence
-        description: Description de la compétence si elle existe     
+        description: Description de la compétence si elle existe
     config:
       column_types:
         id_indicateur: nvarchar(8)
-        description_indicateur: nvarchar(max)      
+        description_indicateur: nvarchar(max)
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
 
@@ -32,33 +32,39 @@ models:
         description: identifiant de l'indicateur.
       - name: description_indicateur
         description: Description de l'indicateur
-     
+
     config:
       column_types:
         id_indicateur: nvarchar(8)
-        description_indicateur: nvarchar(max)      
+        description_indicateur: nvarchar(max)
+
+  - name: pevr_indicateur_des
+    description: Listes de l'indicateur 1.1.1.1 sur le taux d'obtention du diplôme DES
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
 
   - name: pevr_indicateurs_epreuves
-    description: liste des indicateurs du pevr lié aux épreuves du MEQ. 
+    description: liste des indicateurs du pevr lié aux épreuves du MEQ.
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - id_indicateur
-            - annee
-            - etape
-            - eco
-            - genre  
-            - plan_interv_ehdaa
-            - population
-            - is_francisation            
+            - id_filtre
+
 
   - name: pevr_indicateurs_ppp
-    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers. 
+    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - id_indicateur
-            - annee
-            - eco
+            - id_filtre
 
-
+  - name: pevr_filtres
+    description: Table de filtre pour le tableau de bord PEVR.

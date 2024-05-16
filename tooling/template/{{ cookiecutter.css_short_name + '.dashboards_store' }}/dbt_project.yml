@@ -55,8 +55,10 @@ models:
       predictive_view_aggregated:
         +enabled: False
       pevr:
-        +enabled: False        
-  
+        +enabled: False
+      diplome:
+        +enabled: False
+
     interfaces:
       +tags: ["interfaces"]
       +materialized: ephemeral
