@@ -66,7 +66,7 @@ with
             res_mat.is_reussite as ind_reussite,
             agg_volet.ind_reus_volet_fra_5,
             res_mat.res_som as resultat,
-            '1' as 'En_cours',  -- Est considéré comme 'En cours'
+            case when annee = {{ get_current_year() }} then 1 else 0 end as 'En_cours',  -- Est considéré comme 'En cours'
             res_mat.unites
         from perim as ele
         left join
@@ -106,7 +106,7 @@ with
             ri_res.ind_reus_charl as ind_reussite,
             agg_volet.ind_reus_volet_fra_5,
             ri_res.nb_unite_charl as unites,
-            '0' as 'En_cours',  -- Ne contient pas les résultats de l'année courante avant la fin de l'année.
+            case when annee = {{ get_current_year() }} then 1 else 0 end as 'En_cours',  -- Ne contient pas les résultats de l'année courante avant la fin de l'année.
             row_number() over (
                 partition by ele.fiche, ri_res.matiere
                 order by ri_res.date_resultat desc, date_heure_recup desc
