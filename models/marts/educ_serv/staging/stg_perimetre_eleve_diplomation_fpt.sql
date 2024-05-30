@@ -15,13 +15,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select
-    codeperm as code_perm,
-    fiche,
-    ecocenoff as eco_cen_off,
-    progcharl as prog_charl,
-    typediplomecharl as type_diplome_charl,
-    regimesanctcharl as regime_sanct_charl,
-    indreussanctcharl as ind_reus_sanct_charl,
-    dateexecsanct as date_exec_sanct
-from {{ var("database_jade") }}.dbo.e_ri_mentions
+with
+    src as (
+        select y_stud.fiche, y_stud.id_eco
+        from {{ ref("fact_yearly_student") }} as y_stud
+        where
+            y_stud.ordre_ens = '4'  -- Secondaire
+            and type_parcours in ('07')  -- 07 = FPT
+    )
+
+select *
+from src
