@@ -146,7 +146,11 @@ select
         then 1
         when ordre_ens = '3' and cycle_ref = 1 and annee_cycle_ref = 2 and classe = 'B'
         then 0
-        when ordre_ens = '3' and cycle_ref = 1 and annee_cycle_ref = 8 and (classe = 'B' or classe = 'C')
+        when
+            ordre_ens = '3'
+            and cycle_ref = 1
+            and annee_cycle_ref = 8
+            and (classe = 'B' or classe = 'C')
         then 1
         when ordre_ens = '3' and cycle_ref = 2 and annee_cycle_ref = 1 and classe = 'D'
         then 0
@@ -154,7 +158,11 @@ select
         then 1
         when ordre_ens = '3' and cycle_ref = 2 and annee_cycle_ref = 2 and classe = 'E'
         then 0
-        when ordre_ens = '3' and cycle_ref = 2 and annee_cycle_ref = 8 and (classe = 'E' or classe = 'F')
+        when
+            ordre_ens = '3'
+            and cycle_ref = 2
+            and annee_cycle_ref = 8
+            and (classe = 'E' or classe = 'F')
         then 1
         when ordre_ens = '3' and cycle_ref = 3 and annee_cycle_ref = 1 and classe = 'G'
         then 0
@@ -162,11 +170,15 @@ select
         then 1
         when ordre_ens = '3' and cycle_ref = 3 and annee_cycle_ref = 2 and classe = 'H'
         then 0
-        when ordre_ens = '3' and cycle_ref = 3 and annee_cycle_ref = 8 and (classe = 'H' or classe = 'I')
+        when
+            ordre_ens = '3'
+            and cycle_ref = 3
+            and annee_cycle_ref = 8
+            and (classe = 'H' or classe = 'I')
         then 1
         when
-            ordre_ens = '4' 
-            and population LIKE '%régulier%'
+            ordre_ens = '4'
+            and population like '%régulier%'
             and lag(classe) over (partition by fiche order by annee) = classe
         then 1
         when
