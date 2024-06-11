@@ -87,3 +87,28 @@ seeds:
         is_reg: bit
         valid_from: int
         valid_until: int
+
+  - name: ens_qualification
+    description: >
+      Une table qui vient spécifier si les diplômes, certifications, brevets etc des enseignants font d'eux des enseignants légalement qualifié ou non
+    columns:
+      - name: code
+        description: Représentation codifiée des papiers
+        tests:
+          - not_null
+      - name: descr
+        description: Description des papiers
+        tests:
+          - not_null
+      - name: is_qualified
+        description: Légalement qualifié ou non?
+        tests:
+          - not_null
+    config:
+      tags:
+        - human_resources
+      schema: human_resources_seeds
+      column_types:
+        code: nvarchar(3)
+        descr: nvarchar(255)
+        is_qualified: bit

@@ -35,3 +35,7 @@ models:
     tags: ["interface"]
     description: >
       Table d'interface. Utilisée uniquement pour aller chercher les courriels des employé(e)s.           
+  - name: i_pai_qualif
+    tags: ["interface"]
+    description: >
+      Table d'interface. Utilisée uniquement pour aller vérifier les brevets.                 

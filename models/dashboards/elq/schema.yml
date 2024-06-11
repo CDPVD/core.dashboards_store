@@ -1,0 +1,10 @@
+﻿version: 2
+
+models:
+  - name: elq_report
+    description: >
+      Table qui extrait toutes les donnnées requises pour ce tableau de bord
+    tests:
+      - resolution:
+          combination_of_columns:
+            - matr

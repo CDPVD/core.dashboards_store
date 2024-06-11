@@ -89,6 +89,13 @@ models:
                     +post-hook:
                         ["{{ store.stamp_model('dashboard_emp_actif') }}"]
 
+            elq:
+                +tags: ["elq"]
+                +schema: dashboard_elq
+                pbi_tables:
+                    +post-hook:
+                        ["{{ store.stamp_model('dashboard_elq') }}"]                        
+
             prospectif_cdp:
                 +tags: ["prospectif_cdp"]
                 +schema: "dashboard_prospectif_cdp"
