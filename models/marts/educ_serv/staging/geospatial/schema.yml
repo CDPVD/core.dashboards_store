@@ -3,7 +3,7 @@ version: 2
 models:
   - name: stg_adresses_eleves
     description: >
-      This is an exemple
+      table showing students' residential addresses for each year.
     tests:
       - resolution:
           combination_of_columns:
