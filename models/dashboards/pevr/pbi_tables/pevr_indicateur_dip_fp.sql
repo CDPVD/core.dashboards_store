@@ -15,15 +15,26 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{{ config(alias="indicateur_dip_fp") }}
+
 with
     src as (
-        select y_stud.fiche, y_stud.id_eco
-        from {{ ref("fact_yearly_student") }} as y_stud
-        where
-            y_stud.ordre_ens = '4'  -- Secondaire
-            and type_parcours in ('07')  -- 07 = FPT
-            and y_stud.annee < {{ get_current_year() }} + 1  -- Enlève l'année prévisionnelle de GPI
+        select ind.id_indicateur, ind.description_indicateur
+        from {{ ref("pevr_dim_indicateurs") }} as ind
+        where ind.id_indicateur = '1.2.2.8'  -- Indicateur du taux d'obtention d'un diplome au FP.
+    ),
+
+    _data as (
+        select
+            src.id_indicateur,
+            src.description_indicateur,
+            pevr_charl.annee_scolaire,
+            pevr_charl.taux
+        from src
+        inner join
+            {{ ref("indicateur_pevr_charl") }} as pevr_charl
+            on src.id_indicateur = pevr_charl.id_indicateur
     )
 
 select *
-from src
+from _data

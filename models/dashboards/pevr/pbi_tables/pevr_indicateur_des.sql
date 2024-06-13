@@ -61,7 +61,7 @@ with
 
     agg_dip as (
         select
-            '1.1.1.1' as id_indicateur,
+            '1.1.1.1.a' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,

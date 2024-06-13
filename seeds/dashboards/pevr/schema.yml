@@ -28,7 +28,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
+        id_indicateur: nvarchar(max)
         description_indicateur: nvarchar(max)      
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
@@ -60,7 +60,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
+        id_indicateur: nvarchar(max)
         description_indicateur: nvarchar(max)      
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
@@ -83,7 +83,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
+        id_indicateur: nvarchar(max)
         description_indicateur: nvarchar(max)
   
   - name: custom_indicateurs_pevr
@@ -104,5 +104,34 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
+        id_indicateur: nvarchar(max)
         description_indicateur: nvarchar(max)      
+
+  - name: indicateur_pevr_charl
+    description: mapping obligatoire des données tirées de charlemagne pour les indicateurs 1 et 2
+    columns:
+      - name: id_indicateur
+        description: L'identification unique du PEVR
+        tests:
+          - not_null
+      - name: annee_scolaire
+        description: L'année scolaire
+        tests:
+          - not_null
+      - name: annee
+        description: L'année de l'obtention du dip.
+        tests:
+          - not_null
+      - name: taux
+        description: Le pourcentage lié à l'indicateur et l'année scolaire
+        tests:
+          - not_null
+    config:
+      tags: 
+        - pevr
+      schema: pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(max)
+        annee_scolaire: nvarchar(max)
+        periode: nvarchar(max)
+        taux: decimal(5,3)

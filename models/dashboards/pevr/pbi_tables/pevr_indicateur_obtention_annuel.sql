@@ -15,18 +15,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateur_fpt") }}
-
+{{ config(alias="indicateur_obtention_annuel") }}
 
 with
     perimetre as (
         select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
+        from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
+        inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
+        union
+        select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
+        from {{ ref("stg_perimetre_eleve_diplomation_fms") }} as src
+        inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
+        union
+        select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
         from {{ ref("stg_perimetre_eleve_diplomation_fpt") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
-        where
-            sch.annee
-            between {{ store.get_current_year() }}
-            - 3 and {{ store.get_current_year() }}
     ),
 
     _mentions as (
@@ -43,6 +46,7 @@ with
                 when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
             end as 'ind_obtention'
         from {{ ref("i_e_ri_mentions") }} as mentions
+        where type_diplome_charl in ('DES', 'CFMS', 'CFPT')
     ),
 
     src as (
@@ -84,7 +88,7 @@ with
 
     agg_dip as (
         select
-            '1.1.1.1.c' as id_indicateur,
+            '1.1.1.1.d' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,
@@ -92,7 +96,7 @@ with
             population,
             classification,
             count(fiche) nb_resultat,
-            avg(ind_obtention) as taux_qualification_fpt
+            avg(ind_obtention) as taux_obtention_annuel
         from _filtre
         group by
             annee_scolaire, cube (
@@ -115,7 +119,7 @@ with
             coalesce(agg_dip.population, 'Tout') as population,
             coalesce(agg_dip.classification, 'Tout') as classification,
             agg_dip.nb_resultat,
-            agg_dip.taux_qualification_fpt
+            agg_dip.taux_obtention_annuel
         from agg_dip
         inner join
             {{ ref("pevr_dim_indicateurs") }} as ind
@@ -127,7 +131,7 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_qualification_fpt,
+    taux_obtention_annuel,
     {{
         dbt_utils.generate_surrogate_key(
             [

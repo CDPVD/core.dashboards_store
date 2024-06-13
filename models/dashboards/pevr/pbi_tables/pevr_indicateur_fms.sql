@@ -15,32 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{{ config(alias="indicateur_fms") }}
+
 with
-    _mentions as (
-        select
-            mentions.fiche,
-            mentions.prog_charl,
-            (left(mentions.date_exec_sanct, 6) - 1) as brut_annee,
-            mentions.ind_reus_sanct_charl
-        from {{ ref("i_e_ri_mentions") }} as mentions
-    ),
-
-    _date_mentions as (
-        select
-            mentions.fiche,
-            mentions.prog_charl,
-            case
-                when right(brut_annee, 2) between 9 and 12
-                then left(mentions.brut_annee, 4)
-                when right(brut_annee, 2) between 1 and 8
-                then (left(mentions.brut_annee, 4) - 1)
-            end as annee,
-            case
-                when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
-            end as 'ind_obtention'
-        from _mentions as mentions
-    ),
-
     perimetre as (
         select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
         from {{ ref("stg_perimetre_eleve_diplomation_fms") }} as src
@@ -49,6 +26,22 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
+    ),
+
+    _mentions as (
+        select
+            mentions.fiche,
+            mentions.prog_charl,
+            case
+                when month(mentions.date_exec_sanct) between 9 and 12
+                then year(mentions.date_exec_sanct)
+                when month(mentions.date_exec_sanct) between 1 and 8
+                then (year(mentions.date_exec_sanct) - 1)
+            end as annee,
+            case
+                when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
+            end as 'ind_obtention'
+        from {{ ref("i_e_ri_mentions") }} as mentions
     ),
 
     src as (
@@ -62,7 +55,7 @@ with
             end as ind_obtention
         from perimetre as perim
         left join
-            _date_mentions as mentions
+            _mentions as mentions
             on perim.fiche = mentions.fiche
             and perim.annee = mentions.annee
     ),
@@ -90,7 +83,7 @@ with
 
     agg_dip as (
         select
-            '1.1.1.1.1' as id_indicateur,
+            '1.1.1.1.b' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,
