@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: fact_ens_qualif
+    description: >
+      Table permettant de comptabiliser le nombre d'enseignant(e)s qui sont qualifiés pour enseigner.
+    columns:
+      - name: matr
+        description: The unique identifier of an employee.
+        tests:
+          - unique
+    tests:
+      - unique_combination_of_columns:
+          combination_of_columns: ['matr']

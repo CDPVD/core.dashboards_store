@@ -3,7 +3,7 @@
 models:
   - name: elq_report
     description: >
-      Table qui extrait toutes les donnnées requises pour ce tableau de bord
+      Table qui permet d'afficher les données en lien avec la qualification des enseignant(e)s
     tests:
       - resolution:
           combination_of_columns:
