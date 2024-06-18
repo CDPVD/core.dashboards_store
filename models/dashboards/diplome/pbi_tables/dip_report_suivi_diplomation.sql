@@ -383,14 +383,14 @@ with
             ) as nb_unites_g5_en_cours,  -- La somme des unités en cours en secondaire 5. Contient toutes les matières.
             sum(
                 case
-                    when (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
+                    when (is_g4 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
                     then convert(int, unites)
                     else 0
                 end
             ) as nb_unites_previsionnel_4,  -- La somme des unités prévisionnel en cours ou non en secondaire 4. Contient toutes les matières.
             sum(
                 case
-                    when (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
+                    when (is_g5 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
                     then convert(int, unites)
                     else 0
                 end
@@ -399,8 +399,10 @@ with
                 case
                     when
                         (
-                            (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
-                            or (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
+                            (is_g4 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
+                            or (
+                                is_g5 = 1 and isnumeric(resultat) = 1 and resultat >= 60
+                            )
                         )
                     then convert(int, unites)
                     else 0
