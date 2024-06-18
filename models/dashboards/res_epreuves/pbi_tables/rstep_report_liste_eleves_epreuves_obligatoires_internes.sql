@@ -24,13 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 select
     {{
         dbt_utils.generate_surrogate_key(
-            ["src.annee", "src.ecole", "description_matiere"]
+            ["src.annee_scolaire", "src.ecole", "description_matiere"]
         )
     }} as id_epreuve,
     src.fiche,
     nom_prenom_fiche,
-    src.annee,
+    src.annee_scolaire,
     src.ecole,
+    eco as code_ecole,
     population,
     genre,
     is_francisation,
@@ -38,8 +39,8 @@ select
     plan_interv_ehdaa,
     dist,
     class,
+    grp_rep,
     difficulte,
-    code_matiere,
     description_matiere,
     res_comp_etape,
     res_etape_num,
@@ -47,6 +48,10 @@ select
     is_echec,
     is_difficulte,
     is_maitrise,
+    case when is_reussite = 1 then 'Oui' else 'Non' end as descr_is_reussite,
+    case when is_echec = 1 then 'Oui' else 'Non' end as descr_is_echec,
+    case when is_difficulte = 1 then 'Oui' else 'Non' end as descr_is_difficulte,
+    case when is_maitrise = 1 then 'Oui' else 'Non' end as descr_is_maitrise,
     is_reprise
 from {{ ref("rstep_fact_epreuves_obligatoires_internes") }} src
 left join

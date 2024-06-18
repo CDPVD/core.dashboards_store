@@ -25,8 +25,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 }}
 
 select
+    annee_scolaire,
     res.annee,
-    eco as ecole,
+    school_friendly_name as ecole,
     fiche,
     res.code_matiere,
     friendly_name as description_matiere,
@@ -42,7 +43,7 @@ inner join
     {{ ref("dim_mapper_schools") }} as mapper_school
     on res.id_eco = mapper_school.id_eco
 inner join
-    {{ ref("rstep_dim_subject_evaluation") }} as mat
+    {{ ref("rstep_dim_epreuves") }} as mat
     on mat.code_matiere = res.code_matiere
     and mat.code_etape = res.etape
     and mat.no_competence = res.no_comp

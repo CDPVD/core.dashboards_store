@@ -94,7 +94,17 @@ select
     res_comp_etape,
     res_etape_num,
     is_reussite,
-    case when res_etape_num < 60 then 1.0 else 0.0 end as is_echec,
-    case when (res_etape_num between 60 and 69) then 1.0 else 0.0 end as is_difficulte,
-    case when res_etape_num >= 70 then 1.0 else 0.0 end as is_maitrise
+    case
+        when res_etape_num is null then null when res_etape_num < 60 then 1.0 else 0.0
+    end as is_echec,
+    case
+        when res_etape_num is null
+        then null
+        when (res_etape_num between 60 and 69)
+        then 1.0
+        else 0.0
+    end as is_difficulte,
+    case
+        when res_etape_num is null then null when res_etape_num >= 70 then 1.0 else 0.0
+    end as is_maitrise
 from res_num

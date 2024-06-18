@@ -42,13 +42,17 @@ with
             end as ecole,
             no_group_eleve as groupe,
             eleve_note as nb_eleve,
+            moyen_neb as moyenne_ecole_brute,
+            pct_reust_neb as taux_reussite_ecole_brute,
+            moyen_nem as moyenne_ecole_modere,
+            pct_reust_nem as taux_reussite_ecole_modere,
             moyen_nmc as moyenne_epreuve,
             pct_reust_nmc as taux_reussite_epreuve,
             moyen_rf as moyenne_final,
             pct_reust_rf as taux_reussite_final
-        from {{ ref("FichierConsolide") }} res
+        from {{ ref("Fichier_Consolide_epreuves_ministere") }} res
         inner join
-            {{ ref("liste_matiere_epr_unique") }} as dim
+            {{ ref("rstep_liste_matiere_epr_unique") }} as dim
             on dim.code_matiere = res.cd_cours
     ),
     row_number as (
@@ -59,6 +63,10 @@ with
             description_matiere,
             ecole,
             nb_eleve,
+            moyenne_ecole_brute,
+            taux_reussite_ecole_brute,
+            moyenne_ecole_modere,
+            taux_reussite_ecole_modere,
             moyenne_epreuve,
             taux_reussite_epreuve,
             moyenne_final,
@@ -71,15 +79,27 @@ with
         where ecole is not null and groupe is null
     )
 select
-    annee,
+    res.annee,
+    annee_scolaire,
     mois_resultat,
     code_matiere,
     description_matiere,
     ecole,
+    'Tout' as groupe,
     nb_eleve,
+    moyenne_ecole_brute,
+    taux_reussite_ecole_brute,
+    moyenne_ecole_modere,
+    taux_reussite_ecole_modere,
     moyenne_epreuve,
     taux_reussite_epreuve,
     moyenne_final,
-    taux_reussite_final
-from row_number
+    taux_reussite_final,
+    moyenne_ecole_modere - moyenne_ecole_brute as moderation,
+    moyenne_epreuve - moyenne_ecole_brute as moyenne_ecart_res_epreuve,
+    moyenne_final - moyenne_ecole_brute as moyenne_ecart_res_ecole_finale
+from row_number res
+inner join
+    (select distinct annee, annee_scolaire from {{ ref("dim_mapper_schools") }}) sch
+    on res.annee - 1 = sch.annee
 where seqid = 1

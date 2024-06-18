@@ -36,6 +36,7 @@ with
             mois_resultat,
             groupe,
             resb.res_num_som as res_ecole_brute,
+            res_eco_brute as res_ecole_brute_min,
             res_eco_mod as res_ecole_modere,
             res_off_brute as res_ministere_brute,
             res_off_conv as res_ministere_conv,
@@ -88,7 +89,7 @@ with
             ) as seqid
         from {{ ref("i_e_ri_resultats") }} res
         inner join
-            {{ ref("liste_matiere_epr_unique") }} as dim
+            {{ ref("rstep_liste_matiere_epr_unique") }} as dim
             on dim.code_matiere = res.matiere  -- Only keep the tracked courses
         left join
             {{ ref("fact_resultat_bilan_matiere") }} resb
@@ -111,6 +112,7 @@ select
     mois_resultat,
     groupe,
     res_ecole_brute,
+    res_ecole_brute_min,
     case
         when res_ecole_modere = '' then null else res_ecole_modere
     end as res_ecole_modere,
@@ -164,7 +166,7 @@ select
     case
         when res_ecole_modere = 'RIN'
         then null
-        when res_ecole_modere = ''
+        when res_ecole_brute is null
         then null
         else cast(res_ministere_final_num as int) - cast(res_ecole_brute as int)
     end as ecart_res_ecole_finale,
@@ -176,6 +178,8 @@ select
     case
         when res_ministere_brute = ''
         then null
+        when res_ministere_num is null
+        then null
         when res_ministere_num between 60 and 69
         then 1.
         else 0.
@@ -183,20 +187,33 @@ select
     case
         when res_ministere_brute = ''
         then null
-        when res_ministere_num > 70
+        when res_ministere_num is null
+        then null
+        when res_ministere_num >= 70
         then 1.
         else 0.
     end as is_maitrise_epreuve,
     case
         when res_ministere_brute = ''
         then null
+        when res_ministere_num is null
+        then null
         when res_ministere_num < 60
         then 1.
         else 0.
     end as is_echec_epreuve,
-    case when res_final_num between 60 and 69 then 1. else 0. end as is_difficulte_final
-    ,
-    case when res_final_num > 70 then 1. else 0. end as is_maitrise_final,
-    case when res_final_num < 60 then 1. else 0. end as is_echec_final
+    case
+        when res_final_num is null
+        then null
+        when res_final_num between 60 and 69
+        then 1.
+        else 0.
+    end as is_difficulte_final,
+    case
+        when res_final_num is null then null when res_final_num >= 70 then 1. else 0.
+    end as is_maitrise_final,
+    case
+        when res_final_num is null then null when res_final_num < 60 then 1. else 0.
+    end as is_echec_final
 from src
 where seqid = 1
