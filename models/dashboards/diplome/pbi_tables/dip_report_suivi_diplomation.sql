@@ -353,10 +353,10 @@ with
             ) as ind_sanct_complementaire_5,  -- L'indicateur d'une note de passage dans un cours complémentaire 5
             sum(
                 case
-                    when is_g4 = 1 and (ind_reussite = 'RE' or ind_reussite = 'R')
+                    when is_g4 = 1 and en_cours = '0' and (ind_reussite = 'RE' or ind_reussite = 'R')
                     then convert(int, unites)
                     else 0
-                end
+                end 
             ) as nb_unites_acquis_g4,  -- La somme des unités acquis en secondaire 4. Contient toutes les matières.
             sum(
                 case
@@ -365,7 +365,7 @@ with
             ) as nb_unites_g4_en_cours,  -- La somme des unités en cours en secondaire 4. Contient toutes les matières.
             sum(
                 case
-                    when is_g5 = 1 and (ind_reussite = 'RE' or ind_reussite = 'R')
+                    when is_g5 = 1 and en_cours = '0' and (ind_reussite = 'RE' or ind_reussite = 'R')
                     then convert(int, unites)
                     else 0
                 end
