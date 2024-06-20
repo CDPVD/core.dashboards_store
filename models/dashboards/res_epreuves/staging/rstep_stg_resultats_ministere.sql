@@ -50,7 +50,7 @@ with
             pct_reust_nmc as taux_reussite_epreuve,
             moyen_rf as moyenne_final,
             pct_reust_rf as taux_reussite_final
-        from {{ ref("Fichier_Consolide_epreuves_ministere") }} res
+        from {{ ref("fichier_consolide_epreuves_ministerielles") }} res
         inner join
             {{ ref("rstep_liste_matiere_epr_unique") }} as dim
             on dim.code_matiere = res.cd_cours
