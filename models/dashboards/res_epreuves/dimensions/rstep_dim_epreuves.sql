@@ -30,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 {%- set source_relation = adapter.get_relation(
     database=target.database,
     schema=target.schema + "_res_epreuves_seeds",
-    identifier="rstep_epreuves_personnalise",
+    identifier="rstep_epreuves_personnalisees",
 ) -%}
 {% set table_exists = source_relation is not none %}
 
@@ -38,7 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% if execute %}
         {{
             log(
-                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalise' DOES EXIST and will be added to the 'rstep_epreuves_communes'",
+                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalisees' DOES EXIST and will be added to the 'rstep_epreuves_communes'",
                 true,
             )
         }}
@@ -54,7 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% if execute %}
         {{
             log(
-                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalise' DOES NOT exists. The 'rstep_dim_epreuves' table will be defaulted to 'rstep_epreuves_communes'.",
+                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalisees' DOES NOT exists. The 'rstep_dim_epreuves' table will be defaulted to 'rstep_epreuves_communes'.",
                 true,
             )
         }}
