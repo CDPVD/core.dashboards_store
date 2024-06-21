@@ -87,3 +87,17 @@ seeds:
         is_reg: bit
         valid_from: int
         valid_until: int
+  - name: date_ref
+    description: >
+      A mapping table to set the first month-day of the school year..
+    columns:
+      - name: date_ref
+        description: contain the month and the day of the first day of the school year (exenple : -07-01).
+        tests:
+          - not_null
+    config:
+      tags:
+        - human_resources
+      schema: human_resources_seeds
+      column_types:
+        date_ref: nvarchar(6)

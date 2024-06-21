@@ -41,7 +41,8 @@ with
                 left join
                     {{ ref("dim_mapper_job_group") }} as job
                     on src.corp_empl = job.job_group
-                where src.matr not in (select matr from {{ ref("fact_retirement") }})  -- Remove the already retired employes
+            -- where src.matr not in (select matr from {{ ref("fact_retirement") }})
+            -- -- Take all the employees.
             ) as src
         -- Add the current_year date to compute the age at semptember the first of the
         -- current scholar year
@@ -49,7 +50,7 @@ with
             (
                 select
                     concat(
-                        {{ store.get_current_year() }},
+                        {{ store.get_current_year() - 10 }},
                         (select date_ref from {{ ref("date_ref") }})
                     ) as current_year
             ) as crt
@@ -82,7 +83,7 @@ with
             (
                 select seq_value as horizon
                 from {{ ref("int_sequence_0_to_1000") }}
-                where seq_value between 0 and 5
+                where seq_value between 0 and 10
             ) as hrz
 
     -- Add the survival rate for each cohort x age
@@ -135,7 +136,7 @@ with
             convert(
                 date,
                 concat(
-                    {{ store.get_current_year() }} + hrz.horizon,
+                    {{ store.get_current_year() - 10 }} + hrz.horizon,
                     (select date_ref from {{ ref("date_ref") }})
                 ),
                 102
@@ -150,7 +151,7 @@ with
             (
                 select seq_value as horizon
                 from {{ ref("int_sequence_0_to_1000") }}
-                where seq_value between 1 and 5
+                where seq_value between 1 and 10
             ) as hrz
 
     -- Join the padding table to the aggregated table to impute missing values
