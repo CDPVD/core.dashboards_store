@@ -118,8 +118,8 @@ seeds:
         description: L'année scolaire
         tests:
           - not_null
-      - name: annee
-        description: L'année de l'obtention du dip.
+      - name: periode
+        description: Correspond à la période en année de la donnée (sur x année)
         tests:
           - not_null
       - name: taux
