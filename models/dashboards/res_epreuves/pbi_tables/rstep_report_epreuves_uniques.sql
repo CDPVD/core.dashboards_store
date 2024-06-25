@@ -77,7 +77,10 @@ with
             {{ ref("fact_yearly_student") }} as el
             on res.fiche = el.fiche
             and res.annee = el.annee
-        inner join {{ ref("dim_eleve") }} as dim_el on res.fiche = dim_el.fiche
+        inner join
+            {{ ref("dim_eleve") }} as dim_el
+            on res.fiche = dim_el.fiche
+            and genre != 'x'
         inner join
             {{ ref("dim_mapper_schools") }} as mapper_school
             on el.eco = mapper_school.eco

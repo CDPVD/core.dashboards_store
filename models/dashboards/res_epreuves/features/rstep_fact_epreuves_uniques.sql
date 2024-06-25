@@ -100,8 +100,7 @@ with
             type_form_charl = 'FG'
             and secteur_enseign_freq = 'JE'
             and ecole like ('{{ var("res_epreuves")["cod_css"] }}')
-            and res.annee >= {{ store.get_current_year() }} - 4
-    -- and  mois_resultat = 6 
+            and res.annee >= {{ store.get_current_year() }} - 5
     )
 select
     fiche,

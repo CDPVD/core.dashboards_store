@@ -29,8 +29,8 @@ with
             res.annee_scolaire,
             res.ecole,
             description_matiere,
-            population,
-            genre,
+            case when population is null then '-' else population end as population,
+            case when genre is null then '-' else genre end as genre,
             case
                 when plan_interv_ehdaa is null then '-' else plan_interv_ehdaa
             end as plan_interv_ehdaa,
@@ -47,7 +47,8 @@ with
             {{ ref("fact_yearly_student") }} as el_y
             on res.fiche = el_y.fiche
             and res.annee = el_y.annee
-        left join {{ ref("dim_eleve") }} as el on res.fiche = el.fiche
+
+        left join {{ ref("dim_eleve") }} as el on res.fiche = el.fiche and genre != 'x'
     ),
     agg as (
         select

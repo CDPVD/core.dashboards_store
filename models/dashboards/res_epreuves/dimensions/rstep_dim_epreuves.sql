@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         * named 'custom_subject_evaluation'
         * located in the schema 'res_epreuves_seeds'
 #}
-{{ config(alias="dim_subject_evaluation") }}
+{{ config(alias="dim_epreuves") }}
 
 {%- set source_relation = adapter.get_relation(
     database=target.database,
