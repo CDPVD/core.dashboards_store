@@ -81,10 +81,8 @@ with
             and res_mat.etat = 1  -- La matière est actif pour l'année courante
             and left(right(res_mat.code_matiere, 3), 1) in ('4', '5')  -- Matière secondaire 4 et 5
             and (
-                res_mat.code_matiere not in (
-                    select code_matiere
-                    from "tbe_dev"."sadqimo_dashboard_diplome"."matiere_evalue"
-                )  -- ne prendre que les résultats de l'année en cours pour les matière avec des épreuve unique 
+                res_mat.code_matiere
+                not in (select code_matiere from {{ ref("matiere_evalue") }})  -- ne prendre que les résultats de l'année en cours pour les matière avec des épreuve unique 
                 or res_mat.annee = {{ get_current_year() }}
                 and month(getdate()) < 7
             )  -- pour l'année antérieur nous allons récupérer les résultats ministériels   
@@ -355,7 +353,10 @@ with
             ) as ind_sanct_complementaire_5,  -- L'indicateur d'une note de passage dans un cours complémentaire 5
             sum(
                 case
-                    when is_g4 = 1 and ind_reussite = 'RE'
+                    when
+                        is_g4 = 1
+                        and en_cours = '0'
+                        and (ind_reussite = 'RE' or ind_reussite = 'R')
                     then convert(int, unites)
                     else 0
                 end
@@ -367,7 +368,10 @@ with
             ) as nb_unites_g4_en_cours,  -- La somme des unités en cours en secondaire 4. Contient toutes les matières.
             sum(
                 case
-                    when is_g5 = 1 and ind_reussite = 'RE'
+                    when
+                        is_g5 = 1
+                        and en_cours = '0'
+                        and (ind_reussite = 'RE' or ind_reussite = 'R')
                     then convert(int, unites)
                     else 0
                 end
@@ -379,14 +383,14 @@ with
             ) as nb_unites_g5_en_cours,  -- La somme des unités en cours en secondaire 5. Contient toutes les matières.
             sum(
                 case
-                    when (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
+                    when (is_g4 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
                     then convert(int, unites)
                     else 0
                 end
             ) as nb_unites_previsionnel_4,  -- La somme des unités prévisionnel en cours ou non en secondaire 4. Contient toutes les matières.
             sum(
                 case
-                    when (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
+                    when (is_g5 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
                     then convert(int, unites)
                     else 0
                 end
@@ -395,8 +399,10 @@ with
                 case
                     when
                         (
-                            (is_g4 = 1 and convert(nvarchar, resultat) >= '60')
-                            or (is_g5 = 1 and convert(nvarchar, resultat) >= '60')
+                            (is_g4 = 1 and isnumeric(resultat) = 1 and resultat >= 60)
+                            or (
+                                is_g5 = 1 and isnumeric(resultat) = 1 and resultat >= 60
+                            )
                         )
                     then convert(int, unites)
                     else 0
