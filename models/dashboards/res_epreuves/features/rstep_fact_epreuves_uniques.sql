@@ -213,6 +213,11 @@ select
     end as is_maitrise_final,
     case
         when res_final_num is null then null when res_final_num < 60 then 1. else 0.
-    end as is_echec_final
+    end as is_echec_final,
+    case
+        when isnumeric(res_ministere_brute) = 0 and isnumeric(res_ministere_final) = 0
+        then 1
+        else 0
+    end as is_res_epreuve_non_numerique
 from src
 where seqid = 1

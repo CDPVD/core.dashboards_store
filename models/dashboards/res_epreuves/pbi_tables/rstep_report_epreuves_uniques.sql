@@ -85,7 +85,7 @@ with
             {{ ref("dim_mapper_schools") }} as mapper_school
             on el.eco = mapper_school.eco
             and res.annee = mapper_school.annee
-
+        where res_ministere_num is not null or res_final_num is not null
         group by
             res.annee,
             annee_scolaire,

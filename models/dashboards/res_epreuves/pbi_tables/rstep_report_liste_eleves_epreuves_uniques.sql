@@ -86,6 +86,10 @@ select
     end as descr_is_maitrise_final,
     is_maitrise_final,
     case when is_echec_final = 1 then 'Oui' else 'Non' end as descr_is_echec_final,
+    is_res_epreuve_non_numerique,
+    case
+        when is_res_epreuve_non_numerique = 1 then 'Oui' else 'Non'
+    end as descr_is_res_epreuve_non_numerique,
     is_echec_final
 from {{ ref("rstep_fact_epreuves_uniques") }} src
 inner join
