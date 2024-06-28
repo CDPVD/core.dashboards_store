@@ -379,52 +379,90 @@ sources:
 ```
 
 ### res_epreuves
-> Provides a quick overview of the results of the mandatory and optional evaluations by the school board.
+> Donne un aperçu rapide des résultats des évaluations uniques, obligatoires et locales par le conseil scolaire.
 
 | Interfaces  | Marts 	| Marts seeds | Dashboard seeds | Additional config |
 |-----------	|-------------	|-------	|-------	| -------	|
-| gpi |  No | No 	| Yes 	| Yes 	|
+| gpi, jade |  No | No 	| Yes 	| Yes 	|
 
-#### Dbt project specification
-> Update your `cssxx_store/dbt_project.yml` file with the following snippet.
+# Déploiement
+:badge[tag:res_epreuves]{type="success"}
+:badge[new in v0.7.0]
 
+## Bases de données
+
+Les base de données `gpi` et `jade` doivent être liées au projet. Veuillez consulter  la section [linking a database](/using/configuration/linking) pour plus d’informations sur la façon de lier une base de données.
+## Spécification du projet DBT
+> Mettez à jour votre fichier `cssXX.dashboards_store/dbt_project.yml` avec l’extrait suivant.
+
+1. Activer les modèles.
 ```yaml
+# cssXX.dashboards_store/dbt_project.yml
 models:
   store: # Enable the models from the core repo
+    marts:
+        educ_serv:
+            +enabled: True        
     res_epreuves:
       +enabled: True
     shared:
-        interfaces: # The dashboard only needs the GPI database
+        interfaces: 
             gpi:
                 +enabled: True
+            jade:
+                +enabled: True                
 ```  
+2. Définir un `cod_css` personnalisé
+::alert{type=warning}
+cod_css sera utilisé pour filtrer la table de Jade par le code d’organisation afin d’exclure les élèves appartenant à d’autres CSS. Cette variable DOIT être définie pour que le tableau de bord fonctionne correctement. 
+::
 
-#### Additional configuration
-> These steps are optional.
-##### Customizing the tracked courses
-> Update your `cssxx_store/dbt_project.yml` file.
-> This table needs some seeds. Make sure to run `dbt seed --full-refresh` to populate the seeds.
+```yaml
+#cssXX.data.dbe/dbt_project.yml
+vars:
+    # res_epreuves's dashboard variables:
+    res_epreuves:
+        cod_css: ###% --Les trois premiers chiffres de votre code d’organisation 
+```
 
-* To add a list of in-house courses to be tracked :
-  1. Add a `.csv` file in your `cssxx_store/seeds/res_epreuves` folder. The file must be named `custom_subject_evaluation.csv`. The file must be populated with the colums described in `core.data.store/seeds/res_epreuves/schema.yml` (refers to the `custom_subject_evaluation` seed). You might want to use the `GPI.Edo.ResultatsCompetenceEtape` table to find the appropriate mapping.
+# configuration 
 
-  2. Trigger a refresh of your seeds 
+## Personnalisation des épreuves locales
+::alert{type=warning}
+La configuration est facultative. Si vous ne fournissez pas de configuration, le tableau de bord utilisera la configuration par défaut
+::
+
+> Cette table a besoin de quelques graines :). Assurez-vous d’exécuter `dbt seed --full-refresh` pour peupler les seeds.
+
+* Pour ajouter une liste d'épreuves locales à suivre dans le tableau de bord :
+  1. Ajoutez un fichier `.csv` dans votre dossier `cssXX.dashboards_store/seeds/res_epreuves`. Le fichier doit être nommé `rstep_epreuves_personnalisees`. Le fichier doit être rempli avec les colonnes décrites dans `core.dashboards_store/seeds/dashboards/res_epreuves/schema.yml` (qui fait référence à la seed `rstep_epreuves_personnalisees`). 
+
+  2. Déclenchez un rafraîchissement de vos seeds 
 
 ```bash
 dbt seed --full-refresh
 ```
 
-##### Setting a custom `threshold`
-> The threshold is used to compute the identify the overachieving students. It is set to 70% by default.
+::alert{type=info}
+Veuillez consulter la section [seeds](/using/marts/seeds) pour plus d’informations sur la manière d’utiliser et de peupler les graines
+::
+## Ajout des données ministérielles 
+::alert{type=warning}
+Cette configuration est obligatoire. Si vous ne fournissez les données de charlemagne , la partie des épreuves uniques du tableau de bord n'affichera pas de données.
+::
+> Cette table a besoin de quelques graines :). Assurez-vous d’exécuter `dbt seed --full-refresh` pour peupler les seeds.
 
-You can override the default threshold by adding the following variable in your `dbt_project.yml` file.
+* Pour ajouter les données des épreuves uniques au niveau régional et provincial au  tableau de bord :
 
-```yaml
-# cssxx_store/dbt_project.yml
-vars:
-    # res_epreuves's dashboard variables:
-    res_epreuves:
-        threshold: 70
+  1. Vous avez besoin d'exécuter les rapports Charlemagne `CHS040509R - Statistiques provisoires des résultats d'épreuves uniques` de toutes les sessions pour toutes les années que vous voulez suivre dans le tableau de bord.
+  2. Vous devez ensuite les enregistrer dans un seul dossier où il y aurait seulement ces fichiers `XML`.   
+  3. Utilisez le fichier `fichier_traitement.xlsm`, qui se trouve dans le dossier (/analyses/dashboards/res_epreuves) afin de consolider les différents fichiers `XML` des différentes sessions en un seul fichier `.csv`.
+  4. Enregistrez le fichier consolidé dans le dossier `cssXX.dashboards_store/seeds/res_epreuves` sous le nom `fichier_consolide_epreuves_ministerielles`.
+  5. Déclenchez un rafraîchissement de vos seeds.
+  6. refaire les étapes pour ajouter les données à chaque session. 
+
+```bash
+dbt seed --full-refresh
 ```
 
 ### empl_actif
