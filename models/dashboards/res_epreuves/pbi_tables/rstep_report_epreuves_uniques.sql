@@ -35,16 +35,16 @@ with
             mois_resultat,
             groupe,
             count(res.fiche) as nb_eleve,
-            avg(is_reussite_epr) * 100 as taux_reussite_epreuve,
-            avg(is_reussite_final) * 100 as taux_reussite_final,
-            avg(is_reussite_ecole_brute) * 100 as taux_reussite_ecole_brute,
-            avg(is_reussite_ecole_modere) * 100 as taux_reussite_ecole_modere,
-            avg(is_difficulte_epreuve) * 100 as taux_difficulte_epreuve,
-            avg(is_maitrise_epreuve) * 100 as taux_maitrise_epreuve,
-            avg(is_echec_epreuve) * 100 as taux_echec_epreuve,
-            avg(is_difficulte_final) * 100 as taux_difficulte_final,
-            avg(is_maitrise_final) * 100 as taux_maitrise_final,
-            avg(is_echec_final) * 100 as taux_echec_final,
+            avg(is_reussite_epr) as taux_reussite_epreuve,
+            avg(is_reussite_final) as taux_reussite_final,
+            avg(is_reussite_ecole_brute) as taux_reussite_ecole_brute,
+            avg(is_reussite_ecole_modere) as taux_reussite_ecole_modere,
+            avg(is_difficulte_epreuve) as taux_difficulte_epreuve,
+            avg(is_maitrise_epreuve) as taux_maitrise_epreuve,
+            avg(is_echec_epreuve) as taux_echec_epreuve,
+            avg(is_difficulte_final) as taux_difficulte_final,
+            avg(is_maitrise_final) as taux_maitrise_final,
+            avg(is_echec_final) as taux_echec_final,
             sum(is_reussite_epr) as nb_reussite_epreuve,
             sum(is_reussite_final) as nb_reussite_final,
             sum(is_difficulte_epreuve) as nb_difficulte_epreuve,
@@ -178,10 +178,10 @@ with
             moyenne_moderation,
             moyenne_ecart_res_ecole_finale,
             moyenne_ecart_res_epreuve,
-            taux_reussite_epreuve
-            - taux_reussite_epreuve_css as ecart_reussite_epr_ecole_css,
-            taux_reussite_final
-            - taux_reussite_final_css as ecart_reussite_final_ecole_css,
+            (taux_reussite_epreuve - taux_reussite_epreuve_css)
+            * 100 as ecart_reussite_epr_ecole_css,
+            (taux_reussite_final - taux_reussite_final_css)
+            * 100 as ecart_reussite_final_ecole_css,
             moyenne_epreuve - moyenne_epreuve_css as ecart_moyenne_epr_ecole_css,
             moyenne_final - moyenne_final_css as ecart_moyenne_final_ecole_css,
             taux_reussite_epreuve_css,
@@ -262,10 +262,10 @@ with
             ecart_reussite_final_ecole_css,
             ecart_moyenne_epr_ecole_css,
             ecart_moyenne_final_ecole_css,
-            taux_reussite_epreuve
-            - taux_reussite_epreuve_provincial as ecart_reussite_epr_ecole_provincial,
-            taux_reussite_final
-            - taux_reussite_final_provincial as ecart_reussite_final_ecole_provincial,
+            (taux_reussite_epreuve - taux_reussite_epreuve_provincial)
+            * 100 as ecart_reussite_epr_ecole_provincial,
+            (taux_reussite_final - taux_reussite_final_provincial)
+            * 100 as ecart_reussite_final_ecole_provincial,
             moyenne_epreuve
             - moyenne_epreuve_provincial as ecart_moyenne_epr_ecole_provincial,
             moyenne_final
@@ -353,10 +353,10 @@ with
             ecart_reussite_final_ecole_provincial,
             ecart_moyenne_epr_ecole_provincial,
             ecart_moyenne_final_ecole_provincial,
-            taux_reussite_epreuve
-            - taux_reussite_epreuve_régional as ecart_reussite_epr_ecole_régional,
-            taux_reussite_final
-            - taux_reussite_final_régional as ecart_reussite_final_ecole_régional,
+            (taux_reussite_epreuve - taux_reussite_epreuve_régional)
+            * 100 as ecart_reussite_epr_ecole_régional,
+            (taux_reussite_final - taux_reussite_final_régional)
+            * 100 as ecart_reussite_final_ecole_régional,
             moyenne_epreuve
             - moyenne_epreuve_régional as ecart_moyenne_epr_ecole_régional,
             moyenne_final

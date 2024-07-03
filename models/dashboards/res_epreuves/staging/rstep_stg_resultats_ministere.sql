@@ -43,13 +43,13 @@ with
             no_group_eleve as groupe,
             eleve_note as nb_eleve,
             moyen_neb as moyenne_ecole_brute,
-            pct_reust_neb as taux_reussite_ecole_brute,
+            pct_reust_neb / 100 as taux_reussite_ecole_brute,
             moyen_nem as moyenne_ecole_modere,
-            pct_reust_nem as taux_reussite_ecole_modere,
+            pct_reust_nem / 100 as taux_reussite_ecole_modere,
             moyen_nmc as moyenne_epreuve,
-            pct_reust_nmc as taux_reussite_epreuve,
+            pct_reust_nmc / 100 as taux_reussite_epreuve,
             moyen_rf as moyenne_final,
-            pct_reust_rf as taux_reussite_final
+            pct_reust_rf / 100 as taux_reussite_final
         from {{ ref("fichier_consolide_epreuves_ministerielles") }} res
         inner join
             {{ ref("rstep_liste_matiere_epr_unique") }} as dim
