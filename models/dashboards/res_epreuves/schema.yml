@@ -1,48 +1,84 @@
 version: 2
 
 models:
-  - name: rstep_dim_subject_evaluation
+  - name: rstep_dim_epreuves
     description: >
       Table de dimensions mappant à chaque épreuve unique / obligatoire / maison, les codes_matières, les no_competences et les cod_etapes requis.
       La table est constuite en unionant la dimension par défaut (core/seeds/res_epreuves/default_subject_evaluation.csv) et la dimension custom (cssss/seeds/res_epreuves/custom_subject_evaluation.csv).
       La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des épreuves.
 
-  - name: rstep_fact_evaluations_grades_from_dim
+  - name: rstep_fact_epreuves_obligatoires_internes
     description: >
-      La table regroupe les notes des matières sujettes à examens. 
-      Cette table accumule les résultats pour les matières identifées dans 'rstep_dim_subject_evaluation'.
-      Elle sert de point d'entrée à la table 'rstep_fact_evaluations_grades' qui combine ces résultats à ceux d'une éventuelle table custom.
+      La table regroupe les notes des épreuves obligatoires et locales. 
+      Cette table accumule les résultats pour les matières identifées dans 'rstep_dim_epreuves'.
     tests:
       - resolution:
           combination_of_columns:
             - fiche
             - ecole
             - code_matiere
-            - annee
-            - friendly_name
+            - annee_scolaire
+            - description_matiere
     columns:
-      - name: resultat_numerique
+      - name: res_comp_etape
         tests:
           - not_null
+
+  - name: rstep_fact_epreuves_uniques
+    description: >
+      La table regroupe les notes des épreuves unique de 4ème et 5ème secondaire. 
+      Cette table accumule les résultats pour les matières identifées dans 'rstep_liste_matiere_epr_unique'.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee
+            - code_matiere
+            - mois_resultat
+            - groupe
+    columns:
+      - name: res_ministere_final
+        tests:
+          - not_null          
 
   - name: rstep_fact_evaluations_grades
     description: >
       La table regroupe les notes des matières sujettes à examens. Cette table accumulate à la fois les résultats extrait par le processus automatique basé sur rstep_dim_subject_evaluation et aussi les éventuelles tables customs (to be done.)
 
-  - name: rstep_fact_evaluations_minist_sec4_sec5
+  - name: rstep_report_epreuves_obligatoires_internes
+    description: La table calcule les métriques liées aux épreuves obligatoires et locales, pour toutes les combinaisona de filtres choisis.
+
+  - name: rstep_report_epreuves_uniques
+    description: La table calcule des métriques liées aux épreuves uniques, pour toutes les combinaisona de filtres choisis.
+
+  - name: rstep_report_liste_eleves_epreuves_uniques
     description: >
-      La table extrait les données relatives au épreuves ministéerielles uniques et les adaptent à la forme des données des autres épreuves(locales et obligatoires)
+      Cette table liste toutes les informations liées à l'élèves en relation avec les résultats aux épreuves uniques. 
     tests:
       - resolution:
           combination_of_columns:
             - fiche
-            - ecole
+            - annee_scolaire
             - code_matiere
-            - groupe
-            - date_resultat
+            - mois_resultat
+  
+  - name: rstep_report_liste_eleves_epreuves_obligatoires_internes
+    description: >
+      Cette table liste toutes les informations liées à l'élèves en relation avec les résultats aux épreuves obligatoires et locales. 
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee_scolaire
+            - description_matiere
 
-  - name: rstep_report_evaluation_grades_schools
-    description: La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison), par établissement et par année.
-
-  - name: rstep_report_evaluation_grades
-    description: La table calcule des métriques de taux de succès par évaluation (obligatoire ou maison) par année, au niveau (aggrégé) du CSS.
+  - name: rstep_stg_resultats_ministere
+    description: >
+      Cette table liste les résultats aux épreuves uniques au niveau régional et provincial. 
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - mois_resultat
+            - code_matiere
+            - ecole

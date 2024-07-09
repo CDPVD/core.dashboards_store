@@ -20,26 +20,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {{
     config(
-        alias="fact_evaluations_grades",
+        alias="fact_epreuves_obligatoires_internes",
     )
 }}
 
 select
-    annee,
-    ecole,
+    annee_scolaire,
+    res.annee,
+    school_friendly_name as ecole,
     fiche,
-    friendly_name,
-    resultat,
-    resultat_numerique,
-    -- make the code reussite a boolean to ease the computation of summary statistics
-    case when code_reussite = 'R' then 1 else 0 end as cod_reussite,
-    -- Create a customly thresolded code reussite.
-    case
-        when
-            resultat_numerique
-            >= {{ var("res_epreuves", {"threshold": 70})["threshold"] }}
-        then 1
-        else 0
-    end as cod_reussite_threshold
-from {{ ref("rstep_fact_evaluations_grades_from_dim") }}
-where resultat_numerique is not null
+    res.code_matiere,
+    friendly_name as description_matiere,
+    res_comp_etape,
+    res_etape_num,
+    case when is_reussite = 'R' then 1. else 0. end as is_reussite,
+    is_echec,
+    is_difficulte,
+    is_maitrise,
+    is_reprise
+from {{ ref("fact_resultat_etape_competence") }} as res
+inner join
+    {{ ref("dim_mapper_schools") }} as mapper_school
+    on res.id_eco = mapper_school.id_eco
+inner join
+    {{ ref("rstep_dim_epreuves") }} as mat
+    on mat.code_matiere = res.code_matiere
+    and mat.code_etape = res.etape
+    and mat.no_competence = res.no_comp
+where res.res_comp_etape is not null
