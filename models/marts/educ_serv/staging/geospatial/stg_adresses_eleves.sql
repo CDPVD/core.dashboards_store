@@ -31,7 +31,9 @@ with
             code_post,
             row_number() over (partition by fiche order by date_effect) as seqid  -- pour identifier la 1ere adresse
         from {{ ref("i_e_adr") }}
-        where date_effect != date_fin
+        where 
+            date_effect != date_fin
+            and fiche in (select distinct fiche from {{ ref("spine") }})
 
     -- fiches avec un seul type d'adresse -> on considere tt les adresses
     ),
