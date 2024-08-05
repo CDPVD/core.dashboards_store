@@ -36,6 +36,7 @@ with
             spi.eco,
             eco.nom_eco,
             dan.classe,
+            dan.class,
             dan.ordre_ens,
             dan.plan_interv_ehdaa,
             dan.difficulte,

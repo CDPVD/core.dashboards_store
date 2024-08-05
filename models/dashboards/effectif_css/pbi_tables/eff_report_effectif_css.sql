@@ -40,6 +40,7 @@ select
     end as population,
     sexe,
     dist,
+    class,
     grp_rep,
     count(code_perm) as total_ele
 from {{ ref("eff_fact_effectif_css") }}
@@ -52,6 +53,7 @@ group by
     population,
     cod_niveau_scolaire,
     dist,
+    class,
     grp_rep,
     plan_interv_ehdaa,
     difficulte
