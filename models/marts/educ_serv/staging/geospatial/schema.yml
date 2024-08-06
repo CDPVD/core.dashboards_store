@@ -9,3 +9,12 @@ models:
           combination_of_columns:
             - fiche
             - annee
+  - name: stg_adresses_eleves_draft
+    description: >
+      table showing students' residential addresses for each year.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee
+            - seqid
