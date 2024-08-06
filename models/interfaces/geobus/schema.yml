@@ -1,6 +1,12 @@
 version: 2
 
 models:
+  - name: i_geo_e_adr
+    tags: 
+      - interface
+      - educ_serv
+    description: >
+      Table d'interface. Utilisée uniquement pour pallier à une enventuelle absence (complète ou partielle) de la table 'geo_e_adr' de la base de données source.
   - name: i_geo_p_parc
     tags: ["interface"]
     description: >
