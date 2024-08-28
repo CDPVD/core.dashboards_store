@@ -38,7 +38,7 @@ with
             adr.rue,
             adr.ville,
 			adr.code_post,
-			ISNULL(adr.appart + '-', '') + ISNULL(adr.no_civ + ' ', '') + ISNULL(adr.rue, '') + ISNULL(', ' + adr.ville, '') + ISNULL(', ' + adr.code_post, '') AS adresse,
+			LOWER(ISNULL(adr.appart + '-', '') + ISNULL(adr.no_civ + ' ', '') + ISNULL(adr.rue, '') + ISNULL(', ' + adr.ville, '') + ISNULL(', ' + adr.code_post, '')) AS adresse,
             adr.longitude,
 			adr.latitude,
 			geography::Point(isnull(adr.latitude,0), isnull(adr.longitude,0), 4326) AS geo, --SP 2022-06-16 pour sortir les élèves ayant longitude et latitude à NULL
