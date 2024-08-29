@@ -41,6 +41,10 @@ models:
         tests:
           - not_null          
 
+  - name: rstep_dim_unique_subj_evaluation
+    description: >
+      La table constitue une liste de clé unique (nom de l'épreuve+année) pour servire de jointure entre les deux table de reporting
+
   - name: rstep_fact_evaluations_grades
     description: >
       La table regroupe les notes des matières sujettes à examens. Cette table accumulate à la fois les résultats extrait par le processus automatique basé sur rstep_dim_subject_evaluation et aussi les éventuelles tables customs (to be done.)
