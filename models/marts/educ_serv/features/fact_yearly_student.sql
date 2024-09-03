@@ -72,6 +72,8 @@ select
     ordre_ens,
     classe,
     class,
+    cycle_ref,
+    annee_cycle_ref,
     case
         when plan_interv_ehdaa is null
         then 'Sans'

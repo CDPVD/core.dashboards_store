@@ -20,8 +20,9 @@ with
         select y_stud.fiche, y_stud.id_eco
         from {{ ref("fact_yearly_student") }} as y_stud
         where
-            y_stud.ordre_ens = '4'  -- Secondaire
-            and type_parcours in ('07')  -- 07 = FPT
+            type_parcours in ('07')  -- 07 = FPT
+            and cycle_ref = 2
+            and annee_cycle_ref = 3
     )
 
 select *
