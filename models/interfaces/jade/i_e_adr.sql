@@ -15,15 +15,20 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select distinct
-    spi.code_perm,
-    spi.fiche,
-    nom,
-    pnom as prenom,
-    concat(nom, ', ', pnom, ' (', spi.fiche, ' )') as nom_prenom_fiche,
-    date_naissance,
-    case
-        when el.sexe = 'F' then 'Fille' when el.sexe = 'M' then 'Garçon' else el.sexe
-    end as genre
-from {{ ref("spine") }} as spi
-inner join {{ ref("i_gpm_e_ele") }} as el on spi.fiche = el.fiche
+select
+    fiche,
+    typeadr as type_adr,
+    dateeffect as date_effect,
+    datefin as date_fin,
+    nociv as no_civ,
+    orientrue as orient_rue,
+    genrerue as genre_rue,
+    rue,
+    app,
+    ville,
+    prov,
+    codepost as code_post,
+    envoimeq as ind_envoi_meq,
+    envoidoc as ind_envoi_doc,
+    envoitrsp as ind_envoi_trsp
+from {{ var("database_jade") }}.dbo.e_adr

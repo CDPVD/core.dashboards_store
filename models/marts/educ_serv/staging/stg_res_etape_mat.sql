@@ -56,4 +56,3 @@ with
 
 select *
 from res_mat_et
-where res_etape is not null
