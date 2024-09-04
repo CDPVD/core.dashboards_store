@@ -23,6 +23,7 @@ with
             type_parcours in ('07')  -- 07 = FPT
             and cycle_ref = 2
             and annee_cycle_ref = 3
+            and y_stud.annee < {{ get_current_year() }} + 1  -- Enlève l'année prévisionnelle de GPI
     )
 
 select *
