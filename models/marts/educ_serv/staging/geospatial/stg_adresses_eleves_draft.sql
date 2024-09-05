@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
     spi as (
-        select
+        select distinct
             spi.fiche,
 			spi.annee,
 			spi.population
@@ -25,7 +25,7 @@ with
     
     -- recuperer les adresses du perimetre
     ), adr as (
-        select
+        select distinct
             spi.fiche,
 			spi.annee,
 			spi.population,
@@ -41,7 +41,6 @@ with
 			LOWER(ISNULL(adr.appart + '-', '') + ISNULL(adr.no_civ + ' ', '') + ISNULL(adr.rue, '') + ISNULL(', ' + adr.ville, '') + ISNULL(', ' + adr.code_post, '')) AS adresse,
             adr.longitude,
 			adr.latitude,
-			geography::Point(isnull(adr.latitude,0), isnull(adr.longitude,0), 4326) AS geo, --SP 2022-06-16 pour sortir les élèves ayant longitude et latitude à NULL
 			adr.distance_batisse,
 			cast(adr.date_effect as date) as date_effect,
 			case
@@ -66,7 +65,7 @@ with
     )
 
 -- Identifier l'adresse au 30/09	
-SELECT 
+select 
 	spi.*,
     adr.bloc,
     adr.ind_envoi_meq,
@@ -80,7 +79,7 @@ SELECT
 	adr.adresse,
     adr.longitude,
 	adr.latitude,
-	adr.geo,
+	geography::Point(isnull(adr.latitude,0), isnull(adr.longitude,0), 4326) AS geo,
 	adr.distance_batisse,
 	adr.date_effect,
 	adr.date_effect_fin,
