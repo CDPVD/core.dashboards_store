@@ -17,78 +17,47 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 
 {{ config(alias="indicateur_des") }}
-
 with
-    _mentions as (
-        select
-            mentions.fiche,
-            mentions.prog_charl,
-            (left(mentions.date_exec_sanct, 6) - 1) as brut_annee,
-            mentions.ind_reus_sanct_charl
-        from {{ ref("i_e_ri_mentions") }} as mentions
-    ),
-
-    --Création de la notion de l'année dans e_ri_mentions
-    mentions_annee as (
-        select
-            mentions.fiche,
-            mentions.prog_charl,
-            case
-                when right(brut_annee, 2) between 9 and 12
-                then left(mentions.brut_annee, 4)
-                when right(brut_annee, 2) between 1 and 8
-                then (left(mentions.brut_annee, 4) - 1)
-            end as annee,
-            case
-                when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
-            end as 'ind_obtention'
-        from _mentions as mentions
-    ),
-
+    --Jumelage du perimetre élèves avec la table mentions
     perimetre as (
-        select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
+        select
+            sch.annee,
+            sch.annee_scolaire,
+            src.fiche,
+            sch.school_friendly_name,
+            mentions.ind_obtention
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
+        left join {{ ref("stg_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
         where
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
     ),
-    --Jumeler la table e_ri_mentions avec le perimètre
-    src as (
-    select
-        perim.annee,
-        perim.annee_scolaire,
-        perim.fiche,
-        perim.school_friendly_name,
-        mentions.ind_obtention
-    from perimetre as perim
-    left join mentions_annee as mentions on perim.fiche = mentions.fiche and perim.annee = mentions.annee
-    where
-        mentions.prog_charl = '6200'
-    ),
 
+    --Ajout des filtres utilisés dans le tableau de bord.
     _filtre as (
         select
-            src.annee,
-            src.annee_scolaire,
-            src.fiche,
-            src.school_friendly_name,
-            src.ind_obtention,
+            perim.annee,
+            perim.annee_scolaire,
+            perim.fiche,
+            perim.school_friendly_name,
+            perim.ind_obtention,
             ele.genre,
             y_stud.plan_interv_ehdaa,
             y_stud.population,
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification
-        from src
+        from perimetre as perim
         inner join
             {{ ref("fact_yearly_student") }} as y_stud
-            on src.fiche = y_stud.fiche
-            and src.annee = y_stud.annee
-        inner join {{ ref("dim_eleve") }} as ele on src.fiche = ele.fiche
+            on perim.fiche = y_stud.fiche
+            and perim.annee = y_stud.annee
+        inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
     ),
 
+    --Début de l'aggrégration
     agg_dip as (
         select
             '1.1.1.1' as id_indicateur,
@@ -111,6 +80,7 @@ with
             )
     ),
 
+    --Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
             ind.id_indicateur,
