@@ -19,23 +19,53 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 {{ config(alias="indicateur_des") }}
 
 with
-    src as (
+    _mentions as (
         select
-            sch.annee,
-            sch.annee_scolaire,
-            src.fiche,
-            sch.school_friendly_name,
+            mentions.fiche,
+            mentions.prog_charl,
+            (left(mentions.date_exec_sanct, 6) - 1) as brut_annee,
+            mentions.ind_reus_sanct_charl
+        from {{ ref("i_e_ri_mentions") }} as mentions
+    ),
+
+    --Création de la notion de l'année dans e_ri_mentions
+    mentions_annee as (
+        select
+            mentions.fiche,
+            mentions.prog_charl,
+            case
+                when right(brut_annee, 2) between 9 and 12
+                then left(mentions.brut_annee, 4)
+                when right(brut_annee, 2) between 1 and 8
+                then (left(mentions.brut_annee, 4) - 1)
+            end as annee,
             case
                 when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
             end as 'ind_obtention'
+        from _mentions as mentions
+    ),
+
+    perimetre as (
+        select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
-        left join {{ ref("i_e_ri_mentions") }} as mentions on src.fiche = mentions.fiche
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         where
-            mentions.prog_charl = '6200'
-            and sch.annee
+            sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
+    ),
+    --Jumeler la table e_ri_mentions avec le perimètre
+    src as (
+    select
+        perim.annee,
+        perim.annee_scolaire,
+        perim.fiche,
+        perim.school_friendly_name,
+        mentions.ind_obtention
+    from perimetre as perim
+    left join mentions_annee as mentions on perim.fiche = mentions.fiche and perim.annee = mentions.annee
+    where
+        mentions.prog_charl = '6200'
     ),
 
     _filtre as (
