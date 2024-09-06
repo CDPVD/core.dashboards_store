@@ -22,8 +22,10 @@ with
         select
             mentions.fiche,
             mentions.prog_charl,
-            (left(mentions.date_exec_sanct, 6) - 1) as brut_annee,
-            mentions.ind_reus_sanct_charl
+            CAST(LEFT(mentions.date_exec_sanct, 4) AS INT) as annee_brute,
+            CAST(RIGHT(LEFT(mentions.date_exec_sanct, 6), 2) AS INT) as mois_brut,
+            mentions.ind_reus_sanct_charl,
+            mentions.regime_sanct_charl
         from {{ ref("i_e_ri_mentions") }} as mentions
     ),
 
@@ -32,11 +34,12 @@ with
         select
             mentions.fiche,
             mentions.prog_charl,
+            mentions.regime_sanct_charl,
             case
-                when MONTH(brut_annee) between 9 and 12 -- Entre septembre et Décembre
-                then YEAR(mentions.brut_annee)
-                when MONTH(brut_annee) between 1 and 8 -- Entre Janvier et Aout
-                then YEAR(mentions.brut_annee)
+                when mentions.mois_brut between 9 and 12 -- Entre septembre et Décembre
+                then mentions.annee_brute
+                when mentions.mois_brut between 1 and 8 -- Entre Janvier et Août
+                then mentions.annee_brute - 1
             end as annee,
             case
                 when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
@@ -48,5 +51,6 @@ select
     fiche,
     prog_charl,
     annee,
-    ind_obtention
+    ind_obtention,
+    regime_sanct_charl
 from mentions_annee
