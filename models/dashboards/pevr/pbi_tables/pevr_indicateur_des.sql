@@ -25,7 +25,8 @@ with
             sch.annee_scolaire,
             src.fiche,
             sch.school_friendly_name,
-            mentions.ind_obtention
+            mentions.ind_obtention,
+            ROW_NUMBER() OVER (PARTITION BY src.fiche, sch.annee order by sch.annee desc) as seqid
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         left join {{ ref("stg_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
@@ -33,6 +34,9 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
+            and mentions.regime_sanct_charl IN ('A3','J5')
+            and (prog_charl = '6200' --Formation générale
+				or prog_charl = 'GENA3FR') --Dip. DES
     ),
 
     --Ajout des filtres utilisés dans le tableau de bord.
