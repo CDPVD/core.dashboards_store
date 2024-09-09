@@ -29,7 +29,7 @@ with
             ROW_NUMBER() OVER (PARTITION BY src.fiche, sch.annee order by sch.annee desc) as seqid
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
-        left join {{ ref("stg_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
+        left join {{ ref("fact_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
         where
             sch.annee
             between {{ store.get_current_year() }}

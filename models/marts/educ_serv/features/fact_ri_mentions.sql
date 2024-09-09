@@ -43,8 +43,20 @@ with
             end as annee,
             case
                 when mentions.ind_reus_sanct_charl = 'O' then 1.0 else 0.0
-            end as 'ind_obtention'
+            end as 'ind_obtention',
+            case
+                when prog.type_diplome = 'DES' THEN 1.0 else 0.0
+            end as 'indice_Des',
+            case
+                when prog.type_diplome = 'CFPT' THEN 1.0 else 0.0
+            end as 'indice_Cfpt',
+            case
+                when prog.type_diplome = 'CFMS' THEN 1.0 else 0.0
+            end as 'indice_Cfms'
         from _mentions as mentions
+        inner join {{ ref("i_t_prog") }} as prog on mentions.prog_charl = prog.prog_meq
+        AND prog.regime_sanct = mentions.regime_sanct_charl
+        WHERE mentions.regime_sanct_charl IN ('A3','J4','J5')
     )
 
 select
@@ -52,5 +64,8 @@ select
     prog_charl,
     annee,
     ind_obtention,
-    regime_sanct_charl
+    regime_sanct_charl,
+    indice_Des,
+    indice_Cfpt,
+    indice_Cfms
 from mentions_annee

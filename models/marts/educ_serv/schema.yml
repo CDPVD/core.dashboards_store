@@ -185,19 +185,3 @@ models:
           combination_of_columns:
             - fiche
             - id_eco
-
-  - name: stg_ri_mentions
-    config:
-      tags:
-        - pevr
-    column_types:
-        annee: nvarchar(max)
-    description: >
-      Table de staging utiliser pour l'acquisition des diplômes élèves.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - fiche
-            - annee
-            - regime_sanct_charl
-            - prog_charl

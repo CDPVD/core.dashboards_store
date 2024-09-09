@@ -21,7 +21,7 @@ with
         select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name, mentions.ind_obtention
         from {{ ref("stg_perimetre_eleve_diplomation_fpt") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
-        left join {{ ref("stg_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
+        left join {{ ref("fact_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
         where
             sch.annee
             between {{ store.get_current_year() }}
