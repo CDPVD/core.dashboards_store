@@ -36,6 +36,7 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
+            and mentions.indice_cfms = 1.0  -- Filtre pour choisir la qualification fms
     ),
 
     -- Ajout des filtres utilisés dans le tableau de bord.

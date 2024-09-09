@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {{ config(alias="indicateur_des") }}
-
 with
     -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
@@ -39,11 +38,7 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
-            and mentions.regime_sanct_charl in ('A3', 'J5')
-            and (
-                prog_charl = '6200'  -- Formation générale
-                or prog_charl = 'GENA3FR'
-            )  -- Dip. DES
+            and mentions.indice_des = 1.0  -- dip DES
     ),
 
     -- Ajout des filtres utilisés dans le tableau de bord.
