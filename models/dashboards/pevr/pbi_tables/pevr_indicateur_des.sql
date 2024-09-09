@@ -15,10 +15,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-
 {{ config(alias="indicateur_des") }}
+
 with
-    --Jumelage du perimetre élèves avec la table mentions
+    -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
         select
             sch.annee,
@@ -26,20 +26,27 @@ with
             src.fiche,
             sch.school_friendly_name,
             mentions.ind_obtention,
-            ROW_NUMBER() OVER (PARTITION BY src.fiche, sch.annee order by sch.annee desc) as seqid
+            row_number() over (
+                partition by src.fiche, sch.annee order by sch.annee desc
+            ) as seqid
         from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
-        left join {{ ref("fact_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
+        left join
+            {{ ref("fact_ri_mentions") }} as mentions
+            on src.fiche = mentions.fiche
+            and sch.annee = mentions.annee
         where
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
-            and mentions.regime_sanct_charl IN ('A3','J5')
-            and (prog_charl = '6200' --Formation générale
-				or prog_charl = 'GENA3FR') --Dip. DES
+            and mentions.regime_sanct_charl in ('A3', 'J5')
+            and (
+                prog_charl = '6200'  -- Formation générale
+                or prog_charl = 'GENA3FR'
+            )  -- Dip. DES
     ),
 
-    --Ajout des filtres utilisés dans le tableau de bord.
+    -- Ajout des filtres utilisés dans le tableau de bord.
     _filtre as (
         select
             perim.annee,
@@ -61,7 +68,7 @@ with
         inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
     ),
 
-    --Début de l'aggrégration
+    -- Début de l'aggrégration
     agg_dip as (
         select
             '1.1.1.1' as id_indicateur,
@@ -84,7 +91,7 @@ with
             )
     ),
 
-    --Coalesce pour crée le choix 'Tout' dans les filtres.
+    -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
             ind.id_indicateur,

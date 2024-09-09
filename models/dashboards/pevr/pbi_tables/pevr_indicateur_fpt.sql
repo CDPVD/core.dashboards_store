@@ -15,19 +15,29 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
+{{ config(alias="indicateur_fpt") }}
+
 with
-    --Jumelage du perimetre élèves avec la table mentions
+    -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
-        select sch.annee, sch.annee_scolaire, src.fiche, sch.school_friendly_name, mentions.ind_obtention
+        select
+            sch.annee,
+            sch.annee_scolaire,
+            src.fiche,
+            sch.school_friendly_name,
+            mentions.ind_obtention
         from {{ ref("stg_perimetre_eleve_diplomation_fpt") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
-        left join {{ ref("fact_ri_mentions")}} as mentions on src.fiche = mentions.fiche and sch.annee = mentions.annee
+        left join
+            {{ ref("fact_ri_mentions") }} as mentions
+            on src.fiche = mentions.fiche
+            and sch.annee = mentions.annee
         where
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
     ),
-    --Ajout des filtres utilisés dans le tableau de bord.
+    -- Ajout des filtres utilisés dans le tableau de bord.
     _filtre as (
         select
             perim.annee,
@@ -48,7 +58,7 @@ with
             and perim.annee = y_stud.annee
         inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
     ),
-    --Début de l'aggrégration
+    -- Début de l'aggrégration
     agg_dip as (
         select
             '1.1.1.1.2' as id_indicateur,
@@ -70,7 +80,7 @@ with
                 classification
             )
     ),
-    --Coalesce pour crée le choix 'Tout' dans les filtres.
+    -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
             ind.id_indicateur,
