@@ -305,7 +305,7 @@ with
                     moyenne_epreuve as moyenne_epreuve_provincial,
                     taux_reussite_final as taux_reussite_final_provincial,
                     moyenne_final as moyenne_final_provincial,
-                    moyenne_moderation as moyenne_moderation_provincial,
+                    moderation as moyenne_moderation_provincial,
                     moyenne_ecart_res_ecole_finale
                     as moyenne_ecart_res_ecole_finale_provincial,
                     moyenne_ecart_res_epreuve as moyenne_ecart_res_epreuve_provincial
@@ -401,7 +401,7 @@ with
                     moyenne_epreuve as moyenne_epreuve_régional,
                     taux_reussite_final as taux_reussite_final_régional,
                     moyenne_final as moyenne_final_régional,
-                    moyenne_moderation as moyenne_moderation_régional,
+                    moderation as moyenne_moderation_régional,
                     moyenne_ecart_res_ecole_finale
                     as moyenne_ecart_res_ecole_finale_régional,
                     moyenne_ecart_res_epreuve as moyenne_ecart_res_epreuve_régional
