@@ -24,7 +24,8 @@ with
             cast(left(mentions.date_exec_sanct, 4) as int) as annee_brute,
             cast(right(left(mentions.date_exec_sanct, 6), 2) as int) as mois_brut,
             mentions.ind_reus_sanct_charl,
-            mentions.regime_sanct_charl
+            mentions.regime_sanct_charl,
+            mentions.date_exec_sanct
         from {{ ref("i_e_ri_mentions") }} as mentions
     ),
 
@@ -34,6 +35,7 @@ with
             mentions.fiche,
             mentions.prog_charl,
             mentions.regime_sanct_charl,
+            mentions.date_exec_sanct,
             case
                 when mentions.mois_brut between 9 and 12  -- Entre septembre et Décembre
                 then mentions.annee_brute
@@ -60,6 +62,7 @@ select
     annee,
     ind_obtention,
     regime_sanct_charl,
+    date_exec_sanct,
     indice_des,
     indice_cfpt,
     indice_cfms
