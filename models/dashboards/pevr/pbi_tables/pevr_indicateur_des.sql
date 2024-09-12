@@ -47,11 +47,21 @@ with
             perim.annee,
             perim.annee_scolaire,
             perim.fiche,
-            perim.school_friendly_name,
+            case
+                when perim.school_friendly_name is null
+                then '-'
+                else perim.school_friendly_name
+            end as school_friendly_name,
             perim.ind_obtention,
-            ele.genre,
-            y_stud.plan_interv_ehdaa,
-            y_stud.population,
+            case when ele.genre is null then '-' else ele.genre end as genre,
+            case
+                when y_stud.plan_interv_ehdaa is null
+                then '-'
+                else y_stud.plan_interv_ehdaa
+            end as plan_interv_ehdaa,
+            case
+                when y_stud.population is null then '-' else y_stud.population
+            end as population,
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification
