@@ -62,7 +62,10 @@ with
             end as population,
             case
                 when y_stud.class is null then '-' else y_stud.class
-            end as classification
+            end as classification,
+            case
+                when y_stud.dist is null then '-' else y_stud.dist
+            end as distribution
         from perimetre as perim
         inner join
             {{ ref("fact_yearly_student") }} as y_stud
@@ -81,6 +84,7 @@ with
             plan_interv_ehdaa,
             population,
             classification,
+            distribution,
             count(fiche) nb_resultat,
             avg(ind_obtention) as taux_qualification_fms
         from _filtre
@@ -90,7 +94,8 @@ with
                 genre,
                 plan_interv_ehdaa,
                 population,
-                classification
+                classification,
+                distribution
             )
     ),
 
@@ -105,6 +110,7 @@ with
             coalesce(agg_dip.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(agg_dip.population, 'Tout') as population,
             coalesce(agg_dip.classification, 'Tout') as classification,
+            coalesce(agg_dip.distribution, 'Tout') as distribution,
             agg_dip.nb_resultat,
             agg_dip.taux_qualification_fms
         from agg_dip
@@ -127,6 +133,7 @@ select
                 "genre",
                 "population",
                 "classification",
+                "distribution",
             ]
         )
     }} as id_filtre

@@ -22,14 +22,26 @@ with
         select
             sch.annee_scolaire,
             sch.annee,
-            sch.school_friendly_name,
-            y_stud.fiche,
-            ele.genre,
-            y_stud.plan_interv_ehdaa,
-            y_stud.population,
+            case
+                when sch.school_friendly_name is null
+                then '-'
+                else sch.school_friendly_name
+            end as school_friendly_name,
+            case when ele.genre is null then '-' else ele.genre end as genre,
+            case
+                when y_stud.plan_interv_ehdaa is null
+                then '-'
+                else y_stud.plan_interv_ehdaa
+            end as plan_interv_ehdaa,
+            case
+                when y_stud.population is null then '-' else y_stud.population
+            end as population,
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
+            case
+                when y_stud.dist is null then '-' else y_stud.dist
+            end as distribution,
             case when y_stud.is_ppp = 1 then 1. else 0. end as is_ppp
         from {{ ref("fact_yearly_student") }} y_stud
         inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche
@@ -49,6 +61,7 @@ with
             plan_interv_ehdaa,
             population,
             classification,
+            distribution,
             sum(is_ppp) as nb_ppp,
             avg(is_ppp) as taux_ppp
         from src
@@ -58,7 +71,8 @@ with
                 genre,
                 plan_interv_ehdaa,
                 population,
-                classification
+                classification,
+                distribution
             )
     ),
 
@@ -72,6 +86,7 @@ with
             coalesce(ppp.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(ppp.population, 'Tout') as population,
             coalesce(ppp.classification, 'Tout') as classification,
+            coalesce(ppp.distribution, 'Tout') as distribution,
             nb_ppp,
             taux_ppp
         from ppp
@@ -94,6 +109,7 @@ select
                 "genre",
                 "population",
                 "classification",
+                "distribution",
             ]
         )
     }} as id_filtre
