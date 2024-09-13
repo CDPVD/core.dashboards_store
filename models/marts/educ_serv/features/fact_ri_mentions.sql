@@ -52,7 +52,6 @@ with
         inner join
             {{ ref("i_t_prog") }} as prog
             on mentions.prog_charl = prog.prog_meq
-            and prog.regime_sanct = mentions.regime_sanct_charl
         where mentions.regime_sanct_charl in ('A3', 'J4', 'J5')
     )
 
@@ -63,7 +62,7 @@ select
     ind_obtention,
     regime_sanct_charl,
     date_exec_sanct,
-    indice_des,
-    indice_cfpt,
-    indice_cfms
+    indice_Des,
+    indice_Cfpt,
+    indice_Cfms
 from mentions_annee
