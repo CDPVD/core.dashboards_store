@@ -50,7 +50,6 @@ with
             case when prog.type_diplome = 'CFMS' then 1.0 else 0.0 end as 'indice_Cfms'
         from _mentions as mentions
         inner join {{ ref("i_t_prog") }} as prog on mentions.prog_charl = prog.prog_meq
-        where mentions.regime_sanct_charl in ('A3', 'J4', 'J5')
     )
 
 select

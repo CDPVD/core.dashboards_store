@@ -72,6 +72,7 @@ with
             on perim.fiche = y_stud.fiche
             and perim.annee = y_stud.annee
         inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
+        where seqid = 1
     ),
 
     -- Début de l'aggrégration

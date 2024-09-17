@@ -25,7 +25,10 @@ with
             sch.annee_scolaire,
             src.fiche,
             sch.school_friendly_name,
-            mentions.ind_obtention
+            mentions.ind_obtention,
+            row_number() over (
+                partition by src.fiche, sch.annee order by sch.annee desc
+            ) as seqid
         from {{ ref("stg_perimetre_eleve_diplomation_fpt") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         left join
@@ -69,6 +72,7 @@ with
             on perim.fiche = y_stud.fiche
             and perim.annee = y_stud.annee
         inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
+        where seqid = 1
     ),
     -- Début de l'aggrégration
     agg_dip as (
