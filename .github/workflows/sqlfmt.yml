@@ -28,7 +28,7 @@ jobs:
 
       # Run the formatter
       - name: Run sqlfmt
-        run: sqlfmt . --exclude ./tooling/**/* --exclude ./target/**/* --exclude ./dbt_packages/**/* --check --verbose
+        run: sqlfmt . --exclude ./tooling/**/* --exclude ./target/**/* --exclude ./dbt_packages/**/* --verbose
 
       # Disable, many things can goes wrong
       # Auto commit the changes (iiiiiiiiihhhhhh)
