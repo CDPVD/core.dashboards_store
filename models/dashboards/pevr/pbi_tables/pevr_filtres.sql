@@ -25,7 +25,7 @@ with
             cat_eco,
             row_number() over (partition by eco order by annee desc) as seqid
         from {{ ref("dim_mapper_schools") }}
-        where cat_eco in ('PRI', 'SEC','PS')
+        where cat_eco in ('PRI', 'SEC', 'PS')
     ),
     eco as (
         select eco, school_friendly_name as ecole
@@ -65,12 +65,14 @@ with
         select classification, eco, population
         from
             (
-            select distinct
-                case
-                    when (cat_eco in ('PRI', 'SEC','PS') and el.class is null) then '-' else el.class
-                end as classification,
-                el.eco,
-                population
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
+                    end as classification,
+                    el.eco,
+                    population
                 from {{ ref("fact_yearly_student") }} el
                 left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union
@@ -79,7 +81,9 @@ with
                 union all
                 select distinct
                     case
-                        when (cat_eco in ('PRI', 'SEC','PS') and el.class is null) then '-' else el.class
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
                     end as classification,
                     'CSS' as eco,
                     population
@@ -88,7 +92,9 @@ with
                 union all
                 select distinct
                     case
-                        when (cat_eco in ('PRI', 'SEC','PS') and el.class is null) then '-' else el.class
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
                     end as classification,
                     el.eco,
                     'Tout' as population
@@ -100,7 +106,9 @@ with
                 union all
                 select distinct
                     case
-                        when (cat_eco in ('PRI', 'SEC','PS') and el.class is null) then '-' else el.class
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
                     end as classification,
                     'CSS' as eco,
                     'Tout' as population
@@ -112,56 +120,54 @@ with
             ) as tab
     ),
     distr as (
-        Select distribution, eco, population
-        from (
-            select distinct
-                case
-                    when (cat_eco in ('PRI', 'SEC','PS') and el.dist is null) then '-' else el.dist
-                end as distribution,
-                el.eco,
-                population
-            from {{ ref("fact_yearly_student") }} el
-            left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
-            union
-            select distinct 'Tout' as distribution, eco, population
-            from {{ ref("fact_yearly_student") }}
-            union all
-            select distinct
-                case
-                    when el.dist is null 
-                    then '-' else el.dist
-                end as distribution,
-                'CSS' as eco,
-                population
-            from {{ ref("fact_yearly_student") }} el
-            left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
-            union all
-            select distinct
-                case
-                    when (cat_eco in ('PRI', 'SEC','PS') and el.dist is null) then '-' else el.dist
-                end as distribution,
-                el.eco,
-                'Tout' as population
-            from {{ ref("fact_yearly_student") }} el
-            left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
-            union all
-            select distinct 'Tout' as distribution, 'CSS' as eco, population
-            from {{ ref("fact_yearly_student") }} el
-            union all
-            select distinct
-                case
-                    when el.dist is null
-                    then '-'
-                    else el.dist
-                end as distribution,
-                'CSS' as eco,
-                'Tout' as population
-            from {{ ref("fact_yearly_student") }} el
-            left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
-            union all
-            select distinct 'Tout' as distribution, eco, 'Tout' as population
-            from eco
-        ) as tab
+        select distribution, eco, population
+        from
+            (
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.dist is null)
+                        then '-'
+                        else el.dist
+                    end as distribution,
+                    el.eco,
+                    population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union
+                select distinct 'Tout' as distribution, eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct
+                    case when el.dist is null then '-' else el.dist end as distribution,
+                    'CSS' as eco,
+                    population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.dist is null)
+                        then '-'
+                        else el.dist
+                    end as distribution,
+                    el.eco,
+                    'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct 'Tout' as distribution, 'CSS' as eco, population
+                from {{ ref("fact_yearly_student") }} el
+                union all
+                select distinct
+                    case when el.dist is null then '-' else el.dist end as distribution,
+                    'CSS' as eco,
+                    'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct 'Tout' as distribution, eco, 'Tout' as population
+                from eco
+            ) as tab
     )
 select
     eco.ecole,

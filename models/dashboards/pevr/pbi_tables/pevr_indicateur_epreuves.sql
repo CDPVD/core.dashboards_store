@@ -41,9 +41,7 @@ with
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
-            case
-                when y_stud.dist is null then '-' else y_stud.dist
-            end as distribution,
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -125,7 +123,6 @@ select
                 "population",
                 "classification",
                 "distribution",
-
             ]
         )
     }} as id_filtre

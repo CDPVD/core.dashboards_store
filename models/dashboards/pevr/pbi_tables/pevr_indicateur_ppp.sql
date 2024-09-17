@@ -39,9 +39,7 @@ with
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
-            case
-                when y_stud.dist is null then '-' else y_stud.dist
-            end as distribution,
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
             case when y_stud.is_ppp = 1 then 1. else 0. end as is_ppp
         from {{ ref("fact_yearly_student") }} y_stud
         inner join {{ ref("dim_eleve") }} as ele on y_stud.fiche = ele.fiche

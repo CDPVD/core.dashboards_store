@@ -62,9 +62,7 @@ with
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
-            case
-                when y_stud.dist is null then '-' else y_stud.dist
-            end as distribution
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution
         from perimetre as perim
         inner join
             {{ ref("fact_yearly_student") }} as y_stud
@@ -130,7 +128,7 @@ select
                 "genre",
                 "population",
                 "classification",
-                "distribution"
+                "distribution",
             ]
         )
     }} as id_filtre
