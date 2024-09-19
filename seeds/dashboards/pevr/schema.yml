@@ -28,7 +28,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(8)
+        id_indicateur: nvarchar(12)
         description_indicateur: nvarchar(max)      
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
@@ -60,7 +60,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(8)
+        id_indicateur: nvarchar(12)
         description_indicateur: nvarchar(max)      
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
@@ -83,7 +83,7 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(8)
+        id_indicateur: nvarchar(12)
         description_indicateur: nvarchar(max)
   
   - name: custom_indicateurs_pevr
@@ -104,5 +104,5 @@ seeds:
         - pevr
       schema: pevr_seeds
       column_types:
-        id_indicateur: nvarchar(8)
+        id_indicateur: nvarchar(12)
         description_indicateur: nvarchar(max)      

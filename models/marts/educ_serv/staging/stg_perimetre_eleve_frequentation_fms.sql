@@ -15,10 +15,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select
-    prog,
-    progmeq as prog_meq,
-    descrprog as descr_prog,
-    regimesanct as regime_sanct,
-    typediplome as type_diplome
-from {{ var("database_jade") }}.dbo.t_prog
+with
+    src as (
+        select y_stud.fiche, y_stud.id_eco
+        from {{ ref("fact_yearly_student") }} as y_stud
+        where
+            y_stud.ordre_ens = '4'  -- Secondaire
+            and type_parcours in ('08')  -- 08 = FMS
+            and y_stud.annee < {{ get_current_year() }} + 1  -- Enlève l'année prévisionnelle de GPI
+    )
+
+select *
+from src
