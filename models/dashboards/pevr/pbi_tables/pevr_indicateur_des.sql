@@ -26,9 +26,9 @@ with
             sch.school_friendly_name,
             mentions.ind_obtention,
             row_number() over (
-                partition by src.fiche, sch.annee order by sch.annee desc
+                partition by src.fiche, sch.annee order by mentions.date_exec_sanct desc
             ) as seqid
-        from {{ ref("stg_perimetre_eleve_diplomation_des") }} as src
+        from {{ ref("stg_perimetre_eleve_frequentation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         left join
             {{ ref("fact_ri_mentions") }} as mentions
