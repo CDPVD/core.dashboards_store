@@ -76,8 +76,8 @@ with
                 from {{ ref("fact_yearly_student") }} el
                 left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union
-                select distinct 'Tout' as classification, el.eco, population
-                from {{ ref("fact_yearly_student") }} el
+                select distinct 'Tout' as classification, eco, population
+                from {{ ref("fact_yearly_student") }}
                 union all
                 select distinct
                     case
@@ -102,7 +102,7 @@ with
                 left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union all
                 select distinct 'Tout' as classification, 'CSS' as eco, population
-                from {{ ref("fact_yearly_student") }} el
+                from {{ ref("fact_yearly_student") }}
                 union all
                 select distinct
                     case
@@ -156,7 +156,7 @@ with
                 left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union all
                 select distinct 'Tout' as distribution, 'CSS' as eco, population
-                from {{ ref("fact_yearly_student") }} el
+                from {{ ref("fact_yearly_student") }}
                 union all
                 select distinct
                     case when el.dist is null then '-' else el.dist end as distribution,
