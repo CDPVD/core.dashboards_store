@@ -49,6 +49,9 @@ seeds:
             pevr:
                 +tags: ["pevr"]
                 +schema: "dashboard_pevr"
+            emp_abs:
+                +tags: ["emp_abs"]
+                +schema: "dashboard_emp_abs"                
 models:
     +materialized: table
     store:
@@ -166,6 +169,16 @@ models:
                         [
                             "{{ store.stamp_model('dashboard_pevr') }}",
                         ]                        
+
+            emp_abs:
+                +tags: ["emp_abs"]
+                +schema: "dashboard_emp_abs"
+                pbi_tables:
+                    +post-hook:
+                        [
+                            "{{ store.stamp_model('dashboard_emp_abs') }}",
+                        ]                        
+
 
         interfaces:
             +tags: ["interfaces"]
