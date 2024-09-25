@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with
     src as (
         select
+            '6' as id_indicateur,
             sch.annee_scolaire,
             sch.annee,
             case
@@ -50,9 +51,31 @@ with
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
     ),
+
+    ind_pevr as (
+        Select
+            case
+                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                else ind.id_indicateur_css
+            end as id_indicateur,
+            ind.description_indicateur,
+			ind.cible,
+            is_ppp,
+            annee_scolaire,
+            school_friendly_name,
+            genre,
+            plan_interv_ehdaa,
+            population,
+            classification,
+            distribution
+        from src
+        inner join
+            "tbe_dev"."busquef_dashboard_pevr"."dim_indicateurs_pevr" as ind
+            on src.id_indicateur = ind.id_indicateur_cdpvd
+    ),
+
     ppp as (
         select
-            '1.3.4.11' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,
@@ -60,11 +83,18 @@ with
             population,
             classification,
             distribution,
+			id_indicateur,
+			description_indicateur,
             sum(is_ppp) as nb_ppp,
-            avg(is_ppp) as taux_ppp
-        from src
+            avg(is_ppp) as taux_ppp,
+            cast(((avg(is_ppp)) - cible) as decimal(5,3)) as ecart_cible,
+            cible
+        from ind_pevr
         group by
-            annee_scolaire, cube (
+            annee_scolaire,
+				id_indicateur,
+				description_indicateur,
+                cible, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
@@ -76,21 +106,20 @@ with
 
     _coalesce as (
         select
-            ind.id_indicateur,
-            ind.description_indicateur,
-            ppp.annee_scolaire,
-            coalesce(ppp.school_friendly_name, 'CSS') as ecole,
-            coalesce(ppp.genre, 'Tout') as genre,
-            coalesce(ppp.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-            coalesce(ppp.population, 'Tout') as population,
-            coalesce(ppp.classification, 'Tout') as classification,
-            coalesce(ppp.distribution, 'Tout') as distribution,
+			id_indicateur,
+            description_indicateur,
+            annee_scolaire,
+            coalesce(school_friendly_name, 'CSS') as ecole,
+            coalesce(genre, 'Tout') as genre,
+            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(population, 'Tout') as population,
+            coalesce(classification, 'Tout') as classification,
+            coalesce(distribution, 'Tout') as distribution,
             nb_ppp,
-            taux_ppp
+            taux_ppp,
+            ecart_cible,
+            cible
         from ppp
-        inner join
-            {{ ref("pevr_dim_indicateurs") }} as ind
-            on ppp.id_indicateur = ind.id_indicateur
     )
 
 select
@@ -99,6 +128,8 @@ select
     annee_scolaire,
     nb_ppp,
     taux_ppp,
+    ecart_cible,
+    cible,
     {{
         dbt_utils.generate_surrogate_key(
             [

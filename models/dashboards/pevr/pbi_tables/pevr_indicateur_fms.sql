@@ -21,6 +21,7 @@ with
     -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
         select
+            '1.2' as id_indicateur,
             sch.annee,
             sch.annee_scolaire,
             src.fiche,
@@ -48,12 +49,18 @@ with
             perim.annee,
             perim.annee_scolaire,
             perim.fiche,
-            perim.ind_obtention,
+            case
+                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                else ind.id_indicateur_css
+            end as id_indicateur,
+            ind.description_indicateur,
+			ind.cible,
             case
                 when perim.school_friendly_name is null
                 then '-'
                 else perim.school_friendly_name
             end as school_friendly_name,
+            perim.ind_obtention,
             case when ele.genre is null then '-' else ele.genre end as genre,
             case
                 when y_stud.plan_interv_ehdaa is null
@@ -69,17 +76,19 @@ with
             case when y_stud.dist is null then '-' else y_stud.dist end as distribution
         from perimetre as perim
         inner join
-            {{ ref("fact_yearly_student") }} as y_stud
+            "tbe_dev"."busquef_educ_serv"."fact_yearly_student" as y_stud
             on perim.fiche = y_stud.fiche
             and perim.annee = y_stud.annee
-        inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
+        inner join "tbe_dev"."busquef_educ_serv"."dim_eleve" as ele on perim.fiche = ele.fiche
+        inner join
+            "tbe_dev"."busquef_dashboard_pevr"."dim_indicateurs_pevr" as ind
+            on perim.id_indicateur = ind.id_indicateur_cdpvd
         where seqid = 1
     ),
 
     -- Début de l'aggrégration
     agg_dip as (
         select
-            '1.1.1.1.1' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,
@@ -87,11 +96,18 @@ with
             population,
             classification,
             distribution,
+			id_indicateur,
+			description_indicateur,
             count(fiche) nb_resultat,
-            avg(ind_obtention) as taux_qualification_fms
+            cast(avg(ind_obtention) as decimal(5,3)) as taux_qualification_fms,
+            cast(((avg(ind_obtention)) - cible) as decimal(5,3)) as ecart_cible,
+			cible
         from _filtre
         group by
-            annee_scolaire, cube (
+            annee_scolaire,
+				id_indicateur,
+				description_indicateur, 
+                cible, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
@@ -104,21 +120,20 @@ with
     -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
-            ind.id_indicateur,
-            ind.description_indicateur,
-            agg_dip.annee_scolaire,
-            coalesce(agg_dip.school_friendly_name, 'CSS') as ecole,
-            coalesce(agg_dip.genre, 'Tout') as genre,
-            coalesce(agg_dip.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-            coalesce(agg_dip.population, 'Tout') as population,
-            coalesce(agg_dip.classification, 'Tout') as classification,
-            coalesce(agg_dip.distribution, 'Tout') as distribution,
-            agg_dip.nb_resultat,
-            agg_dip.taux_qualification_fms
+			id_indicateur,
+            description_indicateur,
+            annee_scolaire,
+            coalesce(school_friendly_name, 'CSS') as ecole,
+            coalesce(genre, 'Tout') as genre,
+            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(population, 'Tout') as population,
+            coalesce(classification, 'Tout') as classification,
+            coalesce(distribution, 'Tout') as distribution,
+            nb_resultat,
+            taux_qualification_fms,
+			ecart_cible,
+            cible
         from agg_dip
-        inner join
-            {{ ref("pevr_dim_indicateurs") }} as ind
-            on agg_dip.id_indicateur = ind.id_indicateur
     )
 
 select
@@ -127,6 +142,8 @@ select
     annee_scolaire,
     nb_resultat,
     taux_qualification_fms,
+    ecart_cible,
+    cible,
     {{
         dbt_utils.generate_surrogate_key(
             [
