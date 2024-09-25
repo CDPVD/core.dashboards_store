@@ -1,45 +1,73 @@
-version: 2
+﻿version: 2
 
 models:
-  - name: pevr_dim_indicateurs_matiere
-    description: >
-      Table de dimension qui mappe les indicateurs communs avec les indicateurs personalisés, qui sont lié à des matières et compétences spécifiques.
-      La table est constuite en unionant la dimension commune (core/seeds/pevr/common_indicateurs_pevr_matiere.csv) et la dimension personalisée (cssss/seeds/pevr/custom_indicateurs_pevr_matiere.csv).
-      La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des indicateurs.
-    columns:
-      - name: id_indicateur
-        description: identifiant de l'indicateur.
-      - name: description_indicateur
-        description: Description de l'indicateur
-      - name: code_matiere
-        description: Code de la matière lié à l'indicateur si elle existe.
-      - name: no_competence
-        description: Description de la compétence si elle existe
-    config:
-      column_types:
-        id_indicateur: nvarchar(8)
-        description_indicateur: nvarchar(max)
-        code_matiere: nvarchar(32)
-        no_competence: nvarchar(32)
-
   - name: pevr_dim_indicateurs
     description: >
       Table de dimension qui mappe les indicateurs communs avec les indicateurs personalisés.
-      La table est constuite en unionant la dimension commune (core/seeds/pevr/common_indicateurs_pevr.csv) et la dimension personalisée (cssss/seeds/pevr/custom_indicateurs_pevr.csv).
+      La table est constuite en unionant la dimension commune (core/seeds/pevr/indicateurs_pevr_cdpvd.csv) et la dimension personalisée (cssss/seeds/pevr/custom_indicateurs_pevr_cdpvd.csv).
       La table `custom` peut-etre adaptée pour chaque CSS pour rajouter des indicateurs.
     columns:
-      - name: id_indicateur
-        description: identifiant de l'indicateur.
+      - name: id_indicateur_cdpvd
+        description: Identifiant unique crée par la cdpvd.
+      - name: id_indicateur_css
+        description: Identifiant unique optionel crée par la CSS.
       - name: description_indicateur
-        description: Description de l'indicateur
+        description: Description de l'indicateur, soit crée par la cdpvd ou par la CSS.
+      - name: code_matiere
+        description: Code la matière. Ex -> 132508 (Français secondaire 5)
+      - name: no_competence
+        description: Numéro de la compétence.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - id_indicateur_cdpvd
+            - id_indicateur_css
 
-    config:
-      column_types:
-        id_indicateur: nvarchar(8)
-        description_indicateur: nvarchar(max)
+  - name: pevr_filtres
+    description: >
+        Table qui contient les combinaisons possibles des filtres pour la liaison des tables de données par rapport à la table de filtre.
 
   - name: pevr_indicateur_des
-    description: Listes de l'indicateur 1.1.1.1 sur le taux d'obtention du diplôme DES
+    description: >
+        Taux de diplomation annuel secondaire 5.
+        Donnée provenant des BD locaux.
+        Indicateur '1.1' de la cdpvd.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
+  - name: pevr_indicateur_dip_fp
+    description: >
+        Taux d'obtention d'un diplôme en formation professionnelle après 3 ans.
+        Donnée provenant de charlemagne.
+        Indicateur '5' de la cpdvd.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+
+  - name: pevr_indicateur_ehdaa
+    description: >
+        Taux de réussite des EHDAA.
+        Donnée provenant de charlemagne.
+        Indicateur '3' de la cpdvd.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - periode
+
+  - name: pevr_indicateurs_epreuves
+    description: >
+      Proportion d'élèves qui obtiennent entre 70% et 100% à l'épreuve  obligatoire.
+      **Code matière et no_compétence modifiable**
+      Donnée provenant des BD locaux.
+      Indicateur '4.1' de la cpdvd
     tests:
       - resolution:
           combination_of_columns:
@@ -48,7 +76,10 @@ models:
             - id_filtre
 
   - name: pevr_indicateur_fms
-    description: Listes de l'indicateur 1.1.1.1.1 sur le taux d'obtention du diplôme DES en FMS
+    description: >
+        Taux de qualification annuel FMS.
+        Donnée provenant des BD locaux.
+        Indicateur '1.2' de la cpdvd.
     tests:
       - resolution:
           combination_of_columns:
@@ -57,7 +88,10 @@ models:
             - id_filtre
 
   - name: pevr_indicateur_fpt
-    description: Listes de l'indicateur 1.1.1.1.2 sur le taux d'obtention du diplôme DES en FPT
+    description: >
+        Taux de qualification annuel FPT.
+        Donnée provenant des BD locaux.
+        Indicateur '1.3' de la cpdvd.
     tests:
       - resolution:
           combination_of_columns:
@@ -65,15 +99,28 @@ models:
             - id_indicateur
             - id_filtre
 
-  - name: pevr_indicateurs_epreuves
-    description: liste des indicateurs du pevr lié aux épreuves du MEQ.
+  - name: pevr_indicateur_masculin
+    description: >
+        Taux de réussite des garçons.
+        Donnée provenant de charlemagne.
+        Indicateur '2' de la cpdvd.
     tests:
       - resolution:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
-            - id_filtre
 
+  - name: pevr_indicateur_obtention
+    description: >
+        Taux d'obtention d'un premier diplôme ou d'une première  qualification en 7 ans après l'entrée au secondaire.
+        Donnée provenant de charlemagne.
+        Indicateur '1' de la cpdvd.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - periode
 
   - name: pevr_indicateurs_ppp
     description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
@@ -83,6 +130,3 @@ models:
             - annee_scolaire
             - id_indicateur
             - id_filtre
-
-  - name: pevr_filtres
-    description: Table de filtre pour le tableau de bord PEVR.
