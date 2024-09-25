@@ -22,7 +22,8 @@ with
     src as (
         select
             case
-                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                when ind.id_indicateur_css is null
+                then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
                 else ind.id_indicateur_css
             end as id_indicateur,
             ind.description_indicateur,
@@ -68,7 +69,7 @@ with
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
             and etape = 'EX'
-            and id_indicateur_cdpvd IN ('4.1') -- Au cas-où qu'on utilise le champs code_matière pour d'autre indicateur
+            and id_indicateur_cdpvd in ('4.1')  -- Au cas-où qu'on utilise le champs code_matière pour d'autre indicateur
     ),
 
     agg as (
@@ -85,8 +86,8 @@ with
             distribution,
             code_matiere,
             count(fiche) nb_resultat,
-            cast(avg(is_maitrise) as decimal(5,3)) as taux_maitrise,
-            cast(((avg(is_maitrise)) - cible) as decimal(5,3)) as ecart_cible
+            cast(avg(is_maitrise) as decimal(5, 3)) as taux_maitrise,
+            cast(((avg(is_maitrise)) - cible) as decimal(5, 3)) as ecart_cible
         from src
         group by
             id_indicateur,
@@ -126,8 +127,8 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_maitrise, -- Possibilité d'avoir un null à cause du res_etape_num peut être nulle. A voir.
-    ecart_cible, -- Même affaire.
+    taux_maitrise,  -- Possibilité d'avoir un null à cause du res_etape_num peut être nulle. A voir.
+    ecart_cible,  -- Même affaire.
     cible,
     {{
         dbt_utils.generate_surrogate_key(

@@ -53,13 +53,14 @@ with
     ),
 
     ind_pevr as (
-        Select
+        select
             case
-                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                when ind.id_indicateur_css is null
+                then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
                 else ind.id_indicateur_css
             end as id_indicateur,
             ind.description_indicateur,
-			ind.cible,
+            ind.cible,
             is_ppp,
             annee_scolaire,
             school_friendly_name,
@@ -83,18 +84,18 @@ with
             population,
             classification,
             distribution,
-			id_indicateur,
-			description_indicateur,
+            id_indicateur,
+            description_indicateur,
             sum(is_ppp) as nb_ppp,
             avg(is_ppp) as taux_ppp,
-            cast(((avg(is_ppp)) - cible) as decimal(5,3)) as ecart_cible,
+            cast(((avg(is_ppp)) - cible) as decimal(5, 3)) as ecart_cible,
             cible
         from ind_pevr
         group by
             annee_scolaire,
-				id_indicateur,
-				description_indicateur,
-                cible, cube (
+            id_indicateur,
+            description_indicateur,
+            cible, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
@@ -106,7 +107,7 @@ with
 
     _coalesce as (
         select
-			id_indicateur,
+            id_indicateur,
             description_indicateur,
             annee_scolaire,
             coalesce(school_friendly_name, 'CSS') as ecole,

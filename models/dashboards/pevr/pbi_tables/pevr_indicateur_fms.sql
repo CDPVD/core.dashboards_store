@@ -50,11 +50,12 @@ with
             perim.annee_scolaire,
             perim.fiche,
             case
-                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                when ind.id_indicateur_css is null
+                then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
                 else ind.id_indicateur_css
             end as id_indicateur,
             ind.description_indicateur,
-			ind.cible,
+            ind.cible,
             case
                 when perim.school_friendly_name is null
                 then '-'
@@ -79,7 +80,8 @@ with
             "tbe_dev"."busquef_educ_serv"."fact_yearly_student" as y_stud
             on perim.fiche = y_stud.fiche
             and perim.annee = y_stud.annee
-        inner join "tbe_dev"."busquef_educ_serv"."dim_eleve" as ele on perim.fiche = ele.fiche
+        inner join
+            "tbe_dev"."busquef_educ_serv"."dim_eleve" as ele on perim.fiche = ele.fiche
         inner join
             "tbe_dev"."busquef_dashboard_pevr"."dim_indicateurs_pevr" as ind
             on perim.id_indicateur = ind.id_indicateur_cdpvd
@@ -96,18 +98,18 @@ with
             population,
             classification,
             distribution,
-			id_indicateur,
-			description_indicateur,
+            id_indicateur,
+            description_indicateur,
             count(fiche) nb_resultat,
-            cast(avg(ind_obtention) as decimal(5,3)) as taux_qualification_fms,
-            cast(((avg(ind_obtention)) - cible) as decimal(5,3)) as ecart_cible,
-			cible
+            cast(avg(ind_obtention) as decimal(5, 3)) as taux_qualification_fms,
+            cast(((avg(ind_obtention)) - cible) as decimal(5, 3)) as ecart_cible,
+            cible
         from _filtre
         group by
             annee_scolaire,
-				id_indicateur,
-				description_indicateur, 
-                cible, cube (
+            id_indicateur,
+            description_indicateur,
+            cible, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
@@ -120,7 +122,7 @@ with
     -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
-			id_indicateur,
+            id_indicateur,
             description_indicateur,
             annee_scolaire,
             coalesce(school_friendly_name, 'CSS') as ecole,
@@ -131,7 +133,7 @@ with
             coalesce(distribution, 'Tout') as distribution,
             nb_resultat,
             taux_qualification_fms,
-			ecart_cible,
+            ecart_cible,
             cible
         from agg_dip
     )

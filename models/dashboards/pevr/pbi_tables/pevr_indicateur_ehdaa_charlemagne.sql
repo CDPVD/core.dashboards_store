@@ -21,7 +21,8 @@ with
     src as (
         select
             case
-                when ind.id_indicateur_css IS NULL then ind.id_indicateur_cdpvd -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                when ind.id_indicateur_css is null
+                then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
                 else ind.id_indicateur_css
             end as id_indicateur,
             ind.description_indicateur,

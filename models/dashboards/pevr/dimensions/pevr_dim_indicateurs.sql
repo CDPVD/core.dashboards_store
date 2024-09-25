@@ -43,27 +43,48 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         }}
     {% endif %}
 
-WITH CTE AS (
-    SELECT
-        id_indicateur_cdpvd, 
-        id_indicateur_css, 
+    with
+        cte as (
+            select
+                id_indicateur_cdpvd,
+                id_indicateur_css,
+                description_indicateur,
+                cible,
+                code_matiere,
+                no_competence,
+                count(case when id_indicateur_css is not null then 1 end) over (
+                    partition by id_indicateur_cdpvd
+                ) as ind_indicateur_custom  -- Si = 1, alors il a un indicateur custom.
+            from
+                (
+                    select
+                        id_indicateur_cdpvd,
+                        id_indicateur_css,
+                        description_indicateur,
+                        cible,
+                        code_matiere,
+                        no_competence
+                    from {{ source_relation }}
+                    union
+                    select
+                        id_indicateur_cdpvd,
+                        null as id_indicateur_css,
+                        description_indicateur,
+                        cible,
+                        code_matiere,
+                        no_competence
+                    from {{ ref("indicateurs_pevr_cdpvd") }}
+                ) as results
+        )
+    select
+        id_indicateur_cdpvd,
+        id_indicateur_css,
         description_indicateur,
         cible,
         code_matiere,
-        no_competence,
-        COUNT(CASE WHEN id_indicateur_css IS NOT NULL THEN 1 END) OVER (PARTITION BY id_indicateur_cdpvd) AS ind_indicateur_custom -- Si = 1, alors il a un indicateur custom.
-    FROM (
-        SELECT id_indicateur_cdpvd, id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
-        FROM {{ source_relation }}
-        UNION
-        SELECT id_indicateur_cdpvd, null AS id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
-        FROM {{ ref("indicateurs_pevr_cdpvd") }}
-    ) AS results
-)
-SELECT id_indicateur_cdpvd, id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
-FROM CTE
-WHERE ind_indicateur_custom = 0 OR id_indicateur_css IS NOT NULL -- Enlève l'indicateur par défaut de la css lorsqu'il a un indicateur custom.
-
+        no_competence
+    from cte
+    where ind_indicateur_custom = 0 or id_indicateur_css is not null  -- Enlève l'indicateur par défaut de la css lorsqu'il a un indicateur custom.
 
 {% else %}
     {% if execute %}
@@ -75,6 +96,12 @@ WHERE ind_indicateur_custom = 0 OR id_indicateur_css IS NOT NULL -- Enlève l'in
         }}
     {% endif %}
 
-    select id_indicateur_cdpvd, cast(null as nvarchar) AS id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
+    select
+        id_indicateur_cdpvd,
+        cast(null as nvarchar) as id_indicateur_css,
+        description_indicateur,
+        cible,
+        code_matiere,
+        no_competence
     from {{ ref("indicateurs_pevr_cdpvd") }}
 {% endif %}
