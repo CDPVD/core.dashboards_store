@@ -15,22 +15,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{# 
-    
+{#
     This table unionize the always-present DEFAULT table and maybe-present CUSTOM table.
     The default table is defined in the core repo while the custom table, as all the CSS''s specifics table is created in the repo css.
 
     The code check for the custom table existence and adds it to the default table
     For the CUSTOM table to be detected, the table must be :
-        * named 'custom_indicateur_pevr'
-        * located in the schema 'dashboard_pevr'
+        * named 'custom_indicateurs_pevr_cdpvd'
+        * located in the schema 'dashboard_pevr_seeds'
 #}
 {{ config(alias="dim_indicateurs_pevr") }}
 
 {%- set source_relation = adapter.get_relation(
     database=target.database,
-    schema=target.schema + "_dashboard_pevr",
-    identifier="custom_indicateurs_pevr",
+    schema=target.schema + "_dashboard_pevr_seeds",
+    identifier="custom_indicateurs_pevr_cdpvd",
 ) -%}
 {% set table_exists = source_relation is not none %}
 
@@ -38,28 +37,44 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% if execute %}
         {{
             log(
-                "The seed '*_dashboard_pevr.custom_indicateurs_pevr' DOES EXIST and will be added to the 'common_indicateurs_pevr'",
+                "The seed '*_dashboard_pevr_seeds.custom_indicateurs_pevr_cdpvd' DOES EXIST and will replace the default 'indicateurs_pevr_cdpvd'",
                 true,
             )
         }}
     {% endif %}
 
-    select id_indicateur, description_indicateur
-    from {{ ref("common_indicateurs_pevr") }}
-    union all
-    select id_indicateur, description_indicateur
-    from {{ source_relation }}
+WITH CTE AS (
+    SELECT
+        id_indicateur_cdpvd, 
+        id_indicateur_css, 
+        description_indicateur,
+        cible,
+        code_matiere,
+        no_competence,
+        COUNT(CASE WHEN id_indicateur_css IS NOT NULL THEN 1 END) OVER (PARTITION BY id_indicateur_cdpvd) AS ind_indicateur_custom -- Si = 1, alors il a un indicateur custom.
+    FROM (
+        SELECT id_indicateur_cdpvd, id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
+        FROM {{ source_relation }}
+        UNION
+        SELECT id_indicateur_cdpvd, null AS id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
+        FROM {{ ref("indicateurs_pevr_cdpvd") }}
+    ) AS results
+)
+SELECT id_indicateur_cdpvd, id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
+FROM CTE
+WHERE ind_indicateur_custom = 0 OR id_indicateur_css IS NOT NULL -- Enlève l'indicateur par défaut de la css lorsqu'il a un indicateur custom.
+
 
 {% else %}
     {% if execute %}
         {{
             log(
-                "The seed '*_dashboard_pevr.custom_indicateurs_pevr' DOES NOT exists. The 'pevr_dim_indicateurs' table will be defaulted to 'common_indicateurs_pevr'.",
+                "The seed '*_dashboard_pevr_seeds.custom_indicateurs_pevr_cdpvd' DOES NOT exists. The 'pevr_dim_indicateurs' table will be defaulted to 'indicateurs_pevr_cdpvd'.",
                 true,
             )
         }}
     {% endif %}
 
-    select id_indicateur, description_indicateur
-    from {{ ref("common_indicateurs_pevr") }}
+    select id_indicateur_cdpvd, cast(null as nvarchar) AS id_indicateur_css, description_indicateur, cible, code_matiere, no_competence
+    from {{ ref("indicateurs_pevr_cdpvd") }}
 {% endif %}
