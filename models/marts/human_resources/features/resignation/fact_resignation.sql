@@ -117,7 +117,7 @@ with
             datediff(day, frst.date_entree, frst.demission_date) as days_employment
 
         from add_first_date as frst
-        left join {{ ref("dim_employees") }} as dos on frst.matr = dos.matr
+        inner join {{ ref("dim_employees") }} as dos on frst.matr = dos.matr
     )
 
 select *

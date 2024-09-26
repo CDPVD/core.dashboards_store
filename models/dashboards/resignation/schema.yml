@@ -23,8 +23,6 @@ models:
       - name: filter_key
       
 
-
-models:
   - name: resignation_report_rate
     description: > 
       Pour le calcul du taux de démission
@@ -50,7 +48,7 @@ models:
   - name: resignation_report_filters
     description: >
       The set of filters to be applied on the report.
-      This table exists because of a double granularity difference between the report_retirement_age and the report_active_employees_age tables.
+      This table exists because of a double granularity difference between the report_resignation_age and the resignation_report_rate tables.
     tests:
       - resolution:
           combination_of_columns:
