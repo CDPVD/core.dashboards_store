@@ -74,7 +74,9 @@ select
     job_group_category,
     lieu_trav,
     stat_eng,
-    convert(date, concat(school_year, '-09-30'), 102) as school_year,
+    convert(
+        date, concat(school_year, (select date_ref from {{ ref("date_ref") }})), 102
+    ) as school_year,
     case
         when {{ store.get_current_year() }} = school_year then 1 else 0
     end as is_current_year,

@@ -25,7 +25,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- Create the start-of-year date
 with
     current_year as (
-        select concat({{ store.get_current_year() }}, '-09-01') as current_year
+        select
+            concat(
+                {{ store.get_current_year() }},
+                (select date_ref from {{ ref("date_ref") }})
+            ) as current_year
 
     -- Add the birth date and the sex to the active employes table
     ),
