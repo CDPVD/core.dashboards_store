@@ -31,7 +31,7 @@ with
             count(distinct(act.ref_empl)) as nbremploi,
             count(distinct(res.ref_empl)) as nbrdemission,
             empl.sex as sexe
-        from {{ ref("fact_activity_yearly") }} act
+        from {{ ref("stg_activity_history") }} act
         left join  -- left join pour aller chercher tous les employés, et non seulement ceux qui ont démissionner.
             {{ ref("fact_resignation") }} res
             on res.matr = act.matr

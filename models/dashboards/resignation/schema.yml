@@ -62,4 +62,5 @@ models:
             - engagement_status_name
             - workplace_name
             - filter_source
+            - Corp_emploi_description
 

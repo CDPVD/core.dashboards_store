@@ -35,8 +35,9 @@ with
             job.job_group_description,
             job.job_group_category
         from {{ ref("fact_resignation") }} as src
-        left join
+        inner join
             {{ ref("dim_mapper_job_group") }} as job on job.job_group = src.corp_empl
+        where src.school_year >= {{ store.get_current_year() }} - 10
 
     )
 

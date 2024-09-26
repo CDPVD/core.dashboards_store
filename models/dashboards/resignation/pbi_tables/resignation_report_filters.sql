@@ -81,12 +81,13 @@ select
     src.filter_key,
     eng.stat_eng as engagement_status_name,
     work.workplace_name,
-    src.filter_source
-
+    src.filter_source,
+    src.corp_empl + ' - ' + job.job_group_description as corp_emploi_description
 from one_for_all as src
 
 left join
     {{ ref("dim_engagement_status_yearly") }} as eng
     on src.stat_eng = eng.stat_eng
     and eng.is_current = 1  -- Only keep the active valid data
-left join {{ ref("dim_mapper_workplace") }} as work on src.lieu_trav = work.workplace
+inner join {{ ref("dim_mapper_workplace") }} as work on src.lieu_trav = work.workplace
+inner join {{ ref("dim_mapper_job_group") }} as job on job.job_group = src.corp_empl

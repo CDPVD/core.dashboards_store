@@ -74,6 +74,7 @@ with
         from extraction ext
         left join
             {{ ref("dim_mapper_job_group") }} as job on job.job_group = ext.corp_empl
+        where ext.school_year >= {{ store.get_current_year() }} - 10
     ),
 
     ajout_filter as (

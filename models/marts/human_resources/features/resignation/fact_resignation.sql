@@ -30,12 +30,7 @@ with
             lieu_trav,
             stat_eng,
             date_eff as date_demission,
-            case
-                when month(date_eff) between 7 and 12
-                then year(date_eff)
-                else year(date_eff) - 1
-            end as school_year
-
+            stg.school_year
         from {{ ref("stg_activity_history") }} as stg
 
         inner join
