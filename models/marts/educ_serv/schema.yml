@@ -49,18 +49,6 @@ models:
             - population
             - eco
 
-  - name: stg_descr_comp
-    config:
-      tags:
-        - res_scolaires
-    description: >
-      Table de staging qui lie chaque compétence à sa description par matière.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - mat
-            - obj_01
-
   - name: stg_descr_mat
     config:
       tags:
@@ -76,9 +64,36 @@ models:
   - name: stg_perimetre_eleve_frequentation_des
     config:
       tags:
-        - diplome
+        - res_scolaires
     description: >
       Table de staging qui créer un périmètre pour cibler les élèves diplomables des.
+<<<<<<< HEAD
+=======
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fms
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fms.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fpt
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fpt.
+>>>>>>> develop
     tests:
       - resolution:
           combination_of_columns:
@@ -106,8 +121,8 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - fiche
-            - id_eco
+            - mat
+            - obj_01
 
   - name: stg_yearly_eleve_matiere_groupe
     config:

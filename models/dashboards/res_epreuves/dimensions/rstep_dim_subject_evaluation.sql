@@ -25,12 +25,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         * named 'custom_subject_evaluation'
         * located in the schema 'res_epreuves_seeds'
 #}
-{{ config(alias="dim_epreuves") }}
+{{ config(alias="dim_subject_evaluation") }}
 
 {%- set source_relation = adapter.get_relation(
     database=target.database,
     schema=target.schema + "_res_epreuves_seeds",
-    identifier="rstep_epreuves_personnalisees",
+    identifier="custom_subject_evaluation",
 ) -%}
 {% set table_exists = source_relation is not none %}
 
@@ -38,14 +38,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% if execute %}
         {{
             log(
-                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalisees' DOES EXIST and will be added to the 'rstep_epreuves_communes'",
+                "The seed '*_res_epreuves_seeds.custom_subject_evaluation' DOES EXIST and will be added to the 'default_subject_evaluation'",
                 true,
             )
         }}
     {% endif %}
 
     select code_matiere, no_competence, 'EX' as code_etape, friendly_name
-    from {{ ref("rstep_epreuves_communes") }}
+    from {{ ref("default_subject_evaluation") }}
     union all
     select code_matiere, no_competence, code_etape, friendly_name
     from {{ source_relation }}
@@ -54,12 +54,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% if execute %}
         {{
             log(
-                "The seed '*_res_epreuves_seeds.rstep_epreuves_personnalisees' DOES NOT exists. The 'rstep_dim_epreuves' table will be defaulted to 'rstep_epreuves_communes'.",
+                "The seed '*_res_epreuves_seeds.custom_subject_evaluation' DOES NOT exists. The 'rstp_dim_subject_evaluation' table will be defaulted to 'default_subject_evaluation'.",
                 true,
             )
         }}
     {% endif %}
 
     select code_matiere, no_competence, 'EX' as code_etape, friendly_name
-    from {{ ref("rstep_epreuves_communes") }}
+    from {{ ref("default_subject_evaluation") }}
 {% endif %}

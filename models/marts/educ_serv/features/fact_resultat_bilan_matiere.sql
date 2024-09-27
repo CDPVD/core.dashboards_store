@@ -26,8 +26,6 @@ with
             groupe_matiere,
             etat,
             res_som,
-            mat_ele.res_meq,
-            mat_ele.unites,
             case
                 when cote is not null
                 then note_equiv
@@ -82,9 +80,6 @@ select
         then 100
         else res_num_som
     end as res_num_som,
-    res_som,
-    res_meq,
-    unites,
     is_reprise,
     case
         when res_num_som < 60 and is_current_year = 1 then 1 else 0

@@ -28,9 +28,6 @@ seeds:
         common:
             +schema: common_seeds
         dashboards:
-            diplome:
-                +tags: ["diplome"]
-                +schema: "dashboard_diplome"
             prospectif_cdp:
                 +tags: ["prospectif_cdp"]
                 +schema: "dashbaord_prospectif_cdp"
@@ -48,7 +45,7 @@ seeds:
                 +schema: "dashboard_chronic_absenteeism"
             pevr:
                 +tags: ["pevr"]
-                +schema: "dashboard_pevr"
+                +schema: "dashboard_pevr"                
 models:
     +materialized: table
     store:
@@ -131,6 +128,13 @@ models:
                     +post-hook:
                         ["{{ store.stamp_model('dashboard_retirement') }}"]
 
+            resignation:
+                +tags: ["resignation"]
+                +schema: "dashboard_resignation"
+                pbi_tables:
+                    +post-hook:
+                        ["{{ store.stamp_model('dashboard_resignation') }}"]
+
             chronic_absenteeism:
                 +tags: ["chronic_absenteeism"]
                 +schema: "dashboard_chronic_absenteeism"
@@ -138,15 +142,6 @@ models:
                     +post-hook:
                         [
                             "{{ store.stamp_model('dashboard_chronic_absenteeism') }}",
-                        ]
-
-            diplome:
-                +tags: ["diplome"]
-                +schema: "dashboard_diplome"
-                pbi_tables:
-                    +post-hook:
-                        [
-                            "{{ store.stamp_model('dashboard_diplome') }}",
                         ]
 
             predictive_view_aggregated:

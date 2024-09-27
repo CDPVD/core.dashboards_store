@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: fact_resignation
+    description: >
+      This table list all the employees that are resignation and provide metadata at the time of their resignation.
+      Provided metadata allow for drill-down by engagement status, workplace, job category, and employment status.
+    config:
+      tags:
+        - resignation
+    columns:
+      - name: matr
+        description: The unique identifier of an employee.
+        tests:
+          - not_null
+      - name: etat
+        description: The school year (from september the first to august the 31 of the following year) for which the status mapping is valid.
+      - name: corp_empl
+        description: Le corp d'emploi.
+      - name: lieu_trav
+        description: Le lieu de travail lors de la démission.
+      - name: ref_empl
+        description: La référence d'emploi.
+      - name: stat_eng
+        description: Le statut d'engagement
+      - name: demission_date
+        description: La date de démission.
+      - name: demission_age
+        description: L'age de démission.
+      - name: school_year
+        description: Année scolaire de démission
+      - name: date_entree
+        description: la date d'entrée sur le poste
+      - name: school_year
+        description: l'année scolaire de démission
+      - name: sexe
+        description: le sexe de l'employé
+      - name: Days_employment
+        description: le nombre de jour sur le poste.
+
+  - name: fact_resignation_rate
+    description: >
+      Cette table contient tous les emploies d'un employé avec le flag si démission.
+    config:
+      tags:
+        - resignation
+    columns:
+      - name: matr
+        description: The unique identifier of an employee.
+        tests:
+          - not_null

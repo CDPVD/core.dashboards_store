@@ -1,51 +1,40 @@
 version: 2
 
 models:
-  - name: emp_actif_fact_emp_actif
+  - name: ema_report_emp_actif
     description: >
-      Table qui extrait toutes les donnnées requises pour ce tableau de bord
-    tests:
-      - resolution:
-          combination_of_columns:
+        Table uniquement pour les employés actifs.
+    tests: 
+      - resolution: 
+          combination_of_columns: 
             - matr
-            - sex_friendly_name
-            - workplace_name
-            - job_class
-            - job_department
-  - name: emp_actif_report_emp_actif
-    description: >
-      Table qui permet d'afficher toutes les données requises avec une surrogate_key
-    tests:
-      - resolution:
-          combination_of_columns:
-            - matr
-            - sex_friendly_name
-            - workplace_name
-            - job_class
-            - job_department
-            - type        
-  - name: emp_actif_report_stat
-    description: >
-      Table avec laquelle, les principaux calculs ont été faits.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - sex_friendly_name
-            - workplace_name
-            - job_class
-            - job_department
-            - type      
-            - is_current  
-  - name: emp_actif_report_filter
-    description: >
-      Une table qui permet d'avoir un filtrage cohérent sur toutes les pages du rapport.
-    tests:
-      - resolution:
-          combination_of_columns:
-            - sex_friendly_name
-            - workplace_name
-            - job_class
-            - job_department
-            - type
-            - filter_key
-            
+            - courriel_portail
+    columns:
+      - name: matr
+        description: le matricule de l'employé
+        tests:
+          - not_null
+          - unique  
+      - name: nom_empl
+        description: le nom complet de l'employé           
+      - name: courriel_portail
+        description: le courriel de l'employé
+        tests: 
+            - not_null
+            - unique
+      - name: lieu_trav
+        description: le lieu de travail de l'employé
+      - name: corps_empl
+        description: le corps de travail de l'employé                           
+      - name: etat_empl
+        description: l'état de l'employé  
+      - name: stat_eng
+        description: le statut d'engagement de l'employé
+      - name: isEmployePermanent
+        description: > 
+            Idicateur de permanence
+            Un employé est considéré comme permanent si l'indicateur de permanence indique 1, sinon il ne l'est pas. 
+            L'ensemble est pris en compte dans les "modèles" au niveau de "pbi_table". 
+            La condition est dans 'ema_report_empl_active.sql'.
+        tests: 
+            - not_null

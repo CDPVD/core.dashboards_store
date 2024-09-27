@@ -50,15 +50,15 @@ models:
         +enabled: False
       retirement:
         +enabled: False
+      resignation:
+        +enabled: False
       chronic_absenteeism:
         +enabled: False
       predictive_view_aggregated:
         +enabled: False
       pevr:
-        +enabled: False
-      diplome:
-        +enabled: False
-
+        +enabled: False        
+  
     interfaces:
       +tags: ["interfaces"]
       +materialized: ephemeral

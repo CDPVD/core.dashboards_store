@@ -31,12 +31,8 @@ select
     resoffbrute as res_off_brute,
     resoffconv as res_off_conv,
     resofffinal as res_off_final,
-    indreuscharl as ind_reus_charl,
-    nbunitecharl as nb_unite_charl,
-    regsanctcharl as reg_sanct_charl,
     annee as annee,
     typeformcharl as type_form_charl,
-    typeclient as type_client,
     secteurenseignfreq as secteur_enseign_freq,
     datehrerecup as date_heure_recup
 from {{ var("database_jade") }}.dbo.e_ri_resultats

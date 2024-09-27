@@ -30,6 +30,7 @@ with
             src.empl_cong,
             src.cong_lt,
             src.etat_actif,
+            src.empl_resi,
             coalesce(src.valid_from, 1950) as valid_from,
             coalesce(src.valid_until, {{ store.get_current_year() }} + 1) as valid_until
         from {{ ref("etat_empl") }} as src
@@ -44,6 +45,7 @@ with
             src.empl_cong,
             src.cong_lt,
             src.etat_actif,
+            src.empl_resi,
             src.valid_from + seq.seq_value as school_year,
             src.valid_until,
             row_number() over (
@@ -69,6 +71,7 @@ select
     empl_cong,
     cong_lt,
     etat_actif,
+    empl_resi,
     concat(descr, ' - (', etat_empl, ')') as employment_status_name,
     case when seq_id = 1 then 1 else 0 end as is_current
 from crossed

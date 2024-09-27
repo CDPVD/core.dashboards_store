@@ -1,13 +1,6 @@
 version: 2
 
 models:
-  - name: i_e_adr
-    tags: 
-      - interface
-      - educ_serv
-    description: >
-      Table d'interface. Utilisée uniquement pour pallier à une enventuelle absence (complète ou partielle) de la table 'e_adr' de la base de données source.
-
   - name: i_e_ele
     tags: 
       - interface

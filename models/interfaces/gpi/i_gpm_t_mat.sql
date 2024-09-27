@@ -15,5 +15,4 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select id_eco, mat, descr, descr_abreg, unites
-from {{ var("database_gpi") }}.dbo.gpm_t_mat
+select id_eco, mat, descr, descr_abreg from {{ var("database_gpi") }}.dbo.gpm_t_mat

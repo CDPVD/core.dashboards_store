@@ -96,3 +96,4 @@ select
     legende,
     is_reprise
 from stg_yearly_comp
+where res_comp_etape is not null

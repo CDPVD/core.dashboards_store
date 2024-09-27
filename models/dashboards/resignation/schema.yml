@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: resignation_report_age
+    description: > 
+      la liste des employés ayant démissionnés
+    columns: 
+      - name: matr
+        tests: 
+            - not_null
+      - name: etat_empl
+      - name: corp_empl
+      - name: ref_empl
+      - name: lieu_trav
+      - name: sexe
+      - name: stat_eng
+      - name: demission_date
+      - name: demission_age
+      - name: school_year
+      - name: job_group_description,
+      - name: job_group_category,
+      - name: Days_employment
+      - name: filter_key
+      
+
+  - name: resignation_report_rate
+    description: > 
+      Pour le calcul du taux de démission
+    columns: 
+      - name: matr
+        tests: 
+            - not_null
+      - name: corp_empl
+      - name: lieu_trav
+      - name: etat_empl
+      - name: stat_eng
+      - name: school_year
+      - name: sexe
+      - name: RaisonDemission
+      - name: job_group_description
+      - name: job_group_category
+      - name: jnbremploi,
+      - name: jnbrdemission,
+      - name: Taux_Demission,
+      - name: filter_key
+
+
+  - name: resignation_report_filters
+    description: >
+      The set of filters to be applied on the report.
+      This table exists because of a double granularity difference between the report_resignation_age and the resignation_report_rate tables.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - corp_empl
+            - lieu_trav
+            - sexe
+            - stat_eng
+            - school_year
+            - job_group_category
+            - filter_key
+            - engagement_status_name
+            - workplace_name
+            - filter_source
+            - Corp_emploi_description
+
