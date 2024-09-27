@@ -67,6 +67,33 @@ models:
         - res_scolaires
     description: >
       Table de staging qui créer un périmètre pour cibler les élèves diplomables des.
+<<<<<<< HEAD
+=======
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fms
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fms.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fpt
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fpt.
+>>>>>>> develop
     tests:
       - resolution:
           combination_of_columns:
