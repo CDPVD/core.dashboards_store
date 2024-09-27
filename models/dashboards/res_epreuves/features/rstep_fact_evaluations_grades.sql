@@ -28,18 +28,10 @@ select
     annee,
     ecole,
     fiche,
-    friendly_name,
-    resultat,
-    resultat_numerique,
-    -- make the code reussite a boolean to ease the computation of summary statistics
-    case when code_reussite = 'R' then 1 else 0 end as cod_reussite,
-    -- Create a customly thresolded code reussite.
-    case
-        when
-            resultat_numerique
-            >= {{ var("res_epreuves", {"threshold": 70})["threshold"] }}
-        then 1
-        else 0
-    end as cod_reussite_threshold
-from {{ ref("rstep_fact_evaluations_grades_from_dim") }}
-where resultat_numerique is not null
+    ecocenoff as eco_cen_off,
+    progcharl as prog_charl,
+    typediplomecharl as type_diplome_charl,
+    regimesanctcharl as regime_sanct_charl,
+    indreussanctcharl as ind_reus_sanct_charl,
+    dateexecsanct as date_exec_sanct
+from {{ var("database_jade") }}.dbo.e_ri_mentions

@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateurs_epreuves") }}
+{{ config(alias="indicateur_epreuves") }}
 
 
 with
@@ -23,11 +23,24 @@ with
         select
             res.annee,
             res.fiche,
-            sch.eco,
-            el.genre,
-            y_stud.plan_interv_ehdaa,
-            y_stud.population,
-            y_stud.is_francisation,
+            case
+                when sch.school_friendly_name is null
+                then '-'
+                else sch.school_friendly_name
+            end as school_friendly_name,
+            case when el.genre is null then '-' else el.genre end as genre,
+            case
+                when y_stud.plan_interv_ehdaa is null
+                then '-'
+                else y_stud.plan_interv_ehdaa
+            end as plan_interv_ehdaa,
+            case
+                when y_stud.population is null then '-' else y_stud.population
+            end as population,
+            case
+                when y_stud.class is null then '-' else y_stud.class
+            end as classification,
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -55,7 +68,8 @@ with
             genre,
             plan_interv_ehdaa,
             population,
-            is_francisation,
+            classification,
+            distribution,
             code_matiere,
             no_competence,
             etape,
@@ -63,10 +77,34 @@ with
             avg(is_maitrise) tx_maitrise
         from src
         group by
-            annee,
-            code_matiere,
-            no_competence,
-            etape, cube (eco, genre, plan_interv_ehdaa, population, is_francisation)
+            annee_scolaire,
+            code_matiere, cube (
+                school_friendly_name,
+                genre,
+                plan_interv_ehdaa,
+                population,
+                classification,
+                distribution
+            )
+    ),
+
+    _coalesce as (
+        select
+            ind.id_indicateur,
+            ind.description_indicateur,
+            agg.annee_scolaire,
+            coalesce(agg.school_friendly_name, 'CSS') as ecole,
+            coalesce(agg.genre, 'Tout') as genre,
+            coalesce(agg.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(agg.population, 'Tout') as population,
+            coalesce(agg.classification, 'Tout') as classification,
+            coalesce(agg.distribution, 'Tout') as distribution,
+            nb_resultat,
+            taux_maitrise
+        from agg
+        inner join
+            {{ ref("pevr_dim_indicateurs_matiere") }} as ind
+            on agg.code_matiere = ind.code_matiere
     )
 select
     ind.id_indicateur,
@@ -82,12 +120,17 @@ select
     agg.no_competence,
     etape,
     nb_resultat,
-    tx_maitrise
-from agg
-left join
-    {{ ref("dim_mapper_schools") }} as sch
-    on agg.annee = sch.annee
-    and agg.eco = sch.eco
-inner join
-    {{ ref("pevr_dim_indicateurs_matiere") }} as ind
-    on agg.code_matiere = ind.code_matiere
+    taux_maitrise,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "ecole",
+                "plan_interv_ehdaa",
+                "genre",
+                "population",
+                "classification",
+                "distribution",
+            ]
+        )
+    }} as id_filtre
+from _coalesce
