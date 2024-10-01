@@ -67,7 +67,7 @@ models:
       Proportion d'élèves qui obtiennent entre 70% et 100% à l'épreuve  obligatoire.
       **Code matière et no_compétence modifiable**
       Donnée provenant des BD locaux.
-      Indicateur '4.1' de la cpdvd
+      Indicateur '4' de la cpdvd
     tests:
       - resolution:
           combination_of_columns:
