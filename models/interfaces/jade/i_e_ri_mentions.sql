@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select
+select distinct
     codeperm as code_perm,
     fiche,
     ecocenoff as eco_cen_off,
