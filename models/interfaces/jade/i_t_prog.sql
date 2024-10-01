@@ -15,5 +15,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select prog, progmeq as prog_meq, descrprog as descr_prog
+select
+    prog,
+    progmeq as prog_meq,
+    descrprog as descr_prog,
+    regimesanct as regime_sanct,
+    typediplome as type_diplome
 from {{ var("database_jade") }}.dbo.t_prog

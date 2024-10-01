@@ -73,12 +73,36 @@ models:
             - id_eco
             - mat
 
-  - name: stg_perimetre_eleve_diplomation_des
+  - name: stg_perimetre_eleve_frequentation_des
     config:
       tags:
         - diplome
     description: >
-      Table de staging qui créer un périmètre pour cibler les élèves diplomables.
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables des.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fms
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fms.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - id_eco
+
+  - name: stg_perimetre_eleve_frequentation_fpt
+    config:
+      tags:
+        - diplome
+    description: >
+      Table de staging qui créer un périmètre pour cibler les élèves diplomables fpt.
     tests:
       - resolution:
           combination_of_columns:
@@ -185,5 +209,3 @@ models:
           combination_of_columns:
             - fiche
             - id_eco
-
-

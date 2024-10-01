@@ -2,7 +2,7 @@ version: 2
 
 seeds:
   - name: default_subject_evaluation
-    description: Mapping of the mandatory evaluation to their cod_matiere
+    description: Mapping des épreuves obligatoires avec leur code_matiere.
     config:
       tags: 
         - res_epreuves
@@ -12,8 +12,8 @@ seeds:
         no_competence: nvarchar(32)
         friendly_name: nvarchar(64)
   
-  - name: custom_subject_evaluation
-    description: An optional mapping of evaluation to be tracked by the dahsboard
+  - name: rstep_epreuves_personnalisees
+    description: Mapping optionnel des épreuves locales à suivre dans le tableau de bord.
     config:
       tags: 
         - res_epreuves
@@ -22,3 +22,23 @@ seeds:
         code_matiere: nvarchar(32)
         no_competence: nvarchar(32)
         friendly_name: nvarchar(64)
+
+  - name: rstep_liste_matiere_epr_unique
+    description: Mapping des épreuves uniques avec leur code_matiere.
+    config:
+      tags: 
+        - res_epreuves
+      schema: res_epreuves_seeds
+      column_types:
+        code_matiere: nvarchar(32)
+        description_matiere: nvarchar(64)
+
+  - name: fichier_consolide_epreuves_ministerielles
+    description: Table qui introduit les résultats régionaux et provinciaux dans le tableau de bord.
+    config:
+      tags: 
+        - res_epreuves
+      schema: res_epreuves_seeds
+
+
+

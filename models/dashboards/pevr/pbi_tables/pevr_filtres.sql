@@ -25,7 +25,7 @@ with
             cat_eco,
             row_number() over (partition by eco order by annee desc) as seqid
         from {{ ref("dim_mapper_schools") }}
-        where cat_eco in ('PRI', 'SEC')
+        where cat_eco in ('PRI', 'SEC', 'PS')
     ),
     eco as (
         select eco, school_friendly_name as ecole
@@ -65,26 +65,107 @@ with
         select classification, eco, population
         from
             (
-                select distinct class as classification, eco, population
-                from {{ ref("fact_yearly_student") }}
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
+                    end as classification,
+                    el.eco,
+                    population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union
                 select distinct 'Tout' as classification, eco, population
                 from {{ ref("fact_yearly_student") }}
                 union all
-                select distinct class as classification, 'CSS' as eco, population
-                from {{ ref("fact_yearly_student") }}
-                union all
-                select distinct class as classification, eco, 'Tout' as population
-                from {{ ref("fact_yearly_student") }}
-                union all
-                select distinct 'Tout' as classification, 'CSS' as eco, population
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
+                    end as classification,
+                    'CSS' as eco,
+                    population
                 from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union all
                 select distinct
-                    class as classification, 'CSS' as eco, 'Tout' as population
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
+                    end as classification,
+                    el.eco,
+                    'Tout' as population
                 from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct 'Tout' as classification, 'CSS' as eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.class is null)
+                        then '-'
+                        else el.class
+                    end as classification,
+                    'CSS' as eco,
+                    'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
                 union all
                 select distinct 'Tout' as classification, eco, 'Tout' as population
+                from eco
+            ) as tab
+    ),
+    distr as (
+        select distribution, eco, population
+        from
+            (
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.dist is null)
+                        then '-'
+                        else el.dist
+                    end as distribution,
+                    el.eco,
+                    population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union
+                select distinct 'Tout' as distribution, eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct
+                    case when el.dist is null then '-' else el.dist end as distribution,
+                    'CSS' as eco,
+                    population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct
+                    case
+                        when (cat_eco in ('PRI', 'SEC', 'PS') and el.dist is null)
+                        then '-'
+                        else el.dist
+                    end as distribution,
+                    el.eco,
+                    'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct 'Tout' as distribution, 'CSS' as eco, population
+                from {{ ref("fact_yearly_student") }}
+                union all
+                select distinct
+                    case when el.dist is null then '-' else el.dist end as distribution,
+                    'CSS' as eco,
+                    'Tout' as population
+                from {{ ref("fact_yearly_student") }} el
+                left join {{ ref("dim_mapper_schools") }} eco on el.id_eco = eco.id_eco
+                union all
+                select distinct 'Tout' as distribution, eco, 'Tout' as population
                 from eco
             ) as tab
     )
@@ -94,6 +175,7 @@ select
     genre.genre,
     pop.population,
     class.classification,
+    distr.distribution,
     {{
         dbt_utils.generate_surrogate_key(
             [
@@ -102,6 +184,7 @@ select
                 "genre",
                 "pop.population",
                 "classification",
+                "distribution",
             ]
         )
     }} as id_filtre
@@ -110,8 +193,11 @@ cross join ehdaa
 cross join genre
 cross join pop
 cross join class
+cross join distr
 where
     ehdaa.eco = eco.eco
     and pop.eco = eco.eco
     and class.eco = eco.eco
     and class.population = pop.population
+    and distr.eco = eco.eco
+    and distr.population = pop.population

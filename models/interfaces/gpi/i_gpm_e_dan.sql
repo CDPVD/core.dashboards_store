@@ -34,5 +34,6 @@ select
     categ_prog_part,
     type_prog_part,
     regrp_ehdaa,
-    motif_depart
+    motif_depart,
+    type_parcours
 from {{ var("database_gpi") }}.dbo.gpm_e_dan

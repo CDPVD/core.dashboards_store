@@ -212,3 +212,19 @@ models:
             - id_eco
             - annee
             - population
+
+  - name: fact_ri_mentions
+    config:
+      tags:
+        - pevr
+    column_types:
+        annee: nvarchar(max)
+    description: >
+      Table de 
+    tests:
+      - resolution:
+          combination_of_columns:
+            - fiche
+            - annee
+            - regime_sanct_charl
+            - prog_charl

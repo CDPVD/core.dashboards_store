@@ -35,6 +35,7 @@ with
             dan.annee_cycle_ref,
             dan.difficulte,
             dan.age_30_sept,
+            dan.type_parcours,
             dan.categ_prog_part as categorie_programme_particulier,
             dan.type_prog_part as type_programme_particulier,
             mes.type_mesure,
@@ -71,6 +72,8 @@ select
     ordre_ens,
     classe,
     class,
+    cycle_ref,
+    annee_cycle_ref,
     case
         when plan_interv_ehdaa is null
         then 'Sans'
@@ -188,6 +191,7 @@ select
         else 0
     end as is_doubleur,
     age_30_sept,
+    type_parcours,
     type_programme_particulier,
     categorie_programme_particulier,
     case when categorie_programme_particulier is not null then 1 else 0 end as is_ppp,

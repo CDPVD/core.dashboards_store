@@ -47,6 +47,24 @@ models:
             - id_indicateur
             - id_filtre
 
+  - name: pevr_indicateur_fms
+    description: Listes de l'indicateur 1.1.1.1.1 sur le taux d'obtention du diplôme DES en FMS
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
+  - name: pevr_indicateur_fpt
+    description: Listes de l'indicateur 1.1.1.1.2 sur le taux d'obtention du diplôme DES en FPT
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
   - name: pevr_indicateurs_epreuves
     description: liste des indicateurs du pevr lié aux épreuves du MEQ.
     tests:

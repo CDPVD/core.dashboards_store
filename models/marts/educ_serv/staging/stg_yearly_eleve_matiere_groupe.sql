@@ -48,6 +48,5 @@ inner join
     on oa.annee = std.annee
     and std.annee >= {{ store.get_current_year() }} - 10
 where
-    mat_ele.res_som is not null  -- prendre en note le risque de perdre des données pour la compétence. a voir à le 2e itérations.
-    and mat_ele.etat != 0  -- -- 0 = inactive, 1 = active, 5 = en continuation, 6 = equivalence, 8 = terminee
+    mat_ele.etat != 0  -- -- 0 = inactive, 1 = active, 5 = en continuation, 6 = equivalence, 8 = terminee
     and mat_ele.modele_etape is not null

@@ -15,15 +15,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select distinct
-    spi.code_perm,
-    spi.fiche,
-    nom,
-    pnom as prenom,
-    concat(nom, ', ', pnom, ' (', spi.fiche, ' )') as nom_prenom_fiche,
-    date_naissance,
-    case
-        when el.sexe = 'F' then 'Fille' when el.sexe = 'M' then 'Garçon' else el.sexe
-    end as genre
-from {{ ref("spine") }} as spi
-inner join {{ ref("i_gpm_e_ele") }} as el on spi.fiche = el.fiche
+with
+    src as (
+        select y_stud.fiche, y_stud.id_eco
+        from {{ ref("fact_yearly_student") }} as y_stud
+        where
+            y_stud.ordre_ens = '4'  -- Secondaire
+            and type_parcours in ('08')  -- 08 = FMS
+            and y_stud.annee < {{ get_current_year() }} + 1  -- Enlève l'année prévisionnelle de GPI
+    )
+
+select *
+from src

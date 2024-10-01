@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateurs_epreuves") }}
+{{ config(alias="indicateur_epreuves") }}
 
 
 with
@@ -24,16 +24,24 @@ with
             res.annee,
             sch.annee_scolaire,
             res.fiche,
-            sch.school_friendly_name,
-            el.genre,
-            y_stud.plan_interv_ehdaa,
-            y_stud.population,
             case
-                when y_stud.grp_rep is null then '-' else y_stud.grp_rep
-            end as grp_rep,
+                when sch.school_friendly_name is null
+                then '-'
+                else sch.school_friendly_name
+            end as school_friendly_name,
+            case when el.genre is null then '-' else el.genre end as genre,
+            case
+                when y_stud.plan_interv_ehdaa is null
+                then '-'
+                else y_stud.plan_interv_ehdaa
+            end as plan_interv_ehdaa,
+            case
+                when y_stud.population is null then '-' else y_stud.population
+            end as population,
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
             mat.code_matiere,
             mat.no_competence,
             etape,
@@ -64,6 +72,7 @@ with
             plan_interv_ehdaa,
             population,
             classification,
+            distribution,
             code_matiere,
             count(fiche) nb_resultat,
             avg(is_maitrise) taux_maitrise
@@ -75,7 +84,8 @@ with
                 genre,
                 plan_interv_ehdaa,
                 population,
-                classification
+                classification,
+                distribution
             )
     ),
 
@@ -89,6 +99,7 @@ with
             coalesce(agg.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
             coalesce(agg.population, 'Tout') as population,
             coalesce(agg.classification, 'Tout') as classification,
+            coalesce(agg.distribution, 'Tout') as distribution,
             nb_resultat,
             taux_maitrise
         from agg
@@ -111,6 +122,7 @@ select
                 "genre",
                 "population",
                 "classification",
+                "distribution",
             ]
         )
     }} as id_filtre
