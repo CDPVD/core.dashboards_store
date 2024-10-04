@@ -15,12 +15,40 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateur_epreuves") }}
-
+{{ config(alias="indicateur_masculin") }}
 
 with
-    src as (
+    -- Jumelage du perimetre élèves avec la table mentions
+    perimetre as (
         select
+            '2' as id_indicateur,
+            sch.annee,
+            sch.annee_scolaire,
+            src.fiche,
+            sch.school_friendly_name,
+            mentions.ind_obtention,
+            row_number() over (
+                partition by src.fiche, sch.annee order by mentions.date_exec_sanct desc
+            ) as seqid
+        from {{ ref("stg_perimetre_eleve_frequentation_des") }} as src
+        inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
+        left join
+            {{ ref("fact_ri_mentions") }} as mentions
+            on src.fiche = mentions.fiche
+            and sch.annee = mentions.annee
+        where
+            sch.annee
+            between {{ store.get_current_year() }}
+            - 3 and {{ store.get_current_year() }}
+            and mentions.indice_des = 1.0  -- dip DES
+    ),
+
+    -- Ajout des filtres utilisés dans le tableau de bord.
+    _filtre as (
+        select
+            perim.annee,
+            perim.annee_scolaire,
+            perim.fiche,
             case
                 when ind.id_indicateur_css is null
                 then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
@@ -28,15 +56,13 @@ with
             end as id_indicateur,
             ind.description_indicateur,
             ind.cible,
-            res.annee,
-            sch.annee_scolaire,
-            res.fiche,
             case
-                when sch.school_friendly_name is null
+                when perim.school_friendly_name is null
                 then '-'
-                else sch.school_friendly_name
+                else perim.school_friendly_name
             end as school_friendly_name,
-            case when el.genre is null then '-' else el.genre end as genre,
+            perim.ind_obtention,
+            case when ele.genre is null then '-' else ele.genre end as genre,
             case
                 when y_stud.plan_interv_ehdaa is null
                 then '-'
@@ -48,35 +74,23 @@ with
             case
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
-            case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
-            ind.code_matiere,
-            ind.no_competence,
-            etape,
-            cast(is_maitrise as decimal(2, 1)) is_maitrise
-        from {{ ref("fact_resultat_etape_competence") }} as res
-        left join
+            case when y_stud.dist is null then '-' else y_stud.dist end as distribution
+        from perimetre as perim
+        inner join
             {{ ref("fact_yearly_student") }} as y_stud
-            on y_stud.fiche = res.fiche
-            and y_stud.id_eco = res.id_eco
-        inner join {{ ref("dim_mapper_schools") }} as sch on res.id_eco = sch.id_eco
-        inner join {{ ref("dim_eleve") }} as el on res.fiche = el.fiche
+            on perim.fiche = y_stud.fiche
+            and perim.annee = y_stud.annee
+        inner join
+            {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
         inner join
             {{ ref("pevr_dim_indicateurs") }} as ind
-            on res.code_matiere = ind.code_matiere
-            and res.no_comp = ind.no_competence
-        where
-            res.annee
-            between {{ store.get_current_year() }}
-            - 3 and {{ store.get_current_year() }}
-            and etape = 'EX'
-            and id_indicateur_cdpvd in ('4')  -- Au cas-où qu'on utilise le champs code_matière pour d'autre indicateur
+            on perim.id_indicateur = ind.id_indicateur_cdpvd
+        where seqid = 1 AND genre = 'Garçon' -- Élève masculin
     ),
 
-    agg as (
+    -- Début de l'aggrégration
+    agg_dip as (
         select
-            id_indicateur,
-            description_indicateur,
-            cible,
             annee_scolaire,
             school_friendly_name,
             genre,
@@ -84,16 +98,17 @@ with
             population,
             classification,
             distribution,
-            code_matiere,
-            count(fiche) nb_resultat,
-            cast(avg(is_maitrise) as decimal(5, 3)) as taux_maitrise,
-            cast(((avg(is_maitrise)) - cible) as decimal(5, 3)) as ecart_cible
-        from src
-        group by
             id_indicateur,
             description_indicateur,
+            count(fiche) nb_resultat,
+            cast(avg(ind_obtention) as decimal(5, 3)) as taux_diplomation_masculin,
+            cast(((avg(ind_obtention)) - cible) as decimal(5, 3)) as ecart_cible,
+            cible
+        from _filtre
+        group by
             annee_scolaire,
-            code_matiere,
+            id_indicateur,
+            description_indicateur,
             cible, cube (
                 school_friendly_name,
                 genre,
@@ -104,6 +119,7 @@ with
             )
     ),
 
+    -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
             id_indicateur,
@@ -116,10 +132,10 @@ with
             coalesce(classification, 'Tout') as classification,
             coalesce(distribution, 'Tout') as distribution,
             nb_resultat,
-            taux_maitrise,
+            taux_diplomation_masculin,
             ecart_cible,
             cible
-        from agg
+        from agg_dip
     )
 
 select
@@ -127,8 +143,8 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_maitrise,  -- Possibilité d'avoir un null à cause du res_etape_num peut être nulle. A voir.
-    ecart_cible,  -- Même affaire.
+    taux_diplomation_masculin,
+    ecart_cible,
     cible,
     {{
         dbt_utils.generate_surrogate_key(

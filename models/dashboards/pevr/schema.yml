@@ -53,7 +53,7 @@ models:
   - name: pevr_indicateur_ehdaa
     description: >
         Taux de réussite des EHDAA.
-        Donnée provenant de charlemagne.
+        Donnée local.
         Indicateur '3' de la cpdvd.
     tests:
       - resolution:
@@ -102,7 +102,7 @@ models:
   - name: pevr_indicateur_masculin
     description: >
         Taux de réussite des garçons.
-        Donnée provenant de charlemagne.
+        Donnée local.
         Indicateur '2' de la cpdvd.
     tests:
       - resolution:
