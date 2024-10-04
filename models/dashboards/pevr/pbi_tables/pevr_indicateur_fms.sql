@@ -77,13 +77,13 @@ with
             case when y_stud.dist is null then '-' else y_stud.dist end as distribution
         from perimetre as perim
         inner join
-            "tbe_dev"."busquef_educ_serv"."fact_yearly_student" as y_stud
+            {{ ref("fact_yearly_student") }} as y_stud
             on perim.fiche = y_stud.fiche
             and perim.annee = y_stud.annee
         inner join
-            "tbe_dev"."busquef_educ_serv"."dim_eleve" as ele on perim.fiche = ele.fiche
+            {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
         inner join
-            "tbe_dev"."busquef_dashboard_pevr"."dim_indicateurs_pevr" as ind
+            {{ ref("pevr_dim_indicateurs") }} as ind
             on perim.id_indicateur = ind.id_indicateur_cdpvd
         where seqid = 1
     ),
