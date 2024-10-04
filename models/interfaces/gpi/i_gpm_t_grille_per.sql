@@ -16,25 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 select
-    fiche,
-    id_eco,
-    cycle_ref,
-    annee_cycle_ref,
-    grp_rep,
-    statut_don_an,
-    effectif,
-    ordre_ens,
-    classe,
-    class,
-    dist,
-    date_deb,
-    plan_interv_ehdaa,
-    difficulte,
-    age_30_sept,
-    categ_prog_part,
-    type_prog_part,
-    regrp_ehdaa,
-    motif_depart,
-    bat,
-    type_parcours
-from {{ var("database_gpi") }}.dbo.gpm_e_dan
+id_eco
+,grille
+,per
+,descr_abreg
+,descr_eclair
+,hre_deb
+,hre_fin
+,duree
+from {{ var("database_gpi") }}.dbo.gpm_t_grille_per
