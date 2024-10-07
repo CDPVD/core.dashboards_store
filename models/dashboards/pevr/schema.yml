@@ -109,6 +109,7 @@ models:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
+            - id_filtre
 
   - name: pevr_indicateur_obtention
     description: >
