@@ -15,7 +15,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateur_des") }}
+{{ config(alias="indicateur_fpt") }}
+
 with
     -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
@@ -28,7 +29,7 @@ with
             row_number() over (
                 partition by src.fiche, sch.annee order by mentions.date_exec_sanct desc
             ) as seqid
-        from {{ ref("stg_perimetre_eleve_frequentation_des") }} as src
+        from {{ ref("stg_perimetre_eleve_frequentation_fpt") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         left join
             {{ ref("fact_ri_mentions") }} as mentions
@@ -38,9 +39,8 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
-            and mentions.indice_des = 1.0  -- dip DES
+            and mentions.indice_cfpt = 1.0  -- Qualification fpt
     ),
-
     -- Ajout des filtres utilisés dans le tableau de bord.
     _filtre as (
         select
@@ -74,20 +74,19 @@ with
         inner join {{ ref("dim_eleve") }} as ele on perim.fiche = ele.fiche
         where seqid = 1
     ),
-
     -- Début de l'aggrégration
     agg_dip as (
         select
-            '1.1.1.1' as id_indicateur,
+            '1.1.1.1.2' as id_indicateur,
             annee_scolaire,
             school_friendly_name,
             genre,
             plan_interv_ehdaa,
             population,
-            classification,
             distribution,
+            classification,
             count(fiche) nb_resultat,
-            avg(ind_obtention) as taux_diplomation
+            avg(ind_obtention) as taux_qualification_fpt
         from _filtre
         group by
             annee_scolaire, cube (
@@ -99,7 +98,6 @@ with
                 distribution
             )
     ),
-
     -- Coalesce pour crée le choix 'Tout' dans les filtres.
     _coalesce as (
         select
@@ -113,7 +111,7 @@ with
             coalesce(agg_dip.classification, 'Tout') as classification,
             coalesce(agg_dip.distribution, 'Tout') as distribution,
             agg_dip.nb_resultat,
-            agg_dip.taux_diplomation
+            agg_dip.taux_qualification_fpt
         from agg_dip
         inner join
             {{ ref("pevr_dim_indicateurs") }} as ind
@@ -125,7 +123,7 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_diplomation,
+    taux_qualification_fpt,
     {{
         dbt_utils.generate_surrogate_key(
             [

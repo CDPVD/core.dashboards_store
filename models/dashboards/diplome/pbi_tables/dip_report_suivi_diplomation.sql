@@ -19,7 +19,7 @@ with
     -- identifier le perimètre des élève de l'année en cours
     perim as (
         select fiche, ele.id_eco
-        from {{ ref("stg_perimetre_eleve_diplomation_des") }} as ele
+        from {{ ref("stg_perimetre_eleve_frequentation_des") }} as ele
         inner join
             {{ ref("dim_mapper_schools") }} as eco
             on ele.id_eco = eco.id_eco
