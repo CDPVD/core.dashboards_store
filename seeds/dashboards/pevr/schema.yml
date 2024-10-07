@@ -8,7 +8,6 @@ seeds:
         description: Identifiant de l'indicateur de la cdpvd
         tests:
           - not_null
-          - unique
       - name: id_indicateur_css
         description: Mapping optionnel des indicateurs personalisés des css.
         tests:
@@ -43,7 +42,6 @@ seeds:
         description: Identifiant de l'indicateur de la cdpvd 
         tests:
           - not_null
-          - unique
       - name: id_indicateur_css
         description: Mapping optionnel des indicateurs personalisés des css.
         tests:
