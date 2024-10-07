@@ -20,7 +20,6 @@ with
         select distinct
             spi.fiche,
 			spi.annee,
-			spi.population
         from {{ ref("spine") }} as spi
     
     -- recuperer les adresses du perimetre
@@ -28,7 +27,6 @@ with
         select distinct
             spi.fiche,
 			spi.annee,
-			spi.population,
             adr.bloc,
             adr.ind_envoi_meq,
             adr.genre_adr,
