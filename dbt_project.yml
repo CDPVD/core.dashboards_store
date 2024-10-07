@@ -167,6 +167,15 @@ models:
                             "{{ store.stamp_model('dashboard_pevr') }}",
                         ]                        
 
+            absence:
+                +tags: ["absence"]
+                +schema: "dashboard_absence"
+                pbi_tables:
+                    +post-hook:
+                        [
+                            "{{ store.stamp_model('dashboard_absence') }}",
+                        ]                        
+
         interfaces:
             +tags: ["interfaces"]
             +materialized: ephemeral
