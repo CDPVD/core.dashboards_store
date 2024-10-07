@@ -19,7 +19,7 @@ with
     spi as (
         select distinct
             spi.fiche,
-			spi.annee,
+			spi.annee
         from {{ ref("spine") }} as spi
     
     -- recuperer les adresses du perimetre
