@@ -26,5 +26,11 @@ select
     {% for i in range(1, 31) %} leg_etape_{{ "%02d" % i }}, {% endfor %}
     {% for i in range(1, 31) %} eval_res_etape_{{ "%02d" % i }}, {% endfor %}
     leg_som,
-    leg_obj_final
+    leg_obj_final,
+    cat_mat_grp,
+    interv,
+    modele_eval,
+    activ,
+    nb_ele,
+    grille
 from {{ var("database_gpi") }}.dbo.gpm_t_mat_grp

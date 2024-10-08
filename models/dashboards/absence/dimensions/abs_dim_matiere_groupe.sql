@@ -47,7 +47,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     {% endif %}
 {% endif %}
 
-{{ config(alias="dim_grille") }}
+
+{{ config(alias="dim_matiere_groupe") }}
 
 with ecodata as (
     select
@@ -58,11 +59,23 @@ with ecodata as (
     where e.annee >= {{ store.get_current_year() }} - {{ annee_value }}
 )
 select
-id_grille = cast(ed.annee as varchar) + cast(ed.eco as varchar)  + cast(gp.per as varchar) + cast(gp.grille as varchar)
-, annee = ed.annee
-, ecole= ed.eco
-, descriptiongrille = g.descr
-, gp.*
-from {{ ref("i_gpm_t_grille") }} g  
- join {{ ref("i_gpm_t_grille_per") }} gp on g.id_eco = gp.id_eco and g.grille = gp.grille
- join ecodata ed on gp.id_eco = ed.id_eco
+    id_matiere_groupe = mg.id_mat_grp
+    , annee = ed.annee
+    , ecole = ed.eco
+    , codematiere = mg.mat
+    , descriptmatiere = isnull((
+        select  m.descr from {{ ref("i_gpm_t_mat") }} m where m.mat= mg.mat and m.id_eco=  mg.id_eco), '')
+    , matieregroupe = isnull(mg.grp, '')
+    , categoriematieregroupe = isnull(mg.cat_mat_grp, '')
+    , codeintervenant = isnull(mg.interv, '')
+    , intervenant = (
+        select i.nom +' '+ i.pnom from {{ ref("i_gpm_t_interv") }} i where mg.id_eco = i.id_eco and i.interv = mg.interv)
+    , modeleevaluation = isnull(mg.modele_eval, '')
+    , modeleevaluationdescription = (
+        select mev.descr from {{ ref("i_gpm_t_modele_eval") }} mev where mg.id_eco = mev.id_eco and mev.modele_eval =mg.modele_eval)
+    , activite = isnull(mg.activ, '')
+    , activitedescription = isnull((
+        select cf_descr from {{ ref("i_wl_descr") }} where nom_table = 'activ' and code = mg.activ), '')
+    , nbelevesgroupe = isnull(mg.nb_ele, 0)
+    , grille = isnull(mg.grille, '')
+from {{ ref("i_gpm_t_mat_grp") }} mg join ecodata ed on  mg.id_eco = ed.id_eco
