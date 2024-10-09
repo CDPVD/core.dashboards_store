@@ -35,6 +35,9 @@ select
     type_prog_part,
     regrp_ehdaa,
     motif_depart,
+    date_deb as date_debut,
+    date_depart,
+    grille,
     bat,
     type_parcours
 from {{ var("database_gpi") }}.dbo.gpm_e_dan
