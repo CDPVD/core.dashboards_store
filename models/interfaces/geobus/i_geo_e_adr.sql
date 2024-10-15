@@ -31,7 +31,7 @@ select
     prov,
     codepost as code_post,
     longitude,
-	latitude,
-	distbat as distance_batisse,
+    latitude,
+    distbat as distance_batisse,
     indenvoimeq as ind_envoi_meq
 from {{ var("database_geobus") }}.dbo.geo_e_adr

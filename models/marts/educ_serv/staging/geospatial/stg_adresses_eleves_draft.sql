@@ -17,16 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 with
     spi as (
-        select distinct
-            spi.fiche,
-			spi.annee
-        from {{ ref("spine") }} as spi
-    
+        select distinct spi.fiche, spi.annee from {{ ref("spine") }} as spi
+
     -- recuperer les adresses du perimetre
-    ), adr as (
+    ),
+    adr as (
         select distinct
             spi.fiche,
-			spi.annee,
+            spi.annee,
             adr.bloc,
             adr.ind_envoi_meq,
             adr.genre_adr,
@@ -35,36 +33,52 @@ with
             adr.genre_rue,
             adr.rue,
             adr.ville,
-			adr.code_post,
-			LOWER(ISNULL(adr.appart + '-', '') + ISNULL(adr.no_civ + ' ', '') + ISNULL(adr.rue, '') + ISNULL(', ' + adr.ville, '') + ISNULL(', ' + adr.code_post, '')) AS adresse,
+            adr.code_post,
+            lower(
+                isnull (adr.appart + '-', '')
+                + isnull (adr.no_civ + ' ', '')
+                + isnull (adr.rue, '')
+                + isnull (', ' + adr.ville, '')
+                + isnull (', ' + adr.code_post, '')
+            ) as adresse,
             adr.longitude,
-			adr.latitude,
-			adr.distance_batisse,
-			cast(adr.date_effect as date) as date_effect,
-			case
+            adr.latitude,
+            adr.distance_batisse,
+            cast(adr.date_effect as date) as date_effect,
+            case
                 when
-                    (lead(adr.date_effect) over (partition by adr.fiche, adr.annee order by adr.date_effect))
+                    (
+                        lead(adr.date_effect) over (
+                            partition by adr.fiche, adr.annee order by adr.date_effect
+                        )
+                    )
                     is null
                 then null
                 else
                     dateadd(
                         day,
                         -1,
-                        lead(adr.date_effect) over (partition by adr.fiche, adr.annee order by adr.date_effect)
+                        lead(adr.date_effect) over (
+                            partition by adr.fiche, adr.annee order by adr.date_effect
+                        )
                     )
             end as date_effect_fin,
-            row_number() over (partition by spi.fiche, spi.annee order by adr.date_effect desc) as seqid  -- pour identifier la 1ere adresse
+            row_number() over (
+                partition by spi.fiche, spi.annee order by adr.date_effect desc
+            ) as seqid  -- pour identifier la 1ere adresse
         from {{ ref("spine") }} as spi
-		left join {{ ref("i_geo_e_adr") }} as adr 
-			on spi.fiche=adr.fiche and spi.annee=adr.annee
-        where 
-            adr.simul=0	                     -- A CONFIRMER
-			--and adr.ind_envoi_meq = '1'	 -- A CONFIRMER : on considere uniquement les adresses envoyés au ministere
+        left join
+            {{ ref("i_geo_e_adr") }} as adr
+            on spi.fiche = adr.fiche
+            and spi.annee = adr.annee
+        where adr.simul = 0  -- A CONFIRMER
+    -- and adr.ind_envoi_meq = '1'	 -- A CONFIRMER : on considere uniquement les
+    -- adresses envoyés au ministere
     )
 
 -- Identifier l'adresse au 30/09	
-select 
-	spi.*,
+select
+    spi.*,
     adr.bloc,
     adr.ind_envoi_meq,
     adr.genre_adr,
@@ -73,24 +87,29 @@ select
     adr.genre_rue,
     adr.rue,
     adr.ville,
-	adr.code_post,
-	adr.adresse,
+    adr.code_post,
+    adr.adresse,
     adr.longitude,
-	adr.latitude,
-	geography::Point(isnull(adr.latitude,0), isnull(adr.longitude,0), 4326) AS geo,
-	adr.distance_batisse,
-	adr.date_effect,
-	adr.date_effect_fin,
+    adr.latitude,
+    geography::point(isnull (adr.latitude, 0), isnull (adr.longitude, 0), 4326) as geo,
+    adr.distance_batisse,
+    adr.date_effect,
+    adr.date_effect_fin,
     adr.seqid,
-	case
-		when
-			(
-				(datefromparts(adr.annee, 9, 30) between adr.date_effect and adr.date_effect_fin)
-				OR 
-				(datefromparts(adr.annee, 9, 30) > adr.date_effect and adr.date_effect_fin is null) 
-			) then 1
-            else 0
+    case
+        when
+            (
+                (
+                    datefromparts(adr.annee, 9, 30)
+                    between adr.date_effect and adr.date_effect_fin
+                )
+                or (
+                    datefromparts(adr.annee, 9, 30) > adr.date_effect
+                    and adr.date_effect_fin is null
+                )
+            )
+        then 1
+        else 0
     end as adresse_30sept
-FROM spi
-LEFT JOIN adr
-    ON spi.fiche=adr.fiche AND spi.annee=adr.annee
+from spi
+left join adr on spi.fiche = adr.fiche and spi.annee = adr.annee
