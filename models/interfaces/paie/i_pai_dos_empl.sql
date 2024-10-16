@@ -29,5 +29,6 @@ select
     mode_cour,
     type,
     gr_paie,
-    pourc_sal_cour
+    pourc_sal_cour,
+    pourc_sal_prec
 from {{ var("database_paie") }}.dbo.pai_dos_empl

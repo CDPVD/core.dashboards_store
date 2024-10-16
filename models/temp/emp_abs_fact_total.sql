@@ -8,24 +8,15 @@ published by the Free Software Foundation, either version 3 of the
 License, or any later version.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+but WITHOUT ANY WARRANTY without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select
-    matr,
-    date_eff,
-    lieu_trav,
-    corp_empl,
-    etat,
-    stat_eng,
-    type,
-    ref_empl,
-    date_fin,
-    pourc_sal,
-    gr_paie,
-    sect
-from {{ var("database_paie") }}.dbo.pai_hemp
+{{ config(alias="emp_abs_fact_total") }}
+
+select année, matricule, ref_empl, [lieu de travail], sum(nbrjour) as total
+from {{ ref("fact_abs_jour") }}
+group by année, matricule, ref_empl, [lieu de travail], gr_paie

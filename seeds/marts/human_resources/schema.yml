@@ -87,3 +87,59 @@ seeds:
         is_reg: bit
         valid_from: int
         valid_until: int
+
+  - name: secteur
+    description: sdfdsf
+    columns:
+      - name: ua_Id
+        description: L'ID de l'école
+        tests:
+          - not_null
+      - name: secteur_Id
+        description: The description of the etat_employe.
+        tests:
+          - not_null
+
+    config:
+      tags:
+        - human_resources
+      schema: human_resources_seeds
+      column_types:
+        ua_Id: int
+        secteur_Id: nvarchar(50)
+
+  - name: secteur
+    description: sdfdsf
+    columns:
+      - name: ua_Id
+        description: L'ID de l'école
+        tests:
+          - not_null
+      - name: secteur_Id
+        description: The description of the etat_employe.
+        tests:
+          - not_null
+
+    config:
+      tags:
+        - human_resources
+      schema: human_resources_seeds
+      column_types:
+        ua_Id: int
+        secteur_Id: nvarchar(50)   
+
+  - name: type_absence
+    description: Regroupement des motifs d'absence sous des catégories plus parlantes
+    columns:
+      - name: motif_id
+        description: L'ID du motif
+      - name: categories
+        description: Catégories 
+
+    config:
+      tags:
+        - human_resources
+      schema: human_resources_seeds
+      column_types:
+        motif_id: nvarchar(2)
+        categories: nvarchar(50)                
