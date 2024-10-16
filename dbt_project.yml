@@ -182,6 +182,7 @@ vars:
     database_geobus: "Replace me in the CSS repositery" # contains routes, buses, contractors, student files, and related to db GPL.
     database_piastre: "Replace me in the CSS repositery" # financial data on school transport. no connections to db Geobus.
     database_prodrome: "Replace me in the CSS repositery" # Modelling output from the Sciance's models.
+    database_tosca: "Replace me in the CSS repositery"
     # res_epreuves's dashboard variables:
     res_epreuves:
         threshold: 70
