@@ -26,27 +26,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         * located in the schema ''
 #}
 
-{% set annee_section = var(
-    "dim", {"absence": {"annee": 10 }}
-) %}
-{% set annee_value = annee_section["absence"]["annee"] %}
-{% set is_annee_value_default = annee_value == 10 %}
-
-{% if execute %}
-    {% if is_annee_value_default %}
-        {{
-            log(
-                "Attention : absences : Le nombre d'annéés a extraire est par defaut "~ annee_value ~ " dernieres années. Vous pouvez le surcharger ",
-                true,
-            )
-        }}
-    {% else %}
-        {{ 
-            log("Le nombre d'années a extraire est : " ~ annee_value, info=True) 
-        }}
-    {% endif %}
-{% endif %}
-
 {{ config(alias="dim_motif_abs") }}
 
 WITH EcoData AS (
@@ -54,8 +33,8 @@ WITH EcoData AS (
         E.ID_ECO,
         E.ANNEE,
         E.ECO        
-    FROM GPM_T_ECO E
-    WHERE E.ANNEE >= {{ store.get_current_year() }} - {{ annee_value }}
+    FROM {{ ref("i_gpm_t_eco") }} E
+    WHERE E.ANNEE >= {{ store.get_recup_annee() }}
 )
 SELECT
  ID_MOTIF_ABS = CAST(ED.ANNEE AS VARCHAR) + CAST(ED.ECO AS VARCHAR) + CAST(MAB.MOTIF_ABS AS VARCHAR)

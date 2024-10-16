@@ -1,0 +1,5 @@
+version: 2
+macros:
+  - name: get_recup_annee
+    description: >
+      Retourne l'année de debut pour l'extraction des données
