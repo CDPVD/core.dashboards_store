@@ -130,7 +130,7 @@ select
     n_events,
     n_censored,
     n_survivors,
-    1 - instantaneous_survival_rate as instantaneous_death_rate,
+    cast(n_events as float) / cast(n_survivors as float) as instantaneous_death_rate,
     exp(
         sum(log(instantaneous_survival_rate)) over (
             order by age rows between unbounded preceding and current row

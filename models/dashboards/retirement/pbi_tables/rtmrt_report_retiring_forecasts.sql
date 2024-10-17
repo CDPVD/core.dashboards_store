@@ -16,22 +16,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 {# 
-    Compute the running number of forecasted retiring employees and combine the forecast with the past values
+    Compute the running number of forecasted retiring employees 
 #}
 with
     observed as (
         select
             src.job_group_category,
-            convert(date, concat(src.school_year, '-09-30'), 102) as school_year,
+            convert( date, concat(src.school_year, '-', {{ var("mois_reference")}}, '-01'), 102) as school_year,
             count(*) as observed_retiring_employes,
             null as forecast_retiring_employees,
             null as running_n_retiring_employees,
+
             0 as is_forecast
         from
             (
                 select
                     case
-                        when month(src.retirement_date) < 7
+                        when month(src.retirement_date) < {{ var("mois_reference")}}
                         then year(src.retirement_date) - 1
                         else year(src.retirement_date)
                     end as school_year,
@@ -40,9 +41,13 @@ with
                 left join
                     {{ ref("dim_mapper_job_group") }} as job
                     on src.corp_empl = job.job_group  -- Add the job group category here as I want to aggreagte by job group categories and not by job group.
+
             ) as src
+
         where src.school_year >= {{ store.get_current_year() }} - 10
-        group by src.job_group_category, src.school_year
+        group by
+            src.job_group_category,
+            src.school_year
     )
 
 select
@@ -58,6 +63,7 @@ select
     1 as is_forecast
 from {{ ref("fact_retirement_forecasts") }}
 union all
+
 select
     school_year,
     job_group_category,

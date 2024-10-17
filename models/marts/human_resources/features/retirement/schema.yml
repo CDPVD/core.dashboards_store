@@ -26,3 +26,16 @@ models:
           combination_of_columns:
             - school_year
             - job_group_category
+  - name: fact_retirement_past_forecasts
+    description: >
+      This table combine the survival curves with the list of actives employees to get an estimation of the number of employees that will retire, in the past.
+      The forecasts are done by job category
+    config:
+      tags:
+        - retirement
+    tests:
+      - resolution:
+          combination_of_columns:
+            - school_year
+            - job_group_category
+
