@@ -23,8 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     Finaly, retiring employees for each year is then computed by differencing (first-order) the previously obtained number of surviviors for each year with respect to each cohort.
 
     About the horizon 0 forecast : 
-    * Since I'm differentiating the cumulated survival to get the instantaneous survavival, the horizon 0 will act as a kind of a normalization constant and will capture some of the noise from the survival curve partial mis-fitting.
-    * The horizon 0 has, from a dashboarding viewpoint, no real meaning and is removed from the final table
+    * The horizon 0 represent the current year. 
  #}
 -- Compute the age of the active employes at the start of the year
 with
@@ -47,7 +46,11 @@ with
         -- current scholar year
         cross join
             (
-                select concat({{ store.get_current_year() }}, '-09-01') as current_year
+                select
+                    concat(
+                        {{ store.get_current_year() }},
+                        '-', {{ var("mois_reference")}}, '-01'
+                    ) as current_year
             ) as crt
 
     -- Group together active employes by cohorts
@@ -89,9 +92,19 @@ with
             src.forecast_horizon,
             src.job_group_category,
             src.n_employees,
-            surv.survival_rate,
+            -- Compute the cumulated number of retired employes by producting the
+            -- instantaneous survival rate
             round(
-                src.n_employees - (src.n_employees * surv.survival_rate), 0
+                n_employees - (
+                    n_employees * exp(
+                        sum(log(1 - instantaneous_death_rate)) over (
+                            partition by cohort_id
+                            order by forecast_horizon
+                            rows between unbounded preceding and current row
+                        )
+                    )
+                ),
+                0
             ) as n_cumulated_retired
         from aged_cohorts as src
         inner join
@@ -105,7 +118,7 @@ with
             cohort_id,
             forecast_horizon,
             job_group_category,
-            n_cumulated_retired - lag(n_cumulated_retired) over (
+            n_cumulated_retired - lag(n_cumulated_retired, 1, 0) over (
                 partition by cohort_id order by forecast_horizon
             ) as instantaneous_retiring_employees
         from cumulated
@@ -130,7 +143,10 @@ with
             job.job_group_category,
             convert(
                 date,
-                concat({{ store.get_current_year() }} + hrz.horizon, '-09-01'),
+                concat(
+                    {{ store.get_current_year() }} + hrz.horizon,
+                    '-', {{ var("mois_reference")}}, '-01'
+                ),
                 102
             ) as school_year,
             hrz.horizon as forecast_horizon
@@ -143,7 +159,7 @@ with
             (
                 select seq_value as horizon
                 from {{ ref("int_sequence_0_to_1000") }}
-                where seq_value between 1 and 5
+                where seq_value between 0 and 5
             ) as hrz
 
     -- Join the padding table to the aggregated table to impute missing values
