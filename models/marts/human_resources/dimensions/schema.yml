@@ -11,8 +11,6 @@ models:
           - unique
       - name: sex
         description: The sex of an employee.
-      - name: sex_friendly_name
-        description: The sex of an employee  
       - name: legal_name
         description: The legal name of the employee
       - name: birth_date

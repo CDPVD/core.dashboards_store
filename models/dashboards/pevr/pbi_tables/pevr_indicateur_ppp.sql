@@ -46,9 +46,9 @@ with
         inner join {{ ref("dim_mapper_schools") }} as sch on y_stud.id_eco = sch.id_eco
         where
             ordre_ens = 4
-            and sch.annee
+            and annee
             between {{ store.get_current_year() }}
-            - 3 and {{ store.get_current_year() }}
+            - 2 and {{ store.get_current_year() }}
     ),
     ppp as (
         select
@@ -61,7 +61,7 @@ with
             classification,
             distribution,
             sum(is_ppp) as nb_ppp,
-            avg(is_ppp) as taux_ppp
+            avg(is_ppp) as tx_ppp
         from src
         group by
             annee_scolaire, cube (
@@ -92,11 +92,12 @@ with
             {{ ref("pevr_dim_indicateurs") }} as ind
             on ppp.id_indicateur = ind.id_indicateur
     )
-
 select
-    id_indicateur,
-    description_indicateur,
-    annee_scolaire,
+    ind.id_indicateur,
+    ind.description_indicateur,
+    ppp.annee,
+    coalesce(ppp.eco, 'CSS') as eco,
+    coalesce(school_friendly_name, 'CSS') as nom_ecole,
     nb_ppp,
     taux_ppp,
     {{

@@ -19,14 +19,10 @@ models:
             - annee
             - code_ecole
             - ordre_ens
-            - niveau_scolaire
+            - cod_niveau_scolaire
             - Difficulte
             - dist
-            - genre
+            - sexe
             - population
             - plan_interv_ehdaa
             - grp_rep
-            - class
-            - is_doubleur
-            - is_francisation
-            - type_mesure  

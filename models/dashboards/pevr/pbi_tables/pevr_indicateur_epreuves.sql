@@ -22,7 +22,6 @@ with
     src as (
         select
             res.annee,
-            sch.annee_scolaire,
             res.fiche,
             case
                 when sch.school_friendly_name is null
@@ -60,22 +59,22 @@ with
         where
             res.annee
             between {{ store.get_current_year() }}
-            - 3 and {{ store.get_current_year() }}
-            and etape = 'EX'
+            - 2 and {{ store.get_current_year() }}
     ),
-
     agg as (
         select
-            annee_scolaire,
-            school_friendly_name,
+            annee,
+            eco,
             genre,
             plan_interv_ehdaa,
             population,
             classification,
             distribution,
             code_matiere,
+            no_competence,
+            etape,
             count(fiche) nb_resultat,
-            avg(is_maitrise) taux_maitrise
+            avg(is_maitrise) tx_maitrise
         from src
         group by
             annee_scolaire,
@@ -107,11 +106,19 @@ with
             {{ ref("pevr_dim_indicateurs_matiere") }} as ind
             on agg.code_matiere = ind.code_matiere
     )
-
 select
-    id_indicateur,
-    description_indicateur,
-    annee_scolaire,
+    ind.id_indicateur,
+    ind.description_indicateur,
+    agg.annee,
+    coalesce(agg.eco, 'CSS') as eco,
+    coalesce(school_friendly_name, 'CSS') as nom_ecole,
+    coalesce(genre, 'Tout') as genre,
+    coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+    coalesce(population, 'Tout') as population,
+    coalesce(cast(is_francisation as varchar), 'Tout') as is_francisation,
+    agg.code_matiere,
+    agg.no_competence,
+    etape,
     nb_resultat,
     taux_maitrise,
     {{

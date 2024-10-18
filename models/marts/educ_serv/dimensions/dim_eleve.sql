@@ -15,15 +15,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select distinct
-    spi.code_perm,
-    spi.fiche,
+select
+    code_perm,
+    fiche,
     nom,
     pnom as prenom,
-    concat(nom, ', ', pnom, ' (', spi.fiche, ' )') as nom_prenom_fiche,
+    concat(nom, ', ', pnom, ' (', fiche, ' )') as nom_prenom_fiche,
     date_naissance,
     case
-        when el.sexe = 'F' then 'Fille' when el.sexe = 'M' then 'Garçon' else el.sexe
+        when ele.sexe = 'F' then 'Fille' when ele.sexe = 'M' then 'Garçon' else ele.sexe
     end as genre
-from {{ ref("spine") }} as spi
-inner join {{ ref("i_gpm_e_ele") }} as el on spi.fiche = el.fiche
+
+from {{ ref("i_gpm_e_ele") }} as ele

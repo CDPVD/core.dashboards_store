@@ -38,6 +38,9 @@ seeds:
         description: >
           The YEAR (integer) from which the status stops to be valid. The upper bound is excluded from the validity period.
           If not populated, the status is valid until the current year + 1 .
+      - name: empl_resi
+        description: Is the code identifiing a currently resignation employee ?
+
     config:
       tags:
         - human_resources
@@ -51,6 +54,8 @@ seeds:
         etat_actif: bit
         valid_from: int
         valid_until: int
+        empl_resi: bit
+
 
   - name: stat_eng
     description: >

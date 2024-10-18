@@ -19,33 +19,129 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 with
-    src as (
+    spine as (
         select *
-        from {{ ref("fact_yearly_student") }}
-        where annee between {{ get_current_year() }} -4 and {{ get_current_year() }} + 1
+        from {{ ref("spine") }}
+        where
+            annee between {{ get_current_year() }} -4 and {{ get_current_year() }} + 1
+            and seqid = 1
     ),
 
     el as (
         select
-            src.code_perm,
-            annee,
-            population,
-            ele.genre,
-            eco,
-            -- eco.nom_eco,
-            classe,
-            class,
-            ordre_ens,
-            plan_interv_ehdaa,
-            difficulte,
-            niveau_scolaire,
-            dist,
-            is_doubleur,
-            is_francisation,
-            type_mesure,
-            grp_rep
-        from src
-        left join {{ ref("dim_eleve") }} as ele on src.fiche = ele.fiche
+            spi.code_perm,
+            spi.annee,
+            spi.population,
+            ele.sexe,
+            spi.eco,
+            eco.nom_eco,
+            dan.classe,
+            dan.ordre_ens,
+            dan.plan_interv_ehdaa,
+            dan.difficulte,
+            case
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '1'
+                        and (dan.annee_cycle_ref = '1' or dan.annee_cycle_ref = '7')
+                    )
+                then 'Primaire 1'
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '1'
+                        and (dan.annee_cycle_ref = '2' or dan.annee_cycle_ref = '8')
+                    )
+                then 'Primaire 2'
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '2'
+                        and (dan.annee_cycle_ref = '1' or dan.annee_cycle_ref = '7')
+                    )
+                then 'Primaire 3'
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '2'
+                        and (dan.annee_cycle_ref = '2' or dan.annee_cycle_ref = '8')
+                    )
+                then 'Primaire 4'
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '3'
+                        and (dan.annee_cycle_ref = '1' or dan.annee_cycle_ref = '7')
+                    )
+                then 'Primaire 5'
+                when
+                    dan.ordre_ens = '3'
+                    and (
+                        dan.cycle_ref = '3'
+                        and (dan.annee_cycle_ref = '2' or dan.annee_cycle_ref = '8')
+                    )
+                then 'Primaire 6'
+                when dan.ordre_ens = '1'
+                then 'Maternelle 4'
+                when dan.ordre_ens = '2'
+                then 'Maternelle 5'
+                when
+                    dan.ordre_ens = '4'
+                    and (
+                        dan.cycle_ref = '1'
+                        and (dan.annee_cycle_ref = '1' or dan.annee_cycle_ref = '7')
+                    )
+                then 'Secondaire 1'
+                when
+                    dan.ordre_ens = '4'
+                    and (
+                        dan.cycle_ref = '1'
+                        and (dan.annee_cycle_ref = '2' or dan.annee_cycle_ref = '8')
+                    )
+                then 'Secondaire 2'
+                when
+                    dan.ordre_ens = '4'
+                    and (
+                        (
+                            dan.cycle_ref = '2'
+                            and (dan.annee_cycle_ref = '1' or dan.annee_cycle_ref = '7')
+                        )
+                        or dan.classe = '3'
+                    )
+                then 'Secondaire 3'
+                when
+                    dan.ordre_ens = '4'
+                    and (
+                        (
+                            dan.cycle_ref = '2'
+                            and (dan.annee_cycle_ref = '2' or dan.annee_cycle_ref = '8')
+                        )
+                        or dan.classe = '4'
+                    )
+                then 'Secondaire 4'
+                when
+                    dan.ordre_ens = '4'
+                    and (
+                        (
+                            dan.cycle_ref = '2'
+                            and (dan.annee_cycle_ref = '3' or dan.annee_cycle_ref = '9')
+                        )
+                        or dan.classe in ('5', '7', '8')
+                    )
+                then 'Secondaire 5'
+                else '-'
+            end as cod_niveau_scolaire,
+            dan.dist,
+            dan.grp_rep
+        from spine as spi
+        left join {{ ref("i_gpm_t_eco") }} as eco on spi.eco = eco.eco
+        left join
+            {{ ref("i_gpm_e_dan") }} as dan
+            on spi.fiche = dan.fiche
+            and eco.id_eco = dan.id_eco
+        left join {{ ref("i_gpm_e_ele") }} as ele on spi.fiche = ele.fiche
+        where spi.annee = eco.annee
     )
 
 select *

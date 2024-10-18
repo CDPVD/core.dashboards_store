@@ -41,6 +41,10 @@ models:
         description: The school year (from september to august the 31 of the following year) for which the status mapping is valid.
         tests:
           - not_null
+      - name: empl_resi
+        description: Is the code identifying if the employee is resignate ?
+        tests:
+          - not_null
     tests:
       - resolution:
           combination_of_columns:

@@ -17,6 +17,9 @@ cookiecutter = "^2.3.0"
 shandy-sqlfmt = {extras = ["jinjafmt"], version = "^0.19.2"}
 pre-commit = "^3.3.3"
 
+[tool.poetry.group.dev.dependencies]
+shandy-sqlfmt = {extras = ["jinjafmt"], version = "^0.23.2"}
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

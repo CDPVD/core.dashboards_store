@@ -24,7 +24,6 @@ select
     mat_ele.etat,
     mat_ele.id_mat_ele,
     mat_ele.res_som,
-    mat_ele.res_meq,
     {% for i in range(1, 31) %} mat_ele.res_etape_{{ "%02d" % i }}, {% endfor %}
     {% for i in range(1, 31) %} mg.eval_res_etape_{{ "%02d" % i }}, {% endfor %}
     {% for i in range(1, 31) %} mg.leg_etape_{{ "%02d" % i }}, {% endfor %}
@@ -48,5 +47,6 @@ inner join
     on oa.annee = std.annee
     and std.annee >= {{ store.get_current_year() }} - 10
 where
-    mat_ele.etat != 0  -- -- 0 = inactive, 1 = active, 5 = en continuation, 6 = equivalence, 8 = terminee
+    mat_ele.res_som is not null  -- prendre en note le risque de perdre des données pour la compétence. a voir à le 2e itérations.
+    and mat_ele.etat != 0  -- -- 0 = inactive, 1 = active, 5 = en continuation, 6 = equivalence, 8 = terminee
     and mat_ele.modele_etape is not null

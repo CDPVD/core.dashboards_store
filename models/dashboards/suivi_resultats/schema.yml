@@ -30,4 +30,3 @@ models:
             - code_matiere
             - annee
             - no_comp
-            - groupe_matiere
