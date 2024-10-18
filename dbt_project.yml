@@ -185,3 +185,11 @@ vars:
         threshold: 70
     emp_actif:
         nbrs_sem_dern_paie: 1
+
+    # A mapping table to set the first month-day of the school year..
+    retraite:
+        date_ref: -07-01
+
+    # A mapping table to set the first month-day of the school year..
+    demissions:
+        date_ref: -07-01
