@@ -191,10 +191,5 @@ vars:
     emp_actif:
         nbrs_sem_dern_paie: 1
 
-    # A mapping table to set the first month-day of the school year..
-    retraite:
-        date_ref: -07-01
-
-    # A mapping table to set the first month-day of the school year..
-    demissions:
-        date_ref: -07-01
+    # Le mois de référence pour le début de l'année -- Indiquez en 2 caractères comme, 01, 02, 03, ..., 10, 11, 12
+    mois_reference: 07
