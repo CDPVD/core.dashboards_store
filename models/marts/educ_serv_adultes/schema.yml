@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg_populations_adultes
+    config:
+      tags:
+        - populations_adultes
+        - educ_serv_adultes
+    description: >
+      Table de la population fpfga pour le calcul de métriques inter-populationelles.
+    tests:
+      - resolution:
+          combination_of_columns:
+            - CodePerm
+            - Annee
+            - Freq
+            - population
