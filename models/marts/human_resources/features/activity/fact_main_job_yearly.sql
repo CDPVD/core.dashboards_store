@@ -38,7 +38,7 @@ with
             ) as seq
         where
             case
-                when month(valid_until) between 9 and 12
+                when month(valid_until) between {{ var("mois_reference") }} and 12
                 then year(valid_until)
                 else year(valid_until) - 1
             end

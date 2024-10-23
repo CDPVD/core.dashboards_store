@@ -25,7 +25,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- Create the start-of-year date
 with
     current_year as (
-        select concat({{ store.get_current_year() }}, '-09-01') as current_year
+        select
+            concat(
+                {{ store.get_current_year() }}, '-', {{ var("mois_reference") }}, '-01'
+            ) as current_year
 
     -- Add the birth date and the sex to the active employes table
     ),
@@ -37,7 +40,7 @@ with
             src.corp_empl,
             src.stat_eng,
             dos.birth_date,
-            dos.sex
+            dos.genre as sex
         from {{ ref("fact_activity_current") }} as src
         left join {{ ref("dim_employees") }} as dos on src.matr = dos.matr
         where src.matr not in (select matr from {{ ref("fact_retirement") }})  -- Remove the already retired employes
