@@ -62,6 +62,33 @@ models:
             - id_indicateur
             - periode
 
+  - name: pevr_indicateur_des
+    description: Listes de l'indicateur 1.1.1.1 sur le taux d'obtention du diplôme DES
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
+  - name: pevr_indicateur_fms
+    description: Listes de l'indicateur 1.1.1.1.1 sur le taux d'obtention du diplôme DES en FMS
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
+  - name: pevr_indicateur_fpt
+    description: Listes de l'indicateur 1.1.1.1.2 sur le taux d'obtention du diplôme DES en FPT
+    tests:
+      - resolution:
+          combination_of_columns:
+            - annee_scolaire
+            - id_indicateur
+            - id_filtre
+
   - name: pevr_indicateurs_epreuves
     description: >
       Proportion d'élèves qui obtiennent entre 70% et 100% à l'épreuve  obligatoire.
@@ -120,14 +147,17 @@ models:
       - resolution:
           combination_of_columns:
             - annee_scolaire
+            - annee_scolaire
             - id_indicateur
             - periode
 
   - name: pevr_indicateurs_ppp
     description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
+    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
     tests:
       - resolution:
           combination_of_columns:
+            - annee_scolaire
             - annee_scolaire
             - id_indicateur
             - id_filtre
