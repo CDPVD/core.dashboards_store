@@ -60,7 +60,7 @@ models:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
-            - periode
+            - id_filtre
 
   - name: pevr_indicateur_des
     description: Listes de l'indicateur 1.1.1.1 sur le taux d'obtention du diplôme DES
