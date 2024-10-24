@@ -1,108 +1,99 @@
 version: 2
 
 seeds:
-  - name: common_indicateurs_pevr_matiere
-    description: Mapping des indicateurs communs avec leur description, leur code_matière, si c'est le cas, et leur numéros de compétences.   
+  - name: indicateurs_pevr_cdpvd
+    description: Mapping des indicateurs communs avec leur description.
     columns:
-      - name: id_indicateur
-        description: Identifiant de l'indicateur
+      - name: id_indicateur_cdpvd
+        description: Identifiant de l'indicateur de la cdpvd
         tests:
           - not_null
-          - unique    
+      - name: id_indicateur_css
+        description: Mapping optionnel des indicateurs personalisés des css.
+        tests:
+          - unique
       - name: description_indicateur
         description: Description de l'indicateur
         tests:
           - not_null
-          - unique            
-      - name: code_matiere
-        description: Code de la matière visée par l'indicateur pevr
-        tests:
-          - not_null
-          - unique       
+          - unique
+      - name: cible
+        description: Pourcentage ciblé
+      - name: Code_matière
+        description: Code matière optionnel. Ex -> 132508
       - name: no_competence
-        description: numéro de la compétence visé par l'indicateur pevr
-        tests:
-          - not_null
+        description: Le numéro de compétence du code matière.
     config:
-      tags: 
+      tags:
         - pevr
-      schema: pevr_seeds
+      schema: dashboard_pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
-        description_indicateur: nvarchar(max)      
-        code_matiere: nvarchar(32)
-        no_competence: nvarchar(32)
-  
-  - name: custom_indicateurs_pevr_matiere
-    description: mapping optionnel des indicateurs personalisés des css.
-    columns:
-      - name: id_indicateur
-        description: Identifiant de l'indicateur
-        tests:
-          - not_null
-          - unique    
-      - name: description_indicateur
-        description: Description de l'indicateur
-        tests:
-          - not_null
-          - unique       
-      - name: code_matiere
-        description: Code de la matière visée par l'indicateur pevr
-        tests:
-          - not_null
-          - unique       
-      - name: no_competence
-        description: numéro de la compétence visé par l'indicateur pevr
-        tests:
-          - not_null
-    config:
-      tags: 
-        - pevr
-      schema: pevr_seeds
-      column_types:
-        id_indicateur: nvarchar(12)
-        description_indicateur: nvarchar(max)      
-        code_matiere: nvarchar(32)
-        no_competence: nvarchar(32)
-
-  - name: common_indicateurs_pevr
-    description: Mapping des indicateurs communs avec leur description.   
-    columns:
-      - name: id_indicateur
-        description: Identifiant de l'indicateur
-        tests:
-          - not_null
-          - unique    
-      - name: description_indicateur
-        description: Description de l'indicateur
-        tests:
-          - not_null
-          - unique            
-    config:
-      tags: 
-        - pevr
-      schema: pevr_seeds
-      column_types:
-        id_indicateur: nvarchar(12)
+        id_indicateur_cdpvd: nvarchar(max)
+        id_indicateur_css: nvarchar(max)
         description_indicateur: nvarchar(max)
-  
-  - name: custom_indicateurs_pevr
+        cible: float
+        code_matiere: nvarchar(max)
+        no_competence: nvarchar(max)
+
+  - name: custom_indicateurs_pevr_cdpvd
     description: mapping optionnel des indicateurs personalisés des css.
     columns:
-      - name: id_indicateur
-        description: Identifiant de l'indicateur
+      - name: id_indicateur_cdpvd
+        description: Identifiant de l'indicateur de la cdpvd 
         tests:
           - not_null
-          - unique    
+      - name: id_indicateur_css
+        description: Mapping optionnel des indicateurs personalisés des css.
+        tests:
+          - unique
       - name: description_indicateur
         description: Description de l'indicateur
         tests:
           - not_null
-          - unique             
+          - unique
+      - name: cible
+        description: Pourcentage ciblé par la CSS.
+      - name: Code_matière
+        description: Code matière optionnel. Ex -> 132508
+      - name: no_competence
+        description: Le numéro de compétence du code matière.
     config:
-      tags: 
+      tags:
         - pevr
-      schema: pevr_seeds
+      schema: dashboard_pevr_seeds
       column_types:
-        id_indicateur: nvarchar(12)
-        description_indicateur: nvarchar(max)      
+        id_indicateur_css: nvarchar(max)
+        id_indicateur_cdpvd: nvarchar(max)
+        description_indicateur: nvarchar(max)
+        cible: float
+        code_matiere: nvarchar(max)
+        no_competence: nvarchar(max)
+
+  - name: indicateur_pevr_charl
+    description: mapping obligatoire des données tirées de charlemagne.
+    columns:
+      - name: id_indicateur_cdpvd
+        description: L'identification unique du PEVR
+        tests:
+          - not_null
+      - name: annee_scolaire
+        description: L'année scolaire
+        tests:
+          - not_null
+      - name: periode
+        description: Correspond à la période en année de la donnée (sur x année)
+        tests:
+          - not_null
+      - name: taux
+        description: Le pourcentage lié à l'indicateur et l'année scolaire
+        tests:
+          - not_null
+    config:
+      tags:
+        - pevr
+      schema: dashboard_pevr_seeds
+      column_types:
+        id_indicateur: nvarchar(max)
+        annee_scolaire: nvarchar(max)
+        periode: nvarchar(max)
+        taux: decimal(5,3)
