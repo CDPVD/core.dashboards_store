@@ -21,6 +21,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with
     src as (
         select
+            case
+                when ind.id_indicateur_css is null
+                then ind.id_indicateur_cdpvd  -- Permet d'utiliser l'indicateur défaut de la CDPVD
+                else ind.id_indicateur_css
+            end as id_indicateur,
+            ind.description_indicateur,
+            ind.cible,
             res.annee,
             sch.annee_scolaire,
             res.fiche,
@@ -42,8 +49,8 @@ with
                 when y_stud.class is null then '-' else y_stud.class
             end as classification,
             case when y_stud.dist is null then '-' else y_stud.dist end as distribution,
-            mat.code_matiere,
-            mat.no_competence,
+            ind.code_matiere,
+            ind.no_competence,
             etape,
             cast(is_maitrise as decimal(2, 1)) is_maitrise
         from {{ ref("fact_resultat_etape_competence") }} as res
@@ -54,18 +61,22 @@ with
         inner join {{ ref("dim_mapper_schools") }} as sch on res.id_eco = sch.id_eco
         inner join {{ ref("dim_eleve") }} as el on res.fiche = el.fiche
         inner join
-            {{ ref("pevr_dim_indicateurs_matiere") }} as mat
-            on res.code_matiere = mat.code_matiere
-            and res.no_comp = mat.no_competence
+            {{ ref("pevr_dim_indicateurs") }} as ind
+            on res.code_matiere = ind.code_matiere
+            and res.no_comp = ind.no_competence
         where
             res.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
             and etape = 'EX'
+            and id_indicateur_cdpvd in ('4')  -- Au cas-où qu'on utilise le champs code_matière pour d'autre indicateur
     ),
 
     agg as (
         select
+            id_indicateur,
+            description_indicateur,
+            cible,
             annee_scolaire,
             school_friendly_name,
             genre,
@@ -75,11 +86,15 @@ with
             distribution,
             code_matiere,
             count(fiche) nb_resultat,
-            avg(is_maitrise) taux_maitrise
+            cast(avg(is_maitrise) as decimal(5, 3)) as taux_maitrise,
+            cast(((avg(is_maitrise)) - cible) as decimal(5, 3)) as ecart_cible
         from src
         group by
+            id_indicateur,
+            description_indicateur,
             annee_scolaire,
-            code_matiere, cube (
+            code_matiere,
+            cible, cube (
                 school_friendly_name,
                 genre,
                 plan_interv_ehdaa,
@@ -91,21 +106,20 @@ with
 
     _coalesce as (
         select
-            ind.id_indicateur,
-            ind.description_indicateur,
-            agg.annee_scolaire,
-            coalesce(agg.school_friendly_name, 'CSS') as ecole,
-            coalesce(agg.genre, 'Tout') as genre,
-            coalesce(agg.plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
-            coalesce(agg.population, 'Tout') as population,
-            coalesce(agg.classification, 'Tout') as classification,
-            coalesce(agg.distribution, 'Tout') as distribution,
+            id_indicateur,
+            description_indicateur,
+            annee_scolaire,
+            coalesce(school_friendly_name, 'CSS') as ecole,
+            coalesce(genre, 'Tout') as genre,
+            coalesce(plan_interv_ehdaa, 'Tout') as plan_interv_ehdaa,
+            coalesce(population, 'Tout') as population,
+            coalesce(classification, 'Tout') as classification,
+            coalesce(distribution, 'Tout') as distribution,
             nb_resultat,
-            taux_maitrise
+            taux_maitrise,
+            ecart_cible,
+            cible
         from agg
-        inner join
-            {{ ref("pevr_dim_indicateurs_matiere") }} as ind
-            on agg.code_matiere = ind.code_matiere
     )
 
 select
@@ -113,7 +127,9 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_maitrise,
+    taux_maitrise,  -- Possibilité d'avoir un null à cause du res_etape_num peut être nulle. A voir.
+    ecart_cible,  -- Même affaire.
+    cible,
     {{
         dbt_utils.generate_surrogate_key(
             [
