@@ -19,68 +19,49 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with perimetre as (
     select
         Fiche,
-        Annee
+        MIN(Annee) as Annee_Sec_1
     from {{ ref("fact_yearly_student") }}
     where ordre_ens = 4 and niveau_scolaire = 'Sec 1' and is_doubleur = 0
 	and Annee between {{ store.get_current_year() }} - 7 and {{ store.get_current_year() }}
+	GROUP BY fiche
+),
+
+_parcours as (
+	Select
+		perimetre.Fiche,
+		Annee_Sec_1,
+		MAX(fact.annee) as Annee_Courant
+	FROM perimetre
+	INNER JOIN {{ ref("fact_yearly_student") }} as fact ON perimetre.fiche = fact.fiche
+	GROUP BY perimetre.fiche, Annee_Sec_1
 ),
 
 _cohorte as (
 	Select
 		Fiche,
-		Annee,
+		Annee_Sec_1,
+		Annee_Courant,
 		CASE
-			WHEN Annee = Annee THEN CONCAT(Annee, '-' ,Annee + 1)
-			ELSE Convert(varchar, Annee)
+			WHEN Annee_Sec_1 = Annee_Sec_1 THEN CONCAT(Annee_Sec_1, '-' ,Annee_Sec_1 + 1)
+			ELSE Convert(varchar, Annee_Sec_1)
 		END AS Cohorte
-	FROM perimetre
-),
-
-Freq_Anterieurs as (
-	Select
-		_cohorte.Fiche,
-		_cohorte.cohorte,
-		freq.Annee,
-		ROW_NUMBER() OVER (PARTITION BY freq.fiche, freq.annee ORDER BY freq.date_deb desc) AS seqid
-	from _cohorte
-	LEFT JOIN {{ ref("i_e_freq") }} AS freq ON _cohorte.Fiche = freq.Fiche
-	where freq.client >=2
-),
-
-nb_freq as (
-	SELECT
-        Fiche,
-        Cohorte,
-        Annee,
-        COUNT(*) OVER (PARTITION BY Fiche ORDER BY Annee) AS NbAnFreq
-    FROM
-        Freq_Anterieurs
-	where seqid = 1
+	from _parcours
 ),
 
 --Nombre de fréquentation depuis la 1er cohorte selon l'année
 Frequentation as (
 	Select
-		Max(NbAnFreq) as freq,
-		MAX(Annee) as annee,
 		Fiche,
-		Cohorte
-	from nb_freq
+		Cohorte,
+		Annee_Sec_1,
+		Annee_Courant,
+		SUM(Annee_Courant - Annee_Sec_1 + 1) as Freq --Inclus l'année de départ (+1)
+	from _cohorte
 	group by
 		Fiche,
 		Cohorte,
-		NbAnFreq
-),
-
--- Regroupement par corhote.
-Regroupement as (
-	Select
-        Fiche,
-        Cohorte,
-        MAX(Annee) as annee,
-        MAX(freq) as freq
-    From Frequentation
-	Group by fiche, Cohorte
+		Annee_Sec_1,
+		Annee_Courant
 )
 
-select * from Regroupement
+select * from Frequentation where Freq = 5
