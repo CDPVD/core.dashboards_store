@@ -60,7 +60,7 @@ with
             ) as seq
         where
             case
-                when month(date_fin) between 9 and 12
+                when month(date_fin) between {{ var("mois_reference") }} and 12
                 then year(date_fin)
                 else year(date_fin) - 1
             end

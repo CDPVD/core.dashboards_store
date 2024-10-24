@@ -22,7 +22,11 @@ with
     observed as (
         select
             src.job_group_category,
-            convert(date, concat(src.school_year, '-09-30'), 102) as school_year,
+            convert(
+                date,
+                concat(src.school_year, '-', {{ var("mois_reference") }}, '-01'),
+                102
+            ) as school_year,
             count(*) as observed_retiring_employes,
             null as forecast_retiring_employees,
             null as running_n_retiring_employees,
@@ -31,7 +35,7 @@ with
             (
                 select
                     case
-                        when month(src.retirement_date) < 7
+                        when month(src.retirement_date) < {{ var("mois_reference") }}
                         then year(src.retirement_date) - 1
                         else year(src.retirement_date)
                     end as school_year,

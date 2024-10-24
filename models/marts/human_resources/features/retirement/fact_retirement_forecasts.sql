@@ -47,7 +47,13 @@ with
         -- current scholar year
         cross join
             (
-                select concat({{ store.get_current_year() }}, '-09-01') as current_year
+                select
+                    concat(
+                        {{ store.get_current_year() }},
+                        '-',
+                        {{ var("mois_reference") }},
+                        '-01'
+                    ) as current_year
             ) as crt
 
     -- Group together active employes by cohorts
@@ -130,7 +136,12 @@ with
             job.job_group_category,
             convert(
                 date,
-                concat({{ store.get_current_year() }} + hrz.horizon, '-09-01'),
+                concat(
+                    {{ store.get_current_year() }} + hrz.horizon,
+                    '-',
+                    {{ var("mois_reference") }},
+                    '-01'
+                ),
                 102
             ) as school_year,
             hrz.horizon as forecast_horizon

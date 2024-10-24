@@ -658,6 +658,15 @@ models:
         +enabled: True
 ```
 
+2. Le mois de référence pour le début de l'année
+
+```yaml
+#cssXX.data.dbe/dbt_project.yml
+vars:
+    # Le mois de référence pour le début de l'année -- Indiquez en 2 caractères comme, 01, 02, 03, ..., 10, 11, 12
+    mois_reference: #indiquez le mois de votre année scolaire
+```
+
 > This dashboard requiers the specification of the `human_resources` seeds.
 ### Chronic_absenteeism
 > Display general metrics about the student's absenteeism assessed through the number of days with at least one absence for every students. | (Sciance) Hugo Juhel
