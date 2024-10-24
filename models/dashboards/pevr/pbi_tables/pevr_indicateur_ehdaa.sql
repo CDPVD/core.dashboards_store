@@ -15,13 +15,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-{{ config(alias="indicateur_fms") }}
+{{ config(alias="indicateur_ehdaa") }}
 
 with
     -- Jumelage du perimetre élèves avec la table mentions
     perimetre as (
         select
-            '1.2' as id_indicateur,
+            '3' as id_indicateur,
             sch.annee,
             sch.annee_scolaire,
             src.fiche,
@@ -30,7 +30,7 @@ with
             row_number() over (
                 partition by src.fiche, sch.annee order by mentions.date_exec_sanct desc
             ) as seqid
-        from {{ ref("stg_perimetre_eleve_frequentation_fms") }} as src
+        from {{ ref("stg_perimetre_eleve_frequentation_des") }} as src
         inner join {{ ref("dim_mapper_schools") }} as sch on src.id_eco = sch.id_eco
         left join
             {{ ref("fact_ri_mentions") }} as mentions
@@ -40,7 +40,7 @@ with
             sch.annee
             between {{ store.get_current_year() }}
             - 3 and {{ store.get_current_year() }}
-            and mentions.indice_cfms = 1.0  -- Filtre pour choisir la qualification fms
+            and mentions.indice_des = 1.0  -- dip DES
     ),
 
     -- Ajout des filtres utilisés dans le tableau de bord.
@@ -85,7 +85,7 @@ with
         inner join
             {{ ref("pevr_dim_indicateurs") }} as ind
             on perim.id_indicateur = ind.id_indicateur_cdpvd
-        where seqid = 1
+        where seqid = 1 AND plan_interv_ehdaa = 'Avec' -- Élève en EHDAA
     ),
 
     -- Début de l'aggrégration
@@ -101,7 +101,7 @@ with
             id_indicateur,
             description_indicateur,
             count(fiche) nb_resultat,
-            cast(avg(ind_obtention) as decimal(5, 3)) as taux_qualification_fms,
+            cast(avg(ind_obtention) as decimal(5, 3)) as taux_diplomation_ehdaa,
             cast(((avg(ind_obtention)) - cible) as decimal(5, 3)) as ecart_cible,
             cible
         from _filtre
@@ -132,7 +132,7 @@ with
             coalesce(classification, 'Tout') as classification,
             coalesce(distribution, 'Tout') as distribution,
             nb_resultat,
-            taux_qualification_fms,
+            taux_diplomation_ehdaa,
             ecart_cible,
             cible
         from agg_dip
@@ -143,7 +143,7 @@ select
     description_indicateur,
     annee_scolaire,
     nb_resultat,
-    taux_qualification_fms,
+    taux_diplomation_ehdaa,
     ecart_cible,
     cible,
     {{
