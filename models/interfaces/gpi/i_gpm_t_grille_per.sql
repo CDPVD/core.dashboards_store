@@ -16,21 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
 select
-    id_mat_grp,
-    id_eco,
-    mat,
-    grp,
-    leg_obj_term,
-    leg_obj_non_term,
-    eval_res_obj_final,
-    {% for i in range(1, 31) %} leg_etape_{{ "%02d" % i }}, {% endfor %}
-    {% for i in range(1, 31) %} eval_res_etape_{{ "%02d" % i }}, {% endfor %}
-    leg_som,
-    leg_obj_final,
-    cat_mat_grp,
-    interv,
-    modele_eval,
-    activ,
-    nb_ele,
-    grille
-from {{ var("database_gpi") }}.dbo.gpm_t_mat_grp
+id_eco
+,grille
+,per
+,descr_abreg
+,descr_eclair
+,hre_deb
+,hre_fin
+,duree
+from {{ var("database_gpi") }}.dbo.gpm_t_grille_per
