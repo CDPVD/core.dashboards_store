@@ -21,30 +21,33 @@ with
     joursem as (
         select
             annee,
-            matricule,
+            al.matricule,
             ref_empl,
             motif_abs,
             lieu_trav,
             reg_abs,
+            corp_empl,
             count(case when jour_sem = 1 then jour_sem end) / 7 as lundi,
             count(case when jour_sem = 2 then jour_sem end) / 7 as mardi,
             count(case when jour_sem = 3 then jour_sem end) / 7 as mercredi,
             count(case when jour_sem = 4 then jour_sem end) / 7 as jeudi,
             count(case when jour_sem = 5 then jour_sem end) / 7 as vendredi
-        from {{ ref("fact_abs_list") }}
+        from {{ ref("fact_abs_list") }} as al
         inner join
             {{ ref("i_pai_tab_cal_jour") }} as cal
             on cal.date_jour between startdate and enddate
         where cal.jour_sem not in (6, 0)  -- Exclude weekends
         group by
-            annee,
+            al.annee,
             matricule,
             ref_empl,
             motif_abs,
             lieu_trav,
             startdate,
             enddate,
-            reg_abs
+            reg_abs,
+            corp_empl
+
     ),
 
     stepone as (
@@ -56,6 +59,7 @@ with
             lieu_trav,
             startdate,
             enddate,
+            sex_friendly_name as genre,
             al.gr_paie,
             pourc_sal,
             ((count(case when cal.jour_sem not in (6, 0) then 1 end) * duree) / 7)
@@ -65,6 +69,8 @@ with
         inner join
             {{ ref("i_pai_tab_cal_jour") }} as cal
             on cal.date_jour between startdate and enddate
+
+        inner join {{ ref("dim_employees") }} as emp on al.matricule = emp.matr
         where cal.jour_sem not in (6, 0)  -- Exclude weekends
 
         group by
@@ -77,20 +83,21 @@ with
             enddate,
             al.gr_paie,
             duree,
-            pourc_sal
-
+            pourc_sal,
+            sex_friendly_name
     ),
 
     moyenne as (
         select
             annee,
             matricule,
+            genre,
             ref_empl,
             motif_abs,
             lieu_trav,
             round(avg((nbrjour)), 2) as moyenne
         from stepone
-        group by annee, matricule, ref_empl, motif_abs, lieu_trav
+        group by annee, matricule, ref_empl, motif_abs, lieu_trav, genre
     ),
 
     nbrjour as (
@@ -111,11 +118,62 @@ with
         select annee, matricule, ref_empl, lieu_trav, round(sum(nbrjour), 2) as total
         from stepone
         group by annee, matricule, ref_empl, lieu_trav, gr_paie
+    ),
+
+    age as (
+        select
+            annee,
+            matricule,
+            corp_empl,
+            ref_empl,
+            ta.categories,
+            lieu_trav,
+            motif_abs,
+            case when age <= 25 then 1 else 0 end as 'a25_moins',
+            case when age > 25 and age <= 30 then 1 else 0 end as 'a26_30',
+            case when age >= 31 and age <= 35 then 1 else 0 end as 'a31_35',
+            case when age >= 36 and age <= 40 then 1 else 0 end as 'a36_40',
+            case when age >= 41 and age <= 45 then 1 else 0 end as 'a41_45',
+            case when age >= 46 and age <= 50 then 1 else 0 end as 'a46_50',
+            case when age >= 51 and age <= 55 then 1 else 0 end as 'a51_55',
+            case when age >= 56 and age <= 60 then 1 else 0 end as 'a56_60',
+            case when age >= 61 and age <= 65 then 1 else 0 end as 'a61_65',
+            case when age >= 66 then 1 else 0 end as 'a66_plus'
+        from {{ ref("fact_abs") }} as fa
+        left join
+            {{ ref("type_absence") }} as ta  -- À modifier
+            on fa.motif_abs = ta.motif_id
+        group by
+            annee,
+            matricule,
+            ref_empl,
+            corp_empl,
+            ta.categories,
+            lieu_trav,
+            motif_abs,
+            age
+    ),
+
+    nbr as (
+        select
+            annee,
+            matricule,
+            lieu_trav,
+            count(ta.categories) as nombre_absence_cat,
+            motif_abs,
+            ta.categories
+        from stepone as sd
+        left join
+            {{ ref("type_absence") }} as ta  -- À modifier
+            on sd.motif_abs = ta.motif_id
+        group by annee, matricule, lieu_trav, ta.categories, motif_abs
     )
 
 select
     jo.annee,
     jo.matricule,
+    genre,
+    js.corp_empl,
     jo.ref_empl,
     jo.gr_paie,
     jo.motif_abs,
@@ -123,6 +181,8 @@ select
     js.reg_abs,
     total,
     nbrjour,
+    nb.categories,
+    nb.nombre_absence_cat,
     mo.moyenne,
     max(lundi) as 'lundi',
     max(mardi) as 'mardi',
@@ -131,7 +191,17 @@ select
     max(vendredi) as 'vendredi',
     round((nbrjour / (cal.jour_trav * pourc_sal)) * 100, 2) as taux,
     (cal.jour_trav * pourc_sal) / 100 as jour_trav,
-    cal.jour_trav as temp
+    cal.jour_trav as temp,
+    a25_moins,
+    a26_30,
+    a31_35,
+    a36_40,
+    a41_45,
+    a46_50,
+    a51_55,
+    a56_60,
+    a61_65,
+    a66_plus
 from nbrjour as jo
 
 inner join
@@ -154,9 +224,23 @@ inner join
     and jo.matricule = js.matricule
     and jo.ref_empl = js.ref_empl
 inner join
+    age as ag
+    on jo.annee = ag.annee
+    and jo.motif_abs = ag.motif_abs
+    and jo.lieu_trav = ag.lieu_trav
+    and jo.matricule = ag.matricule
+    and jo.ref_empl = ag.ref_empl
+inner join
+    nbr as nb
+    on jo.annee = nb.annee
+    and jo.motif_abs = nb.motif_abs
+    and jo.lieu_trav = nb.lieu_trav
+    and jo.matricule = nb.matricule
+inner join
     {{ ref("fact_abs_cal") }} as cal
     on jo.annee = cal.an_budg
     and jo.gr_paie = cal.gr_paie
+
 group by
     jo.annee,
     jo.matricule,
@@ -169,4 +253,18 @@ group by
     total,
     jour_trav,
     pourc_sal,
-    js.reg_abs
+    js.reg_abs,
+    js.corp_empl,
+    nombre_absence_cat,
+    genre,
+    nb.categories,
+    a25_moins,
+    a26_30,
+    a31_35,
+    a36_40,
+    a41_45,
+    a46_50,
+    a51_55,
+    a56_60,
+    a61_65,
+    a66_plus

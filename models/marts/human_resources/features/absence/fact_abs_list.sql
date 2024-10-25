@@ -38,6 +38,7 @@ with
             duree,
             gr_paie,
             matricule,
+            absence.corp_empl,
             motif_abs,
             lieu_trav,
             bal_jour_ouv,
@@ -65,6 +66,7 @@ with
         select
             annee,
             matricule,
+            corp_empl,
             gr_paie,
             motif_abs,
             lieu_trav,
@@ -102,6 +104,7 @@ with
         select
             annee,
             matricule,
+            corp_empl,
             gr_paie,
             motif_abs,
             lieu_trav,
@@ -124,7 +127,8 @@ with
             gr_paie,
             duree,
             pourc_sal,
-            reg_abs
+            reg_abs,
+            corp_empl
     )
 
 select *

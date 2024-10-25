@@ -31,7 +31,8 @@ select
     emp.pourc_sal,
     emp.gr_paie,
     absence.ref_empl,
-    absence.reg_abs
+    absence.reg_abs,
+    absence.corp_empl
 from {{ ref("i_pai_habs") }} as absence
 inner join
     {{ ref("i_paie_hemp") }} as emp

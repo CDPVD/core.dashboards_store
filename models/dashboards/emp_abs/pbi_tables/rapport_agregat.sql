@@ -22,13 +22,14 @@ select distinct
     matricule,
     -- ref_empl,
     -- gr_paie,
-    mo.descr,
-    ta.categories,
-    -- abs.lieu_trav AS lieu_code,
-    wk.workplace_name as lieu_nom,
+    genre,
+    corp_empl,
+    categories,
+    abs.lieu_trav,
     total,
     nbrjour,
     moyenne,
+    nombre_absence_cat as nbr_abs,
     lundi,
     mardi,
     mercredi,
@@ -36,18 +37,23 @@ select distinct
     vendredi,
     taux,
     -- jour_trav,
-    sec.secteur_id as secteur
+    sec.secteur_id as secteur,
+    a26_30,
+    a31_35,
+    a36_40,
+    a41_45,
+    a46_50,
+    a51_55,
+    a56_60,
+    a61_65,
+    a66_plus,
+    {{
+        dbt_utils.generate_surrogate_key(
+            ["annee", "abs.corp_empl", "lieu_trav", "abs.categories", "genre"]
+        )
+    }} as filter_key
 from {{ ref("emp_abs_fact_dash") }} as abs
 
 inner join {{ ref("dim_mapper_workplace") }} as wk on abs.lieu_trav = wk.workplace
-
-left join
-    {{ ref("type_absence") }} as ta  -- À modifier
-    on abs.motif_abs = ta.motif_id
-
-left join
-    {{ ref("i_pai_tab_mot_abs") }} as mo  -- À modifier
-    on abs.motif_abs = mo.mot_abs
-    and abs.reg_abs = mo.reg_abs
 
 inner join {{ ref("secteur") }} as sec on abs.lieu_trav = sec.ua_id
