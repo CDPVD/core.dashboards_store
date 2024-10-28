@@ -37,7 +37,6 @@ models:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
-            - id_filtre
 
   - name: pevr_indicateur_dip_fp
     description: >
@@ -60,7 +59,6 @@ models:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
-            - id_filtre
 
   - name: pevr_indicateur_des
     description: Listes de l'indicateur 1.1.1.1 sur le taux d'obtention du diplôme DES
@@ -136,7 +134,6 @@ models:
           combination_of_columns:
             - annee_scolaire
             - id_indicateur
-            - id_filtre
 
   - name: pevr_indicateur_obtention
     description: >
@@ -147,17 +144,13 @@ models:
       - resolution:
           combination_of_columns:
             - annee_scolaire
-            - annee_scolaire
             - id_indicateur
-            - periode
 
   - name: pevr_indicateurs_ppp
-    description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
     description: liste des indicateurs du pevr lié aux projets pédagogiques particuliers.
     tests:
       - resolution:
           combination_of_columns:
-            - annee_scolaire
             - annee_scolaire
             - id_indicateur
             - id_filtre

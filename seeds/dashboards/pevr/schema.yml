@@ -80,10 +80,6 @@ seeds:
         description: L'année scolaire
         tests:
           - not_null
-      - name: periode
-        description: Correspond à la période en année de la donnée (sur x année)
-        tests:
-          - not_null
       - name: taux
         description: Le pourcentage lié à l'indicateur et l'année scolaire
         tests:
@@ -95,5 +91,4 @@ seeds:
       column_types:
         id_indicateur: nvarchar(max)
         annee_scolaire: nvarchar(max)
-        periode: nvarchar(max)
         taux: decimal(5,3)
