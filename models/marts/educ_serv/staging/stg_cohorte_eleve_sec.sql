@@ -19,9 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with perimetre as (
     select
         Fiche,
-        MIN(Annee) as Annee_Sec_1
+        MIN(Annee) as Annee_Sec_1 -- Prend l'année minimum si 2 année de suite en secondaire 1 sans ind_doubleur à 1
     from {{ ref("fact_yearly_student") }}
-    where ordre_ens = 4 and niveau_scolaire = 'Sec 1' and is_doubleur = 0
+    where ordre_ens = 4 and niveau_scolaire = 'Sec 1' and is_doubleur = 0 -- On veut l'année la moins récente de l'élève en secondaire 1
 	and Annee between {{ store.get_current_year() }} - 7 and {{ store.get_current_year() }}
 	GROUP BY fiche
 ),
@@ -30,12 +30,13 @@ _parcours as (
 	Select
 		perimetre.Fiche,
 		Annee_Sec_1,
-		MAX(fact.annee) as Annee_Courant
+		MAX(fact.annee) as Annee_Courant -- On veut l'année la plus récente de l'élève. (Son parcours)
 	FROM perimetre
 	INNER JOIN {{ ref("fact_yearly_student") }} as fact ON perimetre.fiche = fact.fiche
 	GROUP BY perimetre.fiche, Annee_Sec_1
 ),
 
+-- Création de la cohorte par rapport à l'année du 1er secondaire.
 _cohorte as (
 	Select
 		Fiche,
@@ -55,7 +56,7 @@ Frequentation as (
 		Cohorte,
 		Annee_Sec_1,
 		Annee_Courant,
-		SUM(Annee_Courant - Annee_Sec_1 + 1) as Freq --Inclus l'année de départ (+1)
+		SUM(Annee_Courant - Annee_Sec_1 + 1) as Freq --Inclus l'année de départ (donc, +1)
 	from _cohorte
 	group by
 		Fiche,
@@ -64,4 +65,4 @@ Frequentation as (
 		Annee_Courant
 )
 
-select * from Frequentation where Freq = 5
+select * from Frequentation
