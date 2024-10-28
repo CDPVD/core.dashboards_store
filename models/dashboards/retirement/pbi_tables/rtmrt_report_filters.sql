@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 with
     one_for_all as (
         select
-            src.sexe,
+            src.genre,
             src.lieu_trav,
             src.stat_eng,
             src.etat,
@@ -39,7 +39,7 @@ with
         from
             (
                 select
-                    sexe,
+                    genre,
                     lieu_trav,
                     stat_eng,
                     etat,
@@ -49,7 +49,7 @@ with
                 from {{ ref("rtmrt_report_active_employees_age") }}
                 union all
                 select
-                    sexe,
+                    genre,
                     lieu_trav,
                     stat_eng,
                     etat,
@@ -59,7 +59,7 @@ with
                 from {{ ref("rtrmt_report_retirement_age") }}
             ) as src
         group by
-            src.sexe,
+            src.genre,
             src.lieu_trav,
             src.stat_eng,
             src.etat,
@@ -70,7 +70,7 @@ with
 
 -- Join the friendly name
 select
-    src.sexe,
+    src.genre,
     empl.etat_empl as employment_status_name,
     eng.stat_eng as engagement_status_name,
     work.workplace_name,
