@@ -3,6 +3,7 @@ version: 2
 models:
   - name: stg_populations_adultes
     config:
+      schema: "educ_serv_adultes_staging"
       tags:
         - populations_adultes
         - educ_serv_adultes
@@ -11,7 +12,35 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - CodePerm
-            - Annee
-            - Freq
+            - code_perm
+            - annee
+            - freq
             - population
+  - name: stg_ele_fga
+    config:
+      schema: "educ_serv_adultes_staging"
+      tags:
+        - populations_adultes
+        - educ_serv_adultes
+    description: >
+      Identifier les inscriptions en FGA
+    tests:
+      - resolution:
+          combination_of_columns:
+            - code_perm
+            - annee
+            - freq
+  - name: stg_ele_fp
+    config:
+      schema: "educ_serv_adultes_staging"
+      tags:
+        - populations_adultes
+        - educ_serv_adultes
+    description: >
+      Identifier les inscriptions en FP
+    tests:
+      - resolution:
+          combination_of_columns:
+            - code_perm
+            - annee
+            - freq
