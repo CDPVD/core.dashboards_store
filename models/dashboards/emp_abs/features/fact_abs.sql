@@ -30,7 +30,7 @@ select
     startdate,
     enddate,
     round(
-        datediff(day, birth_date, {{ store.get_current_year() }}) / 365.25, 0, 1
+        datediff(day, birth_date, datefromparts(left(annee, 4), 9, 1)) / 365.25, 0, 1
     ) as age
 from {{ ref("fact_abs_list") }} as al
 

@@ -38,15 +38,7 @@ select distinct
     taux,
     -- jour_trav,
     sec.secteur_id as secteur,
-    a26_30,
-    a31_35,
-    a36_40,
-    a41_45,
-    a46_50,
-    a51_55,
-    a56_60,
-    a61_65,
-    a66_plus,
+    tranche_age,
     {{
         dbt_utils.generate_surrogate_key(
             ["annee", "abs.corp_empl", "lieu_trav", "abs.categories", "genre"]

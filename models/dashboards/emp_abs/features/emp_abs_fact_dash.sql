@@ -96,8 +96,11 @@ with
             motif_abs,
             lieu_trav,
             round(avg((nbrjour)), 2) as moyenne
-        from stepone
-        group by annee, matricule, ref_empl, motif_abs, lieu_trav, genre
+        from stepone as fa
+        left join
+            {{ ref("type_absence") }} as ta  -- À modifier
+            on fa.motif_abs = ta.motif_id
+        group by annee, matricule, ref_empl, ta.categories, motif_abs, lieu_trav, genre
     ),
 
     nbrjour as (
@@ -116,8 +119,11 @@ with
 
     total as (
         select annee, matricule, ref_empl, lieu_trav, round(sum(nbrjour), 2) as total
-        from stepone
-        group by annee, matricule, ref_empl, lieu_trav, gr_paie
+        from stepone as fa
+        left join
+            {{ ref("type_absence") }} as ta  -- À modifier
+            on fa.motif_abs = ta.motif_id
+        group by annee, matricule, ta.categories, lieu_trav, ref_empl, gr_paie
     ),
 
     age as (
@@ -129,16 +135,21 @@ with
             ta.categories,
             lieu_trav,
             motif_abs,
-            case when age <= 25 then 1 else 0 end as 'a25_moins',
-            case when age > 25 and age <= 30 then 1 else 0 end as 'a26_30',
-            case when age >= 31 and age <= 35 then 1 else 0 end as 'a31_35',
-            case when age >= 36 and age <= 40 then 1 else 0 end as 'a36_40',
-            case when age >= 41 and age <= 45 then 1 else 0 end as 'a41_45',
-            case when age >= 46 and age <= 50 then 1 else 0 end as 'a46_50',
-            case when age >= 51 and age <= 55 then 1 else 0 end as 'a51_55',
-            case when age >= 56 and age <= 60 then 1 else 0 end as 'a56_60',
-            case when age >= 61 and age <= 65 then 1 else 0 end as 'a61_65',
-            case when age >= 66 then 1 else 0 end as 'a66_plus'
+            fa.age,
+            case
+                when age < 25
+                then '24 ans et moins'
+                when age >= 25 and age < 35
+                then '25 à 34 ans'
+                when age >= 35 and age < 45
+                then '35 à 44 ans'
+                when age >= 45 and age < 55
+                then '45 à 54 ans'
+                when age >= 55 and age < 65
+                then '55 à 64 ans'
+                when age >= 65
+                then '65 ans et plus'
+            end as 'tranche_age'
         from {{ ref("fact_abs") }} as fa
         left join
             {{ ref("type_absence") }} as ta  -- À modifier
@@ -151,7 +162,7 @@ with
             ta.categories,
             lieu_trav,
             motif_abs,
-            age
+            fa.age
     ),
 
     nbr as (
@@ -192,16 +203,8 @@ select
     round((nbrjour / (cal.jour_trav * pourc_sal)) * 100, 2) as taux,
     (cal.jour_trav * pourc_sal) / 100 as jour_trav,
     cal.jour_trav as temp,
-    a25_moins,
-    a26_30,
-    a31_35,
-    a36_40,
-    a41_45,
-    a46_50,
-    a51_55,
-    a56_60,
-    a61_65,
-    a66_plus
+    tranche_age,
+    ag.age
 from nbrjour as jo
 
 inner join
@@ -258,13 +261,5 @@ group by
     nombre_absence_cat,
     genre,
     nb.categories,
-    a25_moins,
-    a26_30,
-    a31_35,
-    a36_40,
-    a41_45,
-    a46_50,
-    a51_55,
-    a56_60,
-    a61_65,
-    a66_plus
+    tranche_age,
+    ag.age
