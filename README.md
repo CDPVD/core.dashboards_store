@@ -1,3 +1,23 @@
+---
+
+# ⚠️ Avis de fermeture et de migration du répertoire
+
+Ce répertoire est désormais **fermé** et **ne sera plus maintenu** ici. Nous avons décidé de migrer ce projet vers un nouveau répertoire afin de mieux répondre à nos besoins actuels et d'assurer une meilleure organisation du code et des contributions futures.
+
+### Nouvelle destination
+Vous pouvez retrouver ce projet à sa nouvelle adresse : [lien vers le nouveau répertoire](https://github.com/CDPVD/cdpvd_dashboards_store).
+
+### Pourquoi ce changement ?
+Cette migration permettra d'améliorer la gestion du code source et de centraliser les mises à jour et les fonctionnalités à venir. Nous vous encourageons à suivre le nouveau répertoire pour rester informé des développements récents et y soumettre vos contributions.
+
+### Notes importantes
+- **Ce répertoire ne sera plus mis à jour** : Toutes les futures versions et correctifs seront publiés exclusivement sur le nouveau répertoire.
+- **Issues et Pull Requests** : Nous ne traiterons plus les *issues* et *pull requests* sur ce répertoire. Veuillez utiliser le nouveau répertoire pour toute soumission.
+- **Installaton du nouveau répetoire** : Veuillez vous référez à la documentation (Readme.md) du nouveau répertoire.
+
+Merci pour votre compréhension et votre soutien continu !
+
+---
 
 # Core.store
 > Helping students, one dashboard at a time.
