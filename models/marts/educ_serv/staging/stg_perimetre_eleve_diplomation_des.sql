@@ -15,22 +15,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #}
-select
-    id_mat_grp,
-    id_eco,
-    mat,
-    grp,
-    leg_obj_term,
-    leg_obj_non_term,
-    eval_res_obj_final,
-    {% for i in range(1, 31) %} leg_etape_{{ "%02d" % i }}, {% endfor %}
-    {% for i in range(1, 31) %} eval_res_etape_{{ "%02d" % i }}, {% endfor %}
-    leg_som,
-    leg_obj_final,
-    cat_mat_grp,
-    interv,
-    modele_eval,
-    activ,
-    nb_ele,
-    grille
-from {{ var("database_gpi") }}.dbo.gpm_t_mat_grp
+with
+    src as (
+        select y_stud.fiche, y_stud.id_eco
+        from {{ ref("fact_yearly_student") }} as y_stud
+        where
+            y_stud.ordre_ens = '4'  -- Secondaire
+            and y_stud.niveau_scolaire = 'Sec 5'  -- L'élève est en sec 5
+            and y_stud.annee < {{ get_current_year() }} + 1  -- Enlève l'année prévisionnelle de GPI
+    )
+
+select *
+from src

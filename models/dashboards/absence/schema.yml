@@ -1,0 +1,6 @@
+version: 2
+
+models:
+  - name: abs_dim_grille
+    description: >
+      La table regroupant les grilles d'horaires 
