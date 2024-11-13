@@ -8,7 +8,7 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - sexe
+            - genre
             - school_year
             - etat
             - job_group_category
@@ -23,7 +23,7 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - sexe
+            - genre
             - etat
             - job_group_category
             - lieu_trav
@@ -42,7 +42,7 @@ models:
     tests:
       - resolution:
           combination_of_columns:
-            - sexe
+            - genre
             - employment_status_name
             - engagement_status_name
             - workplace_name

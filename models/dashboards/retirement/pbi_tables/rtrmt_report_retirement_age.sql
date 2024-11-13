@@ -27,12 +27,12 @@ with
     source as (
         select
             case
-                when month(src.retirement_date) < 7
+                when month(src.retirement_date) < {{ var("mois_reference") }}
                 then year(src.retirement_date) - 1
                 else year(src.retirement_date)
             end as school_year,
             src.matr as matricule,
-            dos.sexe,
+            dos.sexe as genre,
             coalesce(job.job_group_category, 'Inconnu') as job_group_category,
             coalesce(src.lieu_trav, 'Inconnu') as lieu_trav,
             coalesce(src.stat_eng, 'Inconnu') as stat_eng,
@@ -47,7 +47,7 @@ with
     ),
     aggregated as (
         select
-            sexe,
+            genre,
             etat,
             school_year,
             job_group_category,
@@ -58,7 +58,7 @@ with
         from source
         where school_year >= {{ store.get_current_year() }} - 10
         group by
-            sexe,
+            genre,
             etat,
             school_year,
             job_group_category,
@@ -69,12 +69,14 @@ with
 
 -- Flag the current year
 select
-    sexe,
+    genre,
     etat,
     job_group_category,
     lieu_trav,
     stat_eng,
-    convert(date, concat(school_year, '-09-30'), 102) as school_year,
+    convert(
+        date, concat(school_year, '-', {{ var("mois_reference") }}, '-01'), 102
+    ) as school_year,
     case
         when {{ store.get_current_year() }} = school_year then 1 else 0
     end as is_current_year,
@@ -82,7 +84,7 @@ select
     n_retirees,
     {{
         dbt_utils.generate_surrogate_key(
-            ["sexe", "job_group_category", "lieu_trav", "stat_eng", "etat"]
+            ["genre", "job_group_category", "lieu_trav", "stat_eng", "etat"]
         )
     }} as filter_key
 from aggregated
